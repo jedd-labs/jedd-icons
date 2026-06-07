@@ -1,0 +1,63 @@
+---
+title: Options
+description: Every option accepted by the vanilla helpers.
+icon: SlidersHorizontal
+---
+
+The vanilla package exposes the shared styling model as `createElement`
+options, plus a couple specific to imperative rendering and the `createIcons`
+helper.
+
+## createElement options
+
+<TypeTable
+  type={{
+    size: { type: "number | string", default: "24", description: "Sets both width and height." },
+    color: { type: "string", default: '"currentColor"', description: "stroke (stroke variant) or fill (fill variant)." },
+    strokeWidth: { type: "number | string", default: "2", description: "Stroke width (stroke variant only)." },
+    absoluteStrokeWidth: { type: "boolean", default: "false", description: "Keep a constant visual stroke width at any size." },
+    variant: { type: '"stroke" | "fill"', default: '"stroke"', description: "Which presentation defaults to apply." },
+    class: { type: "string", description: "Added alongside the jedd / jedd-<name> classes." },
+    attrs: { type: "Record<string, string | number>", description: "Extra attributes set on the root <svg>." },
+  }}
+/>
+
+## createIcons options
+
+<TypeTable
+  type={{
+    icons: { type: "Record<string, IconNode>", default: "{}", description: "Map of icon names to icon data. The name must match the data-jedd value." },
+    attrs: { type: "CreateElementOptions", default: "{}", description: "Default options applied to every replaced icon." },
+    nameAttr: { type: "string", default: '"data-jedd"', description: "The attribute used to find placeholders." },
+    watch: { type: "boolean", default: "false", description: "Keep replacing icons as new placeholders are added to the DOM." },
+  }}
+/>
+
+import { getMDXComponents } from "@/components/mdx";
+import StylingModel from "../../_shared/styling-model.mdx";
+
+<StylingModel components={getMDXComponents()} />
+
+## Variant selection
+
+In vanilla you select the variant with the `variant` option on `createElement`
+(or via `attrs.variant` in `createIcons`) — `"stroke"` (default) or `"fill"`.
+Import filled icon data from the `@jedd-icons/core/fill` subpath.
+
+## Exported helpers and types
+
+```ts
+import {
+  createElement,
+  createIcons,
+  defaultAttributes,
+  variantDefaults,
+  resolveStrokeWidth,
+} from "@jedd-icons/core";
+import type {
+  IconNode,
+  Variant,
+  CreateElementOptions,
+  CreateIconsOptions,
+} from "@jedd-icons/core";
+```

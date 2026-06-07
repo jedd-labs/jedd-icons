@@ -1,0 +1,31 @@
+---
+title: Installation
+description: Add @jedd-icons/core to your project.
+icon: Download
+---
+
+Install the core package from npm.
+
+```npm
+npm i @jedd-icons/core
+```
+
+`@jedd-icons/core` has **no runtime dependencies** and works anywhere there is
+a DOM.
+
+## Requirements
+
+- **TypeScript** — types ship with the package; no `@types/*` install required.
+- **Bundler** — any ESM-aware bundler (Vite, webpack, Rollup, esbuild, …). A
+  CommonJS (`require`) entry point is also provided.
+
+## Verify the install
+
+```js
+import { ArrowDownLeft, createElement } from "@jedd-icons/core";
+
+const svg = createElement(ArrowDownLeft, { size: 32 });
+document.body.appendChild(svg);
+```
+
+If the icon renders, you're set — head to [Usage](/docs/vanilla/usage).

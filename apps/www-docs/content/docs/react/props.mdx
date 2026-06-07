@@ -1,0 +1,48 @@
+---
+title: Props
+description: Every prop accepted by Jedd Icons React components.
+icon: SlidersHorizontal
+---
+
+Every icon component accepts the props below **plus all standard SVG
+attributes** (`className`, `onClick`, `style`, `aria-*`, `focusable`, …).
+
+<TypeTable
+  type={{
+    size: { type: "number | string", default: "24", description: "Sets both width and height." },
+    color: { type: "string", default: '"currentColor"', description: "stroke (stroke variant) or fill (fill variant)." },
+    strokeWidth: { type: "number | string", default: "2", description: "Stroke width. Ignored by the fill variant." },
+    absoluteStrokeWidth: { type: "boolean", default: "false", description: "Keep a constant visual stroke width regardless of size." },
+  }}
+/>
+
+### Defaults at a glance
+
+| Prop | Default | Notes |
+| --- | --- | --- |
+| `size` | `24` | px when numeric |
+| `color` | `currentColor` | inherits text color |
+| `strokeWidth` | `2` | stroke variant only |
+| `absoluteStrokeWidth` | `false` | see below |
+
+import { getMDXComponents } from "@/components/mdx";
+import StylingModel from "../../_shared/styling-model.mdx";
+
+<StylingModel components={getMDXComponents()} />
+
+## Variant selection
+
+In React the variant is fixed by which entry point you import from —
+`@jedd-icons/react` for stroke, `@jedd-icons/react/fill` for fill. There is no
+`variant` prop on the component.
+
+## Exported types
+
+```ts
+import type { IconProps, JeddIcon, IconNode, Variant } from "@jedd-icons/react";
+```
+
+- **`IconProps`** — the props every icon accepts (extends `SVGProps`).
+- **`JeddIcon`** — the type of an icon component (`ForwardRefExoticComponent`).
+- **`IconNode`** — the raw icon geometry tuple.
+- **`Variant`** — `"stroke" | "fill"`.
