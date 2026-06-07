@@ -33,6 +33,9 @@ catalogs:
     '@fontsource-variable/sora':
       specifier: ^5.2.8
       version: 5.2.8
+    '@fontsource-variable/source-serif-4':
+      specifier: ^5.2.9
+      version: 5.2.9
     '@fontsource/iosevka':
       specifier: ^5.2.5
       version: 5.2.5
@@ -332,6 +335,9 @@ importers:
       '@fontsource-variable/sora':
         specifier: 'catalog:'
         version: 5.2.8
+      '@fontsource-variable/source-serif-4':
+        specifier: 'catalog:'
+        version: 5.2.9
       '@fontsource/iosevka':
         specifier: 'catalog:'
         version: 5.2.5
@@ -1283,6 +1289,9 @@ packages:
 
   '@fontsource-variable/sora@5.2.8':
     resolution: {integrity: sha512-sP+ILTfi5r3cqmMBntI4ooQNxFI+LyHyD5hcPbWwwL4uh4kKFAkOz0w2veCXjz18fKRdva6OG0dY+5yQ02f30w==}
+
+  '@fontsource-variable/source-serif-4@5.2.9':
+    resolution: {integrity: sha512-PPcxjLFk/fS0WHg79pDM2YNvz61kC+oYZ5cWZZyCS0DHpJncmuYOuiZAsvj4tDxlWPBEvxxcRLQQNmSaRbPkqw==}
 
   '@fontsource/iosevka@5.2.5':
     resolution: {integrity: sha512-Zv/UHJodDug1LcnWv2u2+GPp3oWP3U6Xp16cJOsqqZQNsCu8sA/ttT331N0NypxBZ+7c8szlSRlYDcy9liZ8pw==}
@@ -6685,6 +6694,8 @@ snapshots:
   '@fontsource-variable/mona-sans@5.2.8': {}
 
   '@fontsource-variable/sora@5.2.8': {}
+
+  '@fontsource-variable/source-serif-4@5.2.9': {}
 
   '@fontsource/iosevka@5.2.5': {}
 

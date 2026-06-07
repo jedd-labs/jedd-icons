@@ -226,7 +226,7 @@ function IconsPage() {
             }}
           />
           <div className="relative">
-            <h1 className="mt-8 font-semibold text-3xl tracking-normale sm:text-4xl">
+            <h1 className="mt-8 font-heading text-3xl sm:text-4xl">
               Sharp, squared icons <br /> for modern interfaces.
             </h1>
             <p className="mt-3 text-base text-muted-foreground">

@@ -76,3 +76,4 @@ catalog:
 
   # Turbo gen
   "@turbo/gen": ^2.8.1
+  '@fontsource-variable/source-serif-4': ^5.2.9
