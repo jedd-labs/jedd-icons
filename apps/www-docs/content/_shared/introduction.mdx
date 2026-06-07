@@ -1,0 +1,46 @@
+**Jedd Icons** is a set of SVG icons distributed as tree-shakeable React
+components and vanilla JavaScript modules. Every icon is drawn on a `24×24`
+grid and ships in two variants — **stroke** and **fill** — with consumer-side
+control over size, color, and stroke width.
+
+## Packages
+
+There are two packages, one per environment. Pick the one that matches your
+stack.
+
+<Cards>
+  <Card
+    title="@jedd-icons/react"
+    description="React components — each icon is a forwardRef SVG component with size, color, and strokeWidth props."
+    href="/docs/react"
+  />
+  <Card
+    title="@jedd-icons/core"
+    description="Vanilla JS — build SVG elements imperatively or auto-replace data-jedd placeholders in the DOM."
+    href="/docs/vanilla"
+  />
+</Cards>
+
+## Why Jedd Icons
+
+- **Two variants** — every icon comes in `stroke` and `fill`. Import the
+  default for stroke, or the `/fill` subpath for filled glyphs.
+- **Tree-shakeable** — packages are published unbundled (one module per icon),
+  so your bundle only includes the icons you import.
+- **Consistent rendering** — icons inherit presentation attributes
+  (`stroke`, `fill`, `stroke-width`) from the root `<svg>`, so `color`,
+  `size`, and `strokeWidth` props work uniformly across the whole set.
+- **Dual ESM / CJS** — both packages ship `import` and `require` entry points
+  with full TypeScript types.
+
+## The design system
+
+Icons are authored to a strict spec so they render predictably:
+
+- A `24×24` viewBox with ~1px of padding on each side (room for the stroke).
+- **Stroke-only** geometry — no `fill` on child elements. Presentation lives on
+  the root `<svg>` and is inherited.
+- Flat geometry — no `<g>` groups, `<defs>`, or `<mask>`.
+
+This is what lets a single `strokeWidth` or `color` prop restyle any icon
+without touching its paths.

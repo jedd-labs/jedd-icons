@@ -1,0 +1,86 @@
+---
+title: Usage
+description: Render Jedd Icons without a framework.
+icon: Code
+---
+
+The `@jedd-icons/core` package exports each icon as plain icon data plus two
+helpers — `createElement` for building SVG nodes imperatively, and `createIcons`
+for replacing placeholder elements in the DOM.
+
+## createElement
+
+`createElement(iconNode, options)` returns a live `SVGSVGElement` you can insert
+anywhere:
+
+```js
+import { ArrowDownLeft, createElement } from "@jedd-icons/core";
+
+const svg = createElement(ArrowDownLeft, {
+  size: 32,
+  color: "#0f172a",
+  strokeWidth: 1.5,
+});
+
+document.getElementById("app").appendChild(svg);
+```
+
+Icons are exported as **PascalCase** data objects (`arrow-down-left` →
+`ArrowDownLeft`), not as functions — you pass the data to `createElement`. See
+the [options reference](/docs/vanilla/props) for every field.
+
+## The fill variant
+
+Filled icons live on the `/fill` subpath. Pass `variant: "fill"` so the helper
+applies the fill presentation defaults:
+
+```js
+import { createElement } from "@jedd-icons/core";
+import { CircleCheck } from "@jedd-icons/core/fill";
+
+const svg = createElement(CircleCheck, { size: 32, variant: "fill" });
+```
+
+For the fill variant, `color` sets the `fill` attribute and `strokeWidth` is
+ignored.
+
+## createIcons (auto-replace)
+
+`createIcons` scans the DOM for placeholder elements and swaps them for rendered
+SVGs. Mark up your HTML with a `data-jedd` attribute naming the icon:
+
+```html
+<i data-jedd="ArrowDownLeft"></i>
+<i data-jedd="Check" data-jedd-size="40" data-jedd-color="tomato"></i>
+```
+
+Then register the icons you use and call `createIcons`:
+
+```js
+import { ArrowDownLeft, Check, createIcons } from "@jedd-icons/core";
+
+createIcons({
+  icons: { ArrowDownLeft, Check },
+  attrs: { size: 32 }, // defaults for every replaced icon
+});
+```
+
+Per-element `data-jedd-size`, `data-jedd-color`, and `data-jedd-stroke-width`
+attributes override the shared `attrs` defaults.
+
+### Watching for new icons
+
+Set `watch: true` to install a `MutationObserver` that replaces placeholders
+added after the initial call — useful for dynamically rendered content:
+
+```js
+createIcons({
+  icons: { ArrowDownLeft, Check },
+  watch: true,
+});
+```
+
+<Callout type="warn">
+  Unknown icon names are skipped with a `console.warn` — make sure every name
+  referenced by `data-jedd` is present in the `icons` map.
+</Callout>

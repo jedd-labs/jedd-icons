@@ -1,0 +1,128 @@
+Jedd Icons is built from source-of-truth SVGs in the repo. Adding an icon is
+three steps: drop the SVG, add metadata, run the build.
+
+<Steps>
+
+<Step>
+
+### Drop the SVG
+
+Save your file at `icons/<variant>/<name>.svg` using **kebab-case**, where
+`<variant>` is `stroke` or `fill`. Icons must fit inside a `24×24` viewBox and
+use **strokes only** (no fills on child elements). The canonical root attributes
+are:
+
+```xml
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+     fill="none" stroke="currentColor" stroke-width="2"
+     stroke-linecap="butt" stroke-linejoin="miter">
+  <!-- geometry only: <path>, <circle>, <rect>, <line>, <polygon>, <polyline> -->
+</svg>
+```
+
+Child elements should contain **geometry attributes only** (`d`, `cx`, `r`,
+`points`, …) — not presentation attributes like `stroke` or `fill`. Those are
+set on the root `<svg>` and inherited at render time so the `color` and
+`strokeWidth` props work.
+
+<Callout type="info">
+  If your SVGs have inline presentation attributes on child elements (common
+  with design-tool exports), `pnpm clean-svgs` strips them automatically and
+  normalizes the root attributes.
+</Callout>
+
+**Design rules**
+
+- Stay inside the `24×24` viewBox with ~1px padding on each side.
+- Stroke-only — no `fill` on child elements.
+- Keep geometry flat: no `<g>` groups, `<defs>`, or `<mask>`. The parser is
+  intentionally simple.
+
+</Step>
+
+<Step>
+
+### Add metadata
+
+Create `icons/<variant>/<name>.json` next to the SVG:
+
+```json
+{
+  "$schema": "../../icon.schema.json",
+  "tags": ["search-keyword-1", "search-keyword-2"],
+  "categories": ["shapes"]
+}
+```
+
+The full set of fields lives in `icon.schema.json` at the repo root. Useful
+optional fields:
+
+```json
+{
+  "aliases": [{ "name": "older-name" }],
+  "contributors": ["yourname"],
+  "deprecated": true,
+  "deprecationReason": "Use new-name instead"
+}
+```
+
+`categories` is an enum — valid values are listed in `icon.schema.json`.
+
+</Step>
+
+<Step>
+
+### Build everything
+
+```bash
+pnpm icons
+```
+
+This single command runs the full pipeline:
+
+1. **`clean-svgs`** — normalizes root `<svg>` attributes and strips inline
+   presentation attributes from child elements.
+2. **`build`** — builds `@jedd-icons/shared`, generates the per-icon TS files,
+   then builds `@jedd-icons/core` and `@jedd-icons/react`.
+
+</Step>
+
+</Steps>
+
+## Verify in the gallery
+
+```bash
+pnpm --filter www-docs dev
+```
+
+Open the gallery, search for your icon by name, and use the sliders to confirm
+the `size` / `strokeWidth` / `color` / `absoluteStrokeWidth` props behave.
+
+## Individual commands
+
+| Command | What it does |
+| --- | --- |
+| `pnpm icons` | Full pipeline: clean SVGs + build all packages |
+| `pnpm clean-svgs` | Normalize source SVGs (strip inline attrs, set root defaults) |
+| `pnpm build` | Build all packages via Turbo |
+| `pnpm --filter @jedd-icons/react gen` | Regenerate icon TS files only |
+| `pnpm --filter @jedd-icons/react build` | Build the React package |
+| `pnpm --filter @jedd-icons/react dev` | Watch & rebuild on changes |
+| `pnpm --filter www-docs dev` | Run the gallery / docs site |
+
+## Changesets
+
+If your change touches a **published** package (`@jedd-icons/react` or
+`@jedd-icons/core`), add a changeset so it lands in the changelog:
+
+```bash
+pnpm changeset
+```
+
+Pick the package(s), choose a bump level, and write a one-line summary — that
+summary becomes the public changelog line. Docs-only, chore, and
+internal-package changes don't need one.
+
+While the project is on `0.x`, breaking changes ride on a **minor** bump:
+`patch` for fixes and new icons, `minor` for features or breaking changes,
+`major` reserved for `1.0.0`.

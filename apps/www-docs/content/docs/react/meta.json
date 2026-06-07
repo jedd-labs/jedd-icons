@@ -1,0 +1,14 @@
+{
+  "title": "React",
+  "description": "@jedd-icons/react",
+  "icon": "react",
+  "root": true,
+  "pages": [
+    "index",
+    "installation",
+    "usage",
+    "props",
+    "---Contributing---",
+    "adding-icons"
+  ]
+}
