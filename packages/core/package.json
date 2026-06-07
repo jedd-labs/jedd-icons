@@ -40,8 +40,8 @@
   ],
   "scripts": {
     "gen": "tsx ../../tools/build-icons/build.ts --target vanilla",
-    "build": "pnpm gen && tsdown",
-    "dev": "pnpm gen && tsdown --watch",
+    "build": "pnpm gen && tsdown --config-loader tsx",
+    "dev": "pnpm gen && tsdown --config-loader tsx --watch",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
