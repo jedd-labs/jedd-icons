@@ -2,6 +2,28 @@
   "name": "@jedd-icons/react",
   "version": "0.0.1",
   "description": "Jedd icons for React.",
+  "license": "MIT",
+  "author": "Marcello Novelli",
+  "homepage": "https://jeddicons.com/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jedd-labs/jedd-icons.git",
+    "directory": "packages/react"
+  },
+  "bugs": {
+    "url": "https://github.com/jedd-labs/jedd-icons/issues"
+  },
+  "keywords": [
+    "jedd",
+    "jedd-icons",
+    "icons",
+    "icon",
+    "svg",
+    "react",
+    "react-icons",
+    "components",
+    "ui"
+  ],
   "type": "module",
   "sideEffects": false,
   "publishConfig": {
