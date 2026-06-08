@@ -1,0 +1,35 @@
+# Lefthook git hooks — https://lefthook.dev
+# Hooks are installed automatically on `pnpm install` via the root `prepare` script.
+# Bypass in emergencies: `git commit --no-verify`, `LEFTHOOK=0 git push`.
+
+# Auto-install dependencies after a pull/merge — only when the lockfile changed,
+# so it doesn't run on every merge. `|| true` keeps the pull from ever failing here.
+post-merge:
+  commands:
+    pnpm-install:
+      run: git diff-tree -r --name-only HEAD@{1} HEAD | grep -q '^pnpm-lock.yaml$' && pnpm install || true
+
+# Auto-install on branch switch — guarded to branch checkouts (not file checkouts)
+# and gated on the lockfile actually changing between the two refs.
+# Git passes: {1}=prev-HEAD {2}=new-HEAD {3}=branch-flag (1=branch, 0=file).
+post-checkout:
+  commands:
+    pnpm-install:
+      run: test "{3}" = "1" && git diff --name-only {1} {2} | grep -q '^pnpm-lock.yaml$' && pnpm install || true
+
+# Lint only the staged files being committed.
+pre-commit:
+  parallel: true
+  commands:
+    check:
+      glob: "*.{js,jsx,ts,tsx,json,jsonc}"
+      run: pnpm exec ultracite check {staged_files}
+
+# Quality gate before pushing — CI does not run lint/typecheck on PRs, so this is it.
+pre-push:
+  parallel: true
+  commands:
+    typecheck:
+      run: pnpm turbo typecheck
+    lint:
+      run: pnpm exec ultracite check

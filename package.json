@@ -3,6 +3,7 @@
     "@biomejs/biome": "catalog:",
     "@changesets/changelog-github": "catalog:",
     "@changesets/cli": "catalog:",
+    "lefthook": "catalog:",
     "tsx": "catalog:",
     "turbo": "catalog:",
     "typescript": "catalog:",
@@ -21,7 +22,8 @@
     "fix": "ultracite fix",
     "changeset": "changeset",
     "version": "changeset version",
-    "release": "turbo build && changeset publish"
+    "release": "turbo build && changeset publish",
+    "prepare": "lefthook install"
   },
   "version": "0.0.1",
   "private": true,
