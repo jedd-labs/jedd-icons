@@ -34,7 +34,7 @@ function RootComponent() {
       <head>
         <HeadContent />
       </head>
-      <body className="flex min-h-screen flex-col">
+      <body className="flex min-h-screen flex-col antialiased">
         <RootProvider search={{ SearchDialog }}>
           <TooltipProvider delay={150}>
             <Outlet />
