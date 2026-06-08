@@ -23,7 +23,10 @@ export const Route = createRootRoute({
         title: "Jedd Icons - Documentation",
       },
     ],
-    links: [{ rel: "stylesheet", href: appCss }],
+    links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+    ],
   }),
   component: RootComponent,
 });
