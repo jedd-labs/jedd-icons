@@ -1,6 +1,7 @@
 import { docs } from "collections/server";
 import { loader } from "fumadocs-core/source";
 import { lucideIconsPlugin } from "fumadocs-core/source/lucide-icons";
+import { frameworkIconsPlugin } from "./framework-icons";
 import { docsRoute } from "./shared";
 
 const MD_EXTENSION = /\.md$/;
@@ -8,7 +9,9 @@ const MD_EXTENSION = /\.md$/;
 export const source = loader({
   source: docs.toFumadocsSource(),
   baseUrl: docsRoute,
-  plugins: [lucideIconsPlugin()],
+  // frameworkIconsPlugin runs first and resolves our custom SVG names;
+  // lucideIconsPlugin resolves every remaining name from Lucide.
+  plugins: [frameworkIconsPlugin(), lucideIconsPlugin()],
 });
 
 export function markdownPathToSlugs(segs: string[]) {

@@ -26,7 +26,7 @@ function extractIcons(lib: Record<string, unknown>) {
   return Object.entries(lib)
     .filter(
       ([name, value]) =>
-        !RESERVED.has(name) && typeof value === "object" && value !== null,
+        !RESERVED.has(name) && typeof value === "object" && value !== null
     )
     .map(([name, Component]) => ({ name, Component: Component as JeddIcon }))
     .sort((a, b) => a.name.localeCompare(b.name));
@@ -40,10 +40,10 @@ const VARIANT_ICONS: Record<Variant, { name: string; Component: JeddIcon }[]> =
 
 const VARIANT_MAPS: Record<Variant, Record<string, JeddIcon>> = {
   stroke: Object.fromEntries(
-    VARIANT_ICONS.stroke.map(({ name, Component }) => [name, Component]),
+    VARIANT_ICONS.stroke.map(({ name, Component }) => [name, Component])
   ),
   fill: Object.fromEntries(
-    VARIANT_ICONS.fill.map(({ name, Component }) => [name, Component]),
+    VARIANT_ICONS.fill.map(({ name, Component }) => [name, Component])
   ),
 };
 

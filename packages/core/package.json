@@ -1,7 +1,28 @@
 {
   "name": "@jedd-icons/core",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Jedd icons for vanilla JavaScript.",
+  "license": "MIT",
+  "author": "Marcello Novelli",
+  "homepage": "https://jeddicons.com/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jedd-labs/jedd-icons.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/jedd-labs/jedd-icons/issues"
+  },
+  "keywords": [
+    "jedd",
+    "jedd-icons",
+    "icons",
+    "icon",
+    "svg",
+    "vanilla",
+    "javascript",
+    "dom"
+  ],
   "type": "module",
   "sideEffects": false,
   "publishConfig": {
@@ -40,8 +61,8 @@
   ],
   "scripts": {
     "gen": "tsx ../../tools/build-icons/build.ts --target vanilla",
-    "build": "pnpm gen && tsdown",
-    "dev": "pnpm gen && tsdown --watch",
+    "build": "pnpm gen && tsdown --config-loader tsx",
+    "dev": "pnpm gen && tsdown --config-loader tsx --watch",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

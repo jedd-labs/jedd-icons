@@ -1,4 +1,4 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute, notFound, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import browserCollections from "collections/browser";
 import { useFumadocsLoader } from "fumadocs-core/source/client";
@@ -21,6 +21,11 @@ export const Route = createFileRoute("/docs/$")({
   component: Page,
   loader: async ({ params }) => {
     const slugs = params._splat?.split("/") ?? [];
+    // The docs are organized into framework root folders (react / vanilla),
+    // so bare /docs has no page of its own — send it to the default tab.
+    if (slugs.length === 0 || slugs[0] === "") {
+      throw redirect({ to: "/docs/$", params: { _splat: "react" } });
+    }
     const data = await serverLoader({ data: slugs });
     await clientLoader.preload(data.path);
     return data;

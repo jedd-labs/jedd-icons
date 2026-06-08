@@ -1,0 +1,14 @@
+{
+  "title": "Vanilla JS",
+  "description": "@jedd-icons/core",
+  "icon": "vanilla",
+  "root": true,
+  "pages": [
+    "index",
+    "installation",
+    "usage",
+    "props",
+    "---Contributing---",
+    "adding-icons"
+  ]
+}

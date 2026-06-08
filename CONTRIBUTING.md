@@ -2,6 +2,25 @@
 
 Thanks for contributing to jedd-icons!
 
+## Git hooks
+
+We use [Lefthook](https://lefthook.dev) for git hooks. They install
+automatically when you run `pnpm install` (via the root `prepare` script) — no
+manual setup needed.
+
+| Hook | What it does |
+| --- | --- |
+| **post-merge** / **post-checkout** | Runs `pnpm install` automatically after a pull or branch switch, but **only when `pnpm-lock.yaml` changed** — keeps your dependencies in sync without slowing down every checkout. |
+| **pre-commit** | Lints the staged files with `ultracite check`. |
+| **pre-push** | Runs `turbo typecheck` and `ultracite check` before pushing — this is the main quality gate, since CI doesn't lint/typecheck PRs. |
+
+To bypass a hook in an emergency:
+
+```bash
+git commit --no-verify     # skip pre-commit
+LEFTHOOK=0 git push        # skip pre-push
+```
+
 ## Changesets
 
 We use [Changesets](https://github.com/changesets/changesets) to version the

@@ -1,0 +1,34 @@
+---
+title: Installation
+description: Add @jedd-icons/react to your project.
+icon: Download
+---
+
+Install the React package from npm.
+
+```npm
+npm i @jedd-icons/react
+```
+
+<Callout type="info">
+  `react` is a **peer dependency** (`^17 || ^18 || ^19`). You almost certainly
+  already have it installed — Jedd Icons does not bundle its own copy.
+</Callout>
+
+## Requirements
+
+- **TypeScript** — types ship with the package; no `@types/*` install required.
+- **Bundler** — any ESM-aware bundler (Vite, webpack, Rollup, esbuild, …). A
+  CommonJS (`require`) entry point is also provided.
+
+## Verify the install
+
+```tsx
+import { ArrowDownLeft } from "@jedd-icons/react";
+
+export function Demo() {
+  return <ArrowDownLeft />;
+}
+```
+
+If the icon renders, you're set — head to [Usage](/docs/react/usage).

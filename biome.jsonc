@@ -3,7 +3,7 @@
   "extends": [
     "ultracite/biome/core",
     "ultracite/biome/react",
-    "ultracite/biome/tanstack",
+    "ultracite/biome/tanstack"
   ],
   "files": {
     "includes": [
@@ -12,8 +12,8 @@
       "!**/src/icons-*",
       "!**/src/fill.ts",
       // TanStack Router generated route tree.
-      "!**/routeTree.gen.ts",
-    ],
+      "!**/routeTree.gen.ts"
+    ]
   },
   "linter": {
     "rules": {
@@ -21,20 +21,20 @@
         // index.ts files are the intended public API of our published packages.
         "noBarrelFile": "off",
         // `import * as React` and similar namespace imports are idiomatic here.
-        "noNamespaceImport": "off",
+        "noNamespaceImport": "off"
       },
       "style": {
         // We use PascalCase component files (Icon.tsx) and camelCase utils
         // (createJeddIcon.tsx, defaultAttributes.ts) by convention.
         "useFilenamingConvention": "off",
-        "noNestedTernary": "off",
+        "noNestedTernary": "off"
       },
       "suspicious": {
         // forwardRef is required: jedd-icons-react supports React 17/18 as a
         // peer dependency, where the ref-as-prop replacement is unavailable.
-        "noReactForwardRef": "off",
-      },
-    },
+        "noReactForwardRef": "off"
+      }
+    }
   },
   "overrides": [
     {
@@ -45,9 +45,9 @@
         "rules": {
           "performance": { "useTopLevelRegex": "off" },
           "style": { "noParameterAssign": "off" },
-          "suspicious": { "noAssignInExpressions": "off" },
-        },
-      },
+          "suspicious": { "noAssignInExpressions": "off" }
+        }
+      }
     },
     {
       // Static / animation grids render fixed-order lists where the index is a
@@ -55,13 +55,13 @@
       "includes": [
         "apps/www-docs/src/components/hero-*.tsx",
         "apps/www-docs/src/routes/index.tsx",
-        "packages/ui/src/components/**",
+        "packages/ui/src/components/**"
       ],
       "linter": {
         "rules": {
-          "suspicious": { "noArrayIndexKey": "off" },
-        },
-      },
+          "suspicious": { "noArrayIndexKey": "off" }
+        }
+      }
     },
     {
       // shadcn/ui primitives are vendored as-is; a11y associations and semantic
@@ -72,19 +72,19 @@
         "rules": {
           "a11y": {
             "noLabelWithoutControl": "off",
-            "useSemanticElements": "off",
-          },
-        },
-      },
+            "useSemanticElements": "off"
+          }
+        }
+      }
     },
     {
       // Generated icon package: thin re-exports of shared defaults.
       "includes": ["packages/react/src/defaultAttributes.ts"],
       "linter": {
         "rules": {
-          "style": { "noExportedImports": "off" },
-        },
-      },
+          "style": { "noExportedImports": "off" }
+        }
+      }
     },
     {
       // The fumadocs client-loader `component()` callback is a render function;
@@ -92,9 +92,9 @@
       "includes": ["apps/www-docs/src/routes/docs/$.tsx"],
       "linter": {
         "rules": {
-          "correctness": { "useHookAtTopLevel": "off" },
-        },
-      },
-    },
-  ],
+          "correctness": { "useHookAtTopLevel": "off" }
+        }
+      }
+    }
+  ]
 }
