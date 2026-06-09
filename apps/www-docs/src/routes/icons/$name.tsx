@@ -3,7 +3,7 @@ import { HomeLayout } from "fumadocs-ui/layouts/home";
 import { useState } from "react";
 import { humanizeIconName, VARIANT_MAPS, type Variant } from "@/lib/icons";
 import { baseOptions } from "@/lib/layout.shared";
-import { appName, pageTitle } from "@/lib/shared";
+import { appName, pageTitle, siteUrl } from "@/lib/shared";
 
 export const Route = createFileRoute("/icons/$name")({
   component: IconPage,
@@ -27,6 +27,9 @@ export const Route = createFileRoute("/icons/$name")({
           content: `${label} (${params.name}) — a free, open-source ${appName} SVG icon for React and vanilla JS. Preview it live and copy the code, with adjustable size, stroke, and color.`,
         },
       ],
+      // Canonical without the ?variant search param so stroke/fill variants
+      // collapse to a single indexable URL.
+      links: [{ rel: "canonical", href: `${siteUrl}/icons/${params.name}` }],
     };
   },
 });

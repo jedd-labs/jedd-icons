@@ -15,7 +15,7 @@ import { useMemo, useState } from "react";
 import { HeroBlueprint } from "@/components/hero-blueprint";
 import { VARIANT_ICONS, VARIANT_MAPS, type Variant } from "@/lib/icons";
 import { baseOptions } from "@/lib/layout.shared";
-import { appName, pageTitle } from "@/lib/shared";
+import { appName, pageTitle, siteUrl } from "@/lib/shared";
 
 export const Route = createFileRoute("/")({
   component: IconsPage,
@@ -27,6 +27,7 @@ export const Route = createFileRoute("/")({
         content: `Browse the full ${appName} set — sharp, squared, open-source SVG icons for React and vanilla JS. Search, customize size, stroke, and color, then copy the code.`,
       },
     ],
+    links: [{ rel: "canonical", href: `${siteUrl}/` }],
   }),
 });
 
