@@ -22,14 +22,21 @@ function urlEntry({ path, changefreq, priority }: SitemapEntry) {
 }
 
 function buildSitemap() {
+  // Only final, indexable (200) URLs belong in a sitemap. Bare "/docs" is
+  // intentionally omitted: it 307-redirects to "/docs/react", which is itself
+  // listed below via source.getPages().
   const entries: SitemapEntry[] = [
     { path: "/", changefreq: "daily", priority: 1.0 },
-    { path: "/docs", changefreq: "weekly", priority: 0.8 },
   ];
 
   // Docs pages, discovered from the Fumadocs source (page.url is the route path).
+  // The default docs landing ("/docs/react") gets a higher priority.
   for (const page of source.getPages()) {
-    entries.push({ path: page.url, changefreq: "weekly", priority: 0.7 });
+    entries.push({
+      path: page.url,
+      changefreq: "weekly",
+      priority: page.url === "/docs/react" ? 0.8 : 0.7,
+    });
   }
 
   // Individual icon pages, enumerated from the package exports.
