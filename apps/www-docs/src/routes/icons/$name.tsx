@@ -5,10 +5,19 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { HomeLayout } from "fumadocs-ui/layouts/home";
 import { useState } from "react";
 import { baseOptions } from "@/lib/layout.shared";
+import { appName, pageTitle } from "@/lib/shared";
 
 type Variant = "stroke" | "fill";
 
 const RESERVED = new Set(["Icon", "createJeddIcon", "defaultAttributes"]);
+
+// PascalCase component name → spaced words: "ChevronRight" → "Chevron Right".
+function humanizeIconName(name: string) {
+  return name
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
 function extractIconMap(lib: Record<string, unknown>) {
   return Object.fromEntries(
@@ -35,6 +44,18 @@ export const Route = createFileRoute("/icons/$name")({
     if (!(inStroke || inFill)) {
       throw notFound();
     }
+  },
+  head: ({ params }) => {
+    const label = humanizeIconName(params.name);
+    return {
+      meta: [
+        { title: pageTitle(`${label} icon`) },
+        {
+          name: "description",
+          content: `${label} (${params.name}) — a free, open-source ${appName} SVG icon for React and vanilla JS. Preview it live and copy the code, with adjustable size, stroke, and color.`,
+        },
+      ],
+    };
   },
 });
 

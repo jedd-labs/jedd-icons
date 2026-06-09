@@ -17,6 +17,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useMemo, useState } from "react";
 import { HeroBlueprint } from "@/components/hero-blueprint";
 import { baseOptions } from "@/lib/layout.shared";
+import { appName, pageTitle } from "@/lib/shared";
 
 type Variant = "stroke" | "fill";
 
@@ -49,6 +50,15 @@ const VARIANT_MAPS: Record<Variant, Record<string, JeddIcon>> = {
 
 export const Route = createFileRoute("/")({
   component: IconsPage,
+  head: () => ({
+    meta: [
+      { title: pageTitle("Sharp, squared icons for modern interfaces") },
+      {
+        name: "description",
+        content: `Browse the full ${appName} set — sharp, squared, open-source SVG icons for React and vanilla JS. Search, customize size, stroke, and color, then copy the code.`,
+      },
+    ],
+  }),
 });
 
 // Decorative crosshair marker centered on a cell's top-left grid intersection.
