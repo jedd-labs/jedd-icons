@@ -1,6 +1,3 @@
-import type { JeddIcon } from "@jedd-icons/react";
-import * as StrokeLib from "@jedd-icons/react";
-import * as FillLib from "@jedd-icons/react/fill";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button, buttonVariants } from "@workspace/ui/components/button";
 import { Checkbox } from "@workspace/ui/components/checkbox";
@@ -16,39 +13,22 @@ import { HomeLayout } from "fumadocs-ui/layouts/home";
 import { AnimatePresence, motion } from "motion/react";
 import { useMemo, useState } from "react";
 import { HeroBlueprint } from "@/components/hero-blueprint";
+import { VARIANT_ICONS, VARIANT_MAPS, type Variant } from "@/lib/icons";
 import { baseOptions } from "@/lib/layout.shared";
-
-type Variant = "stroke" | "fill";
-
-const RESERVED = new Set(["Icon", "createJeddIcon", "defaultAttributes"]);
-
-function extractIcons(lib: Record<string, unknown>) {
-  return Object.entries(lib)
-    .filter(
-      ([name, value]) =>
-        !RESERVED.has(name) && typeof value === "object" && value !== null
-    )
-    .map(([name, Component]) => ({ name, Component: Component as JeddIcon }))
-    .sort((a, b) => a.name.localeCompare(b.name));
-}
-
-const VARIANT_ICONS: Record<Variant, { name: string; Component: JeddIcon }[]> =
-  {
-    stroke: extractIcons(StrokeLib as unknown as Record<string, unknown>),
-    fill: extractIcons(FillLib as unknown as Record<string, unknown>),
-  };
-
-const VARIANT_MAPS: Record<Variant, Record<string, JeddIcon>> = {
-  stroke: Object.fromEntries(
-    VARIANT_ICONS.stroke.map(({ name, Component }) => [name, Component])
-  ),
-  fill: Object.fromEntries(
-    VARIANT_ICONS.fill.map(({ name, Component }) => [name, Component])
-  ),
-};
+import { appName, pageTitle, siteUrl } from "@/lib/shared";
 
 export const Route = createFileRoute("/")({
   component: IconsPage,
+  head: () => ({
+    meta: [
+      { title: pageTitle("Sharp, squared icons for modern interfaces") },
+      {
+        name: "description",
+        content: `Browse the full ${appName} set — sharp, squared, open-source SVG icons for React and vanilla JS. Search, customize size, stroke, and color, then copy the code.`,
+      },
+    ],
+    links: [{ rel: "canonical", href: `${siteUrl}/` }],
+  }),
 });
 
 // Decorative crosshair marker centered on a cell's top-left grid intersection.

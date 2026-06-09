@@ -1,28 +1,9 @@
-import type { JeddIcon } from "@jedd-icons/react";
-import * as StrokeLib from "@jedd-icons/react";
-import * as FillLib from "@jedd-icons/react/fill";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { HomeLayout } from "fumadocs-ui/layouts/home";
 import { useState } from "react";
+import { humanizeIconName, VARIANT_MAPS, type Variant } from "@/lib/icons";
 import { baseOptions } from "@/lib/layout.shared";
-
-type Variant = "stroke" | "fill";
-
-const RESERVED = new Set(["Icon", "createJeddIcon", "defaultAttributes"]);
-
-function extractIconMap(lib: Record<string, unknown>) {
-  return Object.fromEntries(
-    Object.entries(lib).filter(
-      ([name, value]) =>
-        !RESERVED.has(name) && typeof value === "object" && value !== null
-    )
-  ) as Record<string, JeddIcon>;
-}
-
-const VARIANT_MAPS: Record<Variant, Record<string, JeddIcon>> = {
-  stroke: extractIconMap(StrokeLib as unknown as Record<string, unknown>),
-  fill: extractIconMap(FillLib as unknown as Record<string, unknown>),
-};
+import { appName, pageTitle, siteUrl } from "@/lib/shared";
 
 export const Route = createFileRoute("/icons/$name")({
   component: IconPage,
@@ -35,6 +16,21 @@ export const Route = createFileRoute("/icons/$name")({
     if (!(inStroke || inFill)) {
       throw notFound();
     }
+  },
+  head: ({ params }) => {
+    const label = humanizeIconName(params.name);
+    return {
+      meta: [
+        { title: pageTitle(`${label} icon`) },
+        {
+          name: "description",
+          content: `${label} (${params.name}) — a free, open-source ${appName} SVG icon for React and vanilla JS. Preview it live and copy the code, with adjustable size, stroke, and color.`,
+        },
+      ],
+      // Canonical without the ?variant search param so stroke/fill variants
+      // collapse to a single indexable URL.
+      links: [{ rel: "canonical", href: `${siteUrl}/icons/${params.name}` }],
+    };
   },
 });
 

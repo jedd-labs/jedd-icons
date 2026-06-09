@@ -7,6 +7,7 @@ import {
 import { TooltipProvider } from "@workspace/ui/components/tooltip";
 import { RootProvider } from "fumadocs-ui/provider/tanstack";
 import SearchDialog from "@/components/search";
+import { appDescription, pageTitle } from "@/lib/shared";
 import appCss from "@/styles/app.css?url";
 
 export const Route = createRootRoute({
@@ -20,7 +21,11 @@ export const Route = createRootRoute({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "Jedd Icons - Documentation",
+        title: pageTitle(),
+      },
+      {
+        name: "description",
+        content: appDescription,
       },
     ],
     links: [
