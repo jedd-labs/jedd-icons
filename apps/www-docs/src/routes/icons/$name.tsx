@@ -1,37 +1,9 @@
-import type { JeddIcon } from "@jedd-icons/react";
-import * as StrokeLib from "@jedd-icons/react";
-import * as FillLib from "@jedd-icons/react/fill";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { HomeLayout } from "fumadocs-ui/layouts/home";
 import { useState } from "react";
+import { humanizeIconName, VARIANT_MAPS, type Variant } from "@/lib/icons";
 import { baseOptions } from "@/lib/layout.shared";
 import { appName, pageTitle } from "@/lib/shared";
-
-type Variant = "stroke" | "fill";
-
-const RESERVED = new Set(["Icon", "createJeddIcon", "defaultAttributes"]);
-
-// PascalCase component name → spaced words: "ChevronRight" → "Chevron Right".
-function humanizeIconName(name: string) {
-  return name
-    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function extractIconMap(lib: Record<string, unknown>) {
-  return Object.fromEntries(
-    Object.entries(lib).filter(
-      ([name, value]) =>
-        !RESERVED.has(name) && typeof value === "object" && value !== null
-    )
-  ) as Record<string, JeddIcon>;
-}
-
-const VARIANT_MAPS: Record<Variant, Record<string, JeddIcon>> = {
-  stroke: extractIconMap(StrokeLib as unknown as Record<string, unknown>),
-  fill: extractIconMap(FillLib as unknown as Record<string, unknown>),
-};
 
 export const Route = createFileRoute("/icons/$name")({
   component: IconPage,
