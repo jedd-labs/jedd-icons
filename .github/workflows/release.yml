@@ -33,7 +33,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # changelog-github needs full history for PR/author links
+          fetch-depth: 0 # full history so changeset version/publish can tag correctly
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -41,7 +41,8 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          # Node 24 ships npm >= 11.5.1, which is required for OIDC trusted
+          node-version: 24
           cache: pnpm
           registry-url: https://registry.npmjs.org
 
@@ -62,6 +63,8 @@ jobs:
           commit: "chore: version packages"
           title: "chore: version packages"
         env:
+          # No NPM_TOKEN: this repo uses npm OIDC trusted publishing (configured
+          # per-package on npmjs.com), and the packages are set to disallow
+          # tokens. Auth comes from the id-token: write permission above.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: "true"
