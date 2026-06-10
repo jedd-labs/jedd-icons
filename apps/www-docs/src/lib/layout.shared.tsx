@@ -8,17 +8,17 @@ export function baseOptions(): BaseLayoutProps {
         <>
           <img
             alt={appName}
-            className="block h-6 w-auto dark:hidden"
-            height={48}
+            className="block h-4 w-auto dark:hidden"
+            height={24}
             src="/logo/jedd-icons-wordmark-light.svg"
-            width={48}
+            width={24}
           />
           <img
             alt={appName}
-            className="hidden h-6 w-auto dark:block"
-            height={48}
+            className="hidden h-4 w-auto dark:block"
+            height={24}
             src="/logo/jedd-icons-wordmark-dark.svg"
-            width={48}
+            width={24}
           />
         </>
       ),
