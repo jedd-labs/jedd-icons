@@ -4,7 +4,24 @@ import { appName, gitConfig } from "./shared";
 export function baseOptions(): BaseLayoutProps {
   return {
     nav: {
-      title: appName,
+      title: (
+        <>
+          <img
+            alt={appName}
+            className="block h-4 w-auto dark:hidden"
+            height={24}
+            src="/logo/jedd-icons-wordmark-light.svg"
+            width={24}
+          />
+          <img
+            alt={appName}
+            className="hidden h-4 w-auto dark:block"
+            height={24}
+            src="/logo/jedd-icons-wordmark-dark.svg"
+            width={24}
+          />
+        </>
+      ),
     },
     links: [
       { text: "Icons", url: "/" },

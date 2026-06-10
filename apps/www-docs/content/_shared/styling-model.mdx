@@ -1,0 +1,39 @@
+Both packages share the same styling model: four knobs — `size`, `color`,
+`strokeWidth`, and `absoluteStrokeWidth` — plus the stroke/fill variant
+distinction. Only the surface syntax differs (React props vs `createElement`
+options).
+
+## How `color` behaves per variant
+
+- **Stroke variant** — `color` sets the `stroke` attribute; the interior stays
+  transparent (`fill: none`).
+- **Fill variant** — `color` sets the `fill` attribute; `strokeWidth` and
+  `absoluteStrokeWidth` are ignored.
+
+## How `absoluteStrokeWidth` works
+
+Normally a stroke scales with the icon: a `strokeWidth` of `2` looks thicker at
+`size={48}` than at `size={24}`. With `absoluteStrokeWidth`, the rendered stroke
+is computed as:
+
+```
+renderedStrokeWidth = strokeWidth × 24 / size
+```
+
+So the visual thickness matches your `strokeWidth` value at **any** size — handy
+when icons of different sizes need to read as the same weight.
+
+## CSS hooks
+
+Every rendered icon carries two class names you can target globally: `jedd` (on
+every icon) and `jedd-<name>` (per icon). Any class name you pass is appended to
+these.
+
+```css
+.jedd {
+  vertical-align: middle;
+}
+.jedd-arrow-down-left {
+  /* style one specific icon */
+}
+```

@@ -1,0 +1,104 @@
+---
+title: Usage
+description: Render Jedd Icons as React components.
+icon: Atom
+---
+
+The `@jedd-icons/react` package exports every icon as a `forwardRef` SVG
+component.
+
+## Importing icons
+
+Each icon is exported as a **PascalCase** component derived from its
+kebab-case name (`arrow-down-left` → `ArrowDownLeft`):
+
+```tsx
+import { ArrowDownLeft, ChevronRight } from "@jedd-icons/react";
+
+export function Toolbar() {
+  return (
+    <nav>
+      <ArrowDownLeft />
+      <ChevronRight />
+    </nav>
+  );
+}
+```
+
+By default an icon renders at **24px**, with `currentColor` and a stroke width
+of **2** — so it inherits the surrounding text color out of the box.
+
+## Customizing icons
+
+Pass props to override the defaults:
+
+```tsx
+<ChevronRight />                                  {/* 24px, currentColor, stroke 2 */}
+<ChevronRight size={32} color="#0f172a" strokeWidth={1.5} />
+<ChevronRight className="text-blue-500" />
+```
+
+Because `color` defaults to `currentColor`, the most common way to color an
+icon is to set the CSS `color` of its container:
+
+```tsx
+<span style={{ color: "tomato" }}>
+  <ChevronRight />
+</span>
+```
+
+See the [props reference](/docs/react/props) for the full list.
+
+## The fill variant
+
+Filled icons live on the `/fill` subpath:
+
+```tsx
+import { ChevronRight } from "@jedd-icons/react";        // stroke
+import { ChevronRight as ChevronRightFill } from "@jedd-icons/react/fill"; // fill
+
+<ChevronRight />        {/* stroke — color drives `stroke` */}
+<ChevronRightFill />    {/* fill — color drives `fill` */}
+```
+
+For the fill variant, `color` sets the `fill` attribute; `strokeWidth` and
+`absoluteStrokeWidth` have no effect.
+
+## absoluteStrokeWidth
+
+By default, stroke width scales with the icon. Pass `absoluteStrokeWidth` to
+keep the stroke a constant visual thickness at any size:
+
+```tsx
+<ChevronRight size={64} strokeWidth={1.5} />                    {/* scales up */}
+<ChevronRight size={64} strokeWidth={1.5} absoluteStrokeWidth /> {/* visually 1.5px */}
+```
+
+## Accessibility
+
+Icons are decorative by default and rendered with `aria-hidden="true"`. As soon
+as you provide an `aria-label`, `aria-labelledby`, `role`, or children, the
+`aria-hidden` is dropped so the icon becomes part of the accessibility tree:
+
+```tsx
+{/* Decorative — hidden from assistive tech */}
+<ChevronRight />
+
+{/* Meaningful — announced as "Next page" */}
+<ChevronRight aria-label="Next page" />
+```
+
+## Refs and SVG props
+
+Every icon forwards its ref to the underlying `<svg>` element and accepts any
+standard SVG prop:
+
+```tsx
+import { useRef } from "react";
+import { ChevronRight } from "@jedd-icons/react";
+
+function Example() {
+  const ref = useRef<SVGSVGElement>(null);
+  return <ChevronRight ref={ref} onClick={() => ref.current?.focus()} focusable />;
+}
+```
