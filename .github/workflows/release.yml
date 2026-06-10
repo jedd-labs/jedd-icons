@@ -54,12 +54,12 @@ jobs:
         with:
           # Consumes pending changesets, bumps versions, writes CHANGELOG.md,
           # and opens/updates the "Version Packages" PR. Always safe to run.
-          version: pnpm version
+          version: pnpm run version
           # `publish` is passed ONLY on a manual run with the publish input
           # checked. On every other run (plain push to main, or a dispatch
           # without the box checked) this is empty, so the action never
           # publishes — it only manages the Version PR.
-          publish: ${{ (github.event_name == 'workflow_dispatch' && inputs.publish) && 'pnpm release' || '' }}
+          publish: ${{ (github.event_name == 'workflow_dispatch' && inputs.publish) && 'pnpm run release' || '' }}
           commit: "chore: version packages"
           title: "chore: version packages"
         env:
