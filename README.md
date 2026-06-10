@@ -1,9 +1,9 @@
 <p align="center">
-  <a href="https://jeddicons.com#gh-light-mode-only">
-    <img src="https://jeddicons.com/logo/jedd-icons-wordmark-dark.svg#gh-light-mode-only" alt="jedd-icons - Sharp, squared SVG icons distributed as React components and vanilla JS modules." width="480">
-  </a>
-  <a href="https://jeddicons.com#gh-dark-mode-only">
-    <img src="https://jeddicons.com/logo/jedd-icons-wordmark-light.svg#gh-dark-mode-only" alt="jedd-icons - Sharp, squared SVG icons distributed as React components and vanilla JS modules." width="480">
+  <a href="https://jeddicons.com">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://jeddicons.com/logo/jedd-icons-wordmark-light.svg">
+      <img src="https://jeddicons.com/logo/jedd-icons-wordmark-dark.svg" alt="jedd-icons - Sharp, squared SVG icons distributed as React components and vanilla JS modules." width="480">
+    </picture>
   </a>
 </p>
 <p align="center">
