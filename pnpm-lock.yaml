@@ -9,22 +9,13 @@ catalogs:
     '@base-ui/react':
       specifier: ^1.4.1
       version: 1.4.1
-    '@biomejs/biome':
-      specifier: 2.4.15
-      version: 2.4.15
-    '@changesets/cli':
-      specifier: ^2.31.0
-      version: 2.31.0
-    '@cloudflare/vite-plugin':
-      specifier: ^1.37.1
-      version: 1.37.1
+    '@fontsource-variable/figtree':
+      specifier: ^5.2.10
+      version: 5.2.10
     '@fontsource-variable/hubot-sans':
       specifier: ^5.2.8
       version: 5.2.8
     '@fontsource-variable/inter':
-      specifier: ^5.2.8
-      version: 5.2.8
-    '@fontsource-variable/mona-sans':
       specifier: ^5.2.8
       version: 5.2.8
     '@fontsource-variable/sora':
@@ -36,21 +27,9 @@ catalogs:
     '@tailwindcss/vite':
       specifier: ^4.3.0
       version: 4.3.0
-    '@tanstack/react-router':
-      specifier: 1.170.4
-      version: 1.170.4
-    '@tanstack/react-router-devtools':
-      specifier: 1.167.0
-      version: 1.167.0
-    '@tanstack/react-start':
-      specifier: 1.168.6
-      version: 1.168.6
     '@turbo/gen':
       specifier: ^2.8.1
       version: 2.8.11
-    '@types/mdx':
-      specifier: ^2.0.13
-      version: 2.0.13
     '@types/node':
       specifier: ^25.7.0
       version: 25.8.0
@@ -60,36 +39,15 @@ catalogs:
     '@types/react-dom':
       specifier: ^19.2.3
       version: 19.2.3
-    '@vitejs/plugin-react':
-      specifier: ^6.0.1
-      version: 6.0.2
     class-variance-authority:
       specifier: ^0.7.1
       version: 0.7.1
     clsx:
       specifier: ^2.1.1
       version: 2.1.1
-    fumadocs-core:
-      specifier: 16.8.11
-      version: 16.8.11
-    fumadocs-mdx:
-      specifier: 15.0.6
-      version: 15.0.6
-    fumadocs-ui:
-      specifier: 16.8.11
-      version: 16.8.11
-    lefthook:
-      specifier: ^2.1.9
-      version: 2.1.9
     lucide-react:
       specifier: ^1.16.0
       version: 1.16.0
-    motion:
-      specifier: ^12.38.0
-      version: 12.38.0
-    nitro:
-      specifier: 3.0.260429-beta
-      version: 3.0.260429-beta
     react:
       specifier: ^19.2.6
       version: 19.2.6
@@ -105,33 +63,15 @@ catalogs:
     tailwindcss:
       specifier: ^4.3.0
       version: 4.3.0
-    tsdown:
-      specifier: ^0.22.1
-      version: 0.22.1
-    tsx:
-      specifier: ^4.19.2
-      version: 4.21.0
-    turbo:
-      specifier: ^2.8.17
-      version: 2.9.4
     tw-animate-css:
       specifier: ^1.4.0
       version: 1.4.0
     typescript:
       specifier: ^6.0.3
       version: 6.0.3
-    ultracite:
-      specifier: 7.8.1
-      version: 7.8.1
     vaul:
       specifier: ^1.1.2
       version: 1.1.2
-    vite:
-      specifier: ^8.0.13
-      version: 8.0.13
-    wrangler:
-      specifier: ^4.92.0
-      version: 4.92.0
     zod:
       specifier: ^3.25.76
       version: 3.25.76
@@ -320,13 +260,13 @@ importers:
       '@base-ui/react':
         specifier: 'catalog:'
         version: 1.4.1(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      '@fontsource-variable/figtree':
+        specifier: 'catalog:'
+        version: 5.2.10
       '@fontsource-variable/hubot-sans':
         specifier: 'catalog:'
         version: 5.2.8
       '@fontsource-variable/inter':
-        specifier: 'catalog:'
-        version: 5.2.8
-      '@fontsource-variable/mona-sans':
         specifier: 'catalog:'
         version: 5.2.8
       '@fontsource-variable/sora':
@@ -1266,14 +1206,14 @@ packages:
   '@floating-ui/utils@0.2.11':
     resolution: {integrity: sha512-RiB/yIh78pcIxl6lLMG0CgBXAZ2Y0eVHqMPYugu+9U0AeT6YBeiJpf7lbdJNIugFP5SIjwNRgo4DhR1Qxi26Gg==}
 
+  '@fontsource-variable/figtree@5.2.10':
+    resolution: {integrity: sha512-a5Gumbpy3mdd+Yg31g6Qb7CmjYbrfyutJa3bWfP5q8A4GclIOwX7mI+ZuSHsJnw/mHvW6r9oh1AHJcJTIxK4JA==}
+
   '@fontsource-variable/hubot-sans@5.2.8':
     resolution: {integrity: sha512-snt3rHAg6IrE0DKltYvjsIoeB+GSUpQHY3PAkMGUzxp8gN31kTl8yFuyuK6RcknIjtCVo7v0S6i31Oif3QxtjA==}
 
   '@fontsource-variable/inter@5.2.8':
     resolution: {integrity: sha512-kOfP2D+ykbcX/P3IFnokOhVRNoTozo5/JxhAIVYLpea/UBmCQ/YWPBfWIDuBImXX/15KH+eKh4xpEUyS2sQQGQ==}
-
-  '@fontsource-variable/mona-sans@5.2.8':
-    resolution: {integrity: sha512-8OWdTcP8KvRxkU1Skkk+tX3D5XHN9buejxSDwrT7teRfGnpKBYxQUApV/+zS8TzeHiSU8H5Tc0HfBr57ahgcvA==}
 
   '@fontsource-variable/sora@5.2.8':
     resolution: {integrity: sha512-sP+ILTfi5r3cqmMBntI4ooQNxFI+LyHyD5hcPbWwwL4uh4kKFAkOz0w2veCXjz18fKRdva6OG0dY+5yQ02f30w==}
@@ -6686,11 +6626,11 @@ snapshots:
 
   '@floating-ui/utils@0.2.11': {}
 
+  '@fontsource-variable/figtree@5.2.10': {}
+
   '@fontsource-variable/hubot-sans@5.2.8': {}
 
   '@fontsource-variable/inter@5.2.8': {}
-
-  '@fontsource-variable/mona-sans@5.2.8': {}
 
   '@fontsource-variable/sora@5.2.8': {}
 

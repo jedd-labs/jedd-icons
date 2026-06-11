@@ -8,9 +8,9 @@
   },
   "dependencies": {
     "@base-ui/react": "catalog:",
+    "@fontsource-variable/figtree": "catalog:",
     "@fontsource-variable/hubot-sans": "catalog:",
     "@fontsource-variable/inter": "catalog:",
-    "@fontsource-variable/mona-sans": "catalog:",
     "@fontsource-variable/sora": "catalog:",
     "@fontsource/iosevka": "catalog:",
     "class-variance-authority": "catalog:",
