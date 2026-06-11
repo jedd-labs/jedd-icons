@@ -229,131 +229,167 @@ function IconsPage() {
           className="sticky top-14 z-30 scroll-mt-14 border-b bg-background/80 backdrop-blur"
           id="icons"
         >
-          <div className="mx-auto flex max-w-6xl items-center gap-4 px-6 py-3 text-xs">
-            <div className="flex shrink-0 overflow-hidden rounded-md border border-border">
-              {(["stroke", "fill"] as const).map((v) => (
-                <button
-                  className={`px-2.5 py-1 text-xs capitalize transition-colors ${
-                    variant === v
-                      ? "bg-foreground text-background"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                  key={v}
-                  onClick={() => {
-                    setVariant(v);
-                    setSelected(null);
-                  }}
-                  type="button"
-                >
-                  {v}
-                </button>
-              ))}
+          <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-3 text-xs lg:flex-row lg:items-center lg:gap-4">
+            {/* Row 1: variant + search + count */}
+            <div className="flex items-center gap-3 lg:shrink-0">
+              <div className="flex shrink-0 overflow-hidden rounded-md border border-border">
+                {(["stroke", "fill"] as const).map((v) => (
+                  <button
+                    className={`px-2.5 py-1 text-xs capitalize transition-colors ${
+                      variant === v
+                        ? "bg-foreground text-background"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                    key={v}
+                    onClick={() => {
+                      setVariant(v);
+                      setSelected(null);
+                    }}
+                    type="button"
+                  >
+                    {v}
+                  </button>
+                ))}
+              </div>
+
+              <Input
+                className="min-w-0 flex-1 lg:w-48 lg:flex-none"
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search icons..."
+                type="search"
+                value={query}
+              />
+              <span className="shrink-0 text-muted-foreground">
+                {filtered.length}/{allIcons.length}
+              </span>
             </div>
 
-            <Input
-              className="w-48 shrink-0"
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search icons..."
-              type="search"
-              value={query}
-            />
-            <span className="shrink-0 text-muted-foreground">
-              {filtered.length}/{allIcons.length}
-            </span>
-
-            <Separator className="h-4" orientation="vertical" />
-
-            <span className="shrink-0 text-muted-foreground">Size</span>
-            <Slider
-              className="min-w-12 flex-1"
-              max={96}
-              min={16}
-              onValueChange={(v) => setSize(Array.isArray(v) ? v[0] : v)}
-              step={1}
-              value={[size]}
-            />
-            <span className="w-6 shrink-0 tabular-nums">{size}</span>
-
-            {variant === "stroke" && (
-              <>
-                <Separator className="h-4" orientation="vertical" />
-
-                <span className="shrink-0 text-muted-foreground">Stroke</span>
-                <Slider
-                  className="min-w-12 flex-1"
-                  max={3}
-                  min={0.5}
-                  onValueChange={(v) =>
-                    setStrokeWidth(Array.isArray(v) ? v[0] : v)
-                  }
-                  step={0.25}
-                  value={[strokeWidth]}
-                />
-                <span className="w-8 shrink-0 tabular-nums">
-                  {strokeWidth.toFixed(2)}
-                </span>
-              </>
-            )}
-
-            <Separator className="h-4" orientation="vertical" />
-
-            <span className="shrink-0 text-muted-foreground">Color</span>
-            <input
-              className="h-6 w-8 shrink-0 cursor-pointer border border-input bg-transparent p-0"
-              onChange={(e) => setColor(e.target.value)}
-              type="color"
-              value={color ?? "#0f172a"}
-            />
-
-            {variant === "stroke" && (
-              <>
-                <Separator className="h-4" orientation="vertical" />
-
-                <label
-                  className="flex shrink-0 items-center gap-2"
-                  htmlFor="absolute-stroke-width"
-                >
-                  <Checkbox
-                    checked={absolute}
-                    id="absolute-stroke-width"
-                    onCheckedChange={(checked) => setAbsolute(!!checked)}
-                  />
-                  <span className="text-muted-foreground">
-                    absoluteStrokeWidth
-                  </span>
-                </label>
-              </>
-            )}
-
-            <Separator className="h-4" orientation="vertical" />
-
-            <label
-              className="flex shrink-0 items-center gap-2"
-              htmlFor="show-labels"
-            >
-              <Checkbox
-                checked={showLabels}
-                id="show-labels"
-                onCheckedChange={(checked) => setShowLabels(!!checked)}
+            {/* Row 2: numeric/toggle controls — wraps on small screens */}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-3 lg:flex-1 lg:flex-nowrap">
+              <Separator
+                className="hidden h-4 lg:block"
+                orientation="vertical"
               />
-              <span className="text-muted-foreground">Labels</span>
-            </label>
 
-            <Separator className="h-4" orientation="vertical" />
+              <div className="flex flex-1 items-center gap-2">
+                <span className="shrink-0 text-muted-foreground">Size</span>
+                <Slider
+                  className="min-w-16 flex-1"
+                  max={96}
+                  min={16}
+                  onValueChange={(v) => setSize(Array.isArray(v) ? v[0] : v)}
+                  step={1}
+                  value={[size]}
+                />
+                <span className="w-6 shrink-0 tabular-nums">{size}</span>
+              </div>
 
-            <button
-              className="shrink-0 text-muted-foreground hover:text-foreground"
-              onClick={() => {
-                setSize(32);
-                setStrokeWidth(2);
-                setColor(null);
-                setAbsolute(false);
-                setShowLabels(false);
-              }}
-              type="button"
-            >
-              Reset
-            </button>
+              {variant === "stroke" && (
+                <>
+                  <Separator
+                    className="hidden h-4 lg:block"
+                    orientation="vertical"
+                  />
+
+                  <div className="flex flex-1 items-center gap-2">
+                    <span className="shrink-0 text-muted-foreground">
+                      Stroke
+                    </span>
+                    <Slider
+                      className="min-w-16 flex-1"
+                      max={3}
+                      min={0.5}
+                      onValueChange={(v) =>
+                        setStrokeWidth(Array.isArray(v) ? v[0] : v)
+                      }
+                      step={0.25}
+                      value={[strokeWidth]}
+                    />
+                    <span className="w-8 shrink-0 tabular-nums">
+                      {strokeWidth.toFixed(2)}
+                    </span>
+                  </div>
+                </>
+              )}
+
+              <Separator
+                className="hidden h-4 lg:block"
+                orientation="vertical"
+              />
+
+              <label
+                className="flex shrink-0 items-center gap-2"
+                htmlFor="icon-color"
+              >
+                <span className="text-muted-foreground">Color</span>
+                <input
+                  className="h-6 w-8 shrink-0 cursor-pointer border border-input bg-transparent p-0"
+                  id="icon-color"
+                  onChange={(e) => setColor(e.target.value)}
+                  type="color"
+                  value={color ?? "#0f172a"}
+                />
+              </label>
+
+              {variant === "stroke" && (
+                <>
+                  <Separator
+                    className="hidden h-4 lg:block"
+                    orientation="vertical"
+                  />
+
+                  <label
+                    className="flex shrink-0 items-center gap-2"
+                    htmlFor="absolute-stroke-width"
+                  >
+                    <Checkbox
+                      checked={absolute}
+                      id="absolute-stroke-width"
+                      onCheckedChange={(checked) => setAbsolute(!!checked)}
+                    />
+                    <span className="text-muted-foreground">
+                      absoluteStrokeWidth
+                    </span>
+                  </label>
+                </>
+              )}
+
+              <Separator
+                className="hidden h-4 lg:block"
+                orientation="vertical"
+              />
+
+              <label
+                className="flex shrink-0 items-center gap-2"
+                htmlFor="show-labels"
+              >
+                <Checkbox
+                  checked={showLabels}
+                  id="show-labels"
+                  onCheckedChange={(checked) => setShowLabels(!!checked)}
+                />
+                <span className="text-muted-foreground">Labels</span>
+              </label>
+
+              <Separator
+                className="hidden h-4 lg:block"
+                orientation="vertical"
+              />
+
+              <button
+                className="shrink-0 text-muted-foreground hover:text-foreground"
+                onClick={() => {
+                  setSize(32);
+                  setStrokeWidth(2);
+                  setColor(null);
+                  setAbsolute(false);
+                  setShowLabels(false);
+                }}
+                type="button"
+              >
+                Reset
+              </button>
+            </div>
           </div>
         </div>
 
