@@ -71,7 +71,7 @@ function IconPage() {
         <div className="mx-auto max-w-2xl px-6 py-12">
           <Link
             className="text-muted-foreground text-sm hover:text-foreground"
-            to="/"
+            to="/icons"
           >
             &larr; All icons
           </Link>

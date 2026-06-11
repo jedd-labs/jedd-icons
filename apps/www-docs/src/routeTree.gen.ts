@@ -14,6 +14,7 @@ import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as LlmsFullDottxtRouteImport } from './routes/llms-full[.]txt'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as IconsIndexRouteImport } from './routes/icons/index'
 import { Route as IconsNameRouteImport } from './routes/icons/$name'
 import { Route as DocsChar123Char125DotmdRouteImport } from './routes/docs/{$}[.]md'
 import { Route as DocsSplatRouteImport } from './routes/docs/$'
@@ -42,6 +43,11 @@ const LlmsFullDottxtRoute = LlmsFullDottxtRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IconsIndexRoute = IconsIndexRouteImport.update({
+  id: '/icons/',
+  path: '/icons/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IconsNameRoute = IconsNameRouteImport.update({
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/docs/$': typeof DocsSplatRoute
   '/docs/{$}.md': typeof DocsChar123Char125DotmdRoute
   '/icons/$name': typeof IconsNameRoute
+  '/icons/': typeof IconsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByTo {
   '/docs/$': typeof DocsSplatRoute
   '/docs/{$}.md': typeof DocsChar123Char125DotmdRoute
   '/icons/$name': typeof IconsNameRoute
+  '/icons': typeof IconsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -98,6 +106,7 @@ export interface FileRoutesById {
   '/docs/$': typeof DocsSplatRoute
   '/docs/{$}.md': typeof DocsChar123Char125DotmdRoute
   '/icons/$name': typeof IconsNameRoute
+  '/icons/': typeof IconsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -111,6 +120,7 @@ export interface FileRouteTypes {
     | '/docs/$'
     | '/docs/{$}.md'
     | '/icons/$name'
+    | '/icons/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -122,6 +132,7 @@ export interface FileRouteTypes {
     | '/docs/$'
     | '/docs/{$}.md'
     | '/icons/$name'
+    | '/icons'
   id:
     | '__root__'
     | '/'
@@ -133,6 +144,7 @@ export interface FileRouteTypes {
     | '/docs/$'
     | '/docs/{$}.md'
     | '/icons/$name'
+    | '/icons/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -145,6 +157,7 @@ export interface RootRouteChildren {
   DocsSplatRoute: typeof DocsSplatRoute
   DocsChar123Char125DotmdRoute: typeof DocsChar123Char125DotmdRoute
   IconsNameRoute: typeof IconsNameRoute
+  IconsIndexRoute: typeof IconsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -182,6 +195,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/icons/': {
+      id: '/icons/'
+      path: '/icons'
+      fullPath: '/icons/'
+      preLoaderRoute: typeof IconsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/icons/$name': {
@@ -225,6 +245,7 @@ const rootRouteChildren: RootRouteChildren = {
   DocsSplatRoute: DocsSplatRoute,
   DocsChar123Char125DotmdRoute: DocsChar123Char125DotmdRoute,
   IconsNameRoute: IconsNameRoute,
+  IconsIndexRoute: IconsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

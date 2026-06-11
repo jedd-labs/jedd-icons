@@ -27,6 +27,7 @@ function buildSitemap() {
   // listed below via source.getPages().
   const entries: SitemapEntry[] = [
     { path: "/", changefreq: "daily", priority: 1.0 },
+    { path: "/icons", changefreq: "daily", priority: 0.9 },
   ];
 
   // Docs pages, discovered from the Fumadocs source (page.url is the route path).

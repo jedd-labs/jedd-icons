@@ -24,7 +24,7 @@ export function baseOptions(): BaseLayoutProps {
       ),
     },
     links: [
-      { text: "Icons", url: "/" },
+      { text: "Icons", url: "/icons" },
       { text: "Docs", url: "/docs" },
     ],
     githubUrl: `https://github.com/${gitConfig.user}/${gitConfig.repo}`,
