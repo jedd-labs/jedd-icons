@@ -94,7 +94,7 @@ function IconPage() {
               )}
             </div>
 
-            <h1 className="font-semibold text-2xl">{name}</h1>
+            <h1 className="font-heading text-2xl">{name}</h1>
 
             {availableVariants.length > 1 && (
               <div className="flex overflow-hidden rounded-md border border-border">

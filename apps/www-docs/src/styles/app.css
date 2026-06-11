@@ -7,6 +7,17 @@ html {
   scrollbar-gutter: stable;
 }
 
+/* Auto-apply the heading treatment to all MDX docs-content headings so they
+   stay consistent with the `font-heading` utility used elsewhere. Scoped to the
+   fumadocs prose body so it never touches the nav, sidebar, or homepage.
+   :where() keeps specificity at 0 so per-heading overrides still win. The page
+   title sits outside .prose and gets `font-heading` directly on <DocsTitle>. */
+:where(.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6) {
+  font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight);
+  letter-spacing: var(--font-heading-tracking);
+}
+
 /* Decorative node placed on a grid-line intersection: an 8px square filled with
    the page background and outlined in the border color, centered on the line
    crossing. The x/y offsets nudge it a half-pixel so it lands cleanly on the

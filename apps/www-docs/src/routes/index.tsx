@@ -104,7 +104,7 @@ function HomePage() {
           {/* Hero */}
           <section className="relative border-border border-b px-6 py-20 text-center">
             <GridDots columns={frameColumns} row="100%" y="outer-bottom" />
-            <h1 className="relative mx-auto mb-4 max-w-2xl font-semibold text-4xl text-foreground tracking-tight md:text-5xl">
+            <h1 className="relative mx-auto mb-4 max-w-2xl font-heading text-4xl text-foreground md:text-5xl">
               Sharp, squared icons{" "}
               <span className="text-muted-foreground">
                 for modern interfaces
@@ -195,7 +195,7 @@ function HomePage() {
           <section className="relative flex min-h-[20rem] items-center justify-center border-border border-b px-6 py-20 text-center">
             <GridDots columns={frameColumns} row="100%" y="outer-bottom" />
             <div>
-              <h2 className="mb-2 font-semibold text-3xl text-foreground tracking-tight md:text-4xl">
+              <h2 className="mb-2 font-heading text-3xl text-foreground md:text-4xl">
                 Ready to ship?
               </h2>
               <p className="mx-auto mb-8 max-w-md text-muted-foreground">
