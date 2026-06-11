@@ -7,6 +7,24 @@ html {
   scrollbar-gutter: stable;
 }
 
+/* Decorative node placed on a grid-line intersection: an 8px square filled with
+   the page background and outlined in the border color, centered on the line
+   crossing. The x/y offsets nudge it a half-pixel so it lands cleanly on the
+   1px border instead of straddling a sub-pixel. Used by <GridDots>. */
+.grid-dot {
+  position: absolute;
+  z-index: 10;
+  width: 8px;
+  height: 8px;
+  pointer-events: none;
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  transform: translate(
+    calc(-50% + var(--grid-dot-x, 0px)),
+    calc(-50% + var(--grid-dot-y, 0px))
+  );
+}
+
 html > body[data-scroll-locked] {
   --removed-body-scroll-bar-size: 0px !important;
   margin-right: 0px !important;
