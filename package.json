@@ -12,6 +12,7 @@
   "name": "jedd-icons",
   "scripts": {
     "clean-svgs": "tsx tools/build-icons/clean-svgs.ts",
+    "gen-releases": "tsx tools/build-icons/gen-releases.ts",
     "icons": "pnpm clean-svgs && pnpm build",
     "build": "turbo build",
     "dev": "turbo dev",

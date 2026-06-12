@@ -1,7 +1,12 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { HomeLayout } from "fumadocs-ui/layouts/home";
 import { useState } from "react";
-import { humanizeIconName, VARIANT_MAPS, type Variant } from "@/lib/icons";
+import {
+  getIconRelease,
+  humanizeIconName,
+  VARIANT_MAPS,
+  type Variant,
+} from "@/lib/icons";
 import { baseOptions } from "@/lib/layout.shared";
 import { appName, pageTitle, siteUrl } from "@/lib/shared";
 
@@ -40,6 +45,7 @@ function IconPage() {
 
   const [variant, setVariant] = useState<Variant>(initialVariant);
   const Component = VARIANT_MAPS[variant][name];
+  const release = getIconRelease(name);
 
   const [size, setSize] = useState(48);
   const [strokeWidth, setStrokeWidth] = useState(2);
@@ -95,6 +101,30 @@ function IconPage() {
             </div>
 
             <h1 className="font-heading text-2xl">{name}</h1>
+
+            {release && (
+              <p className="text-muted-foreground text-xs">
+                {release.unreleased ? (
+                  "Unreleased"
+                ) : (
+                  <>
+                    Added in{" "}
+                    <span
+                      className="font-medium text-foreground"
+                      title={new Date(
+                        release.createdRelease.date
+                      ).toLocaleDateString(undefined, {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    >
+                      v{release.createdRelease.version}
+                    </span>
+                  </>
+                )}
+              </p>
+            )}
 
             {availableVariants.length > 1 && (
               <div className="flex overflow-hidden rounded-md border border-border">

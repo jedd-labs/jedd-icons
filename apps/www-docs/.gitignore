@@ -17,4 +17,8 @@ node_modules
 
 .source
 
+# Generated from git tag history by `pnpm gen-releases` (see predev/prebuild).
+# A build artifact like .source — regenerated each install/dev/build, not committed.
+.generated
+
 .wrangler

@@ -1,6 +1,7 @@
 import type { JeddIcon } from "@jedd-icons/react";
 import * as StrokeLib from "@jedd-icons/react";
 import * as FillLib from "@jedd-icons/react/fill";
+import iconReleases from "generated/icon-releases.json";
 
 export type Variant = "stroke" | "fill";
 
@@ -51,4 +52,32 @@ export function humanizeIconName(name: string) {
     .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+/** PascalCase component name → kebab-case source name: "ChevronRight" → "chevron-right". */
+function pascalToKebab(name: string) {
+  return name
+    .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
+    .replace(/([A-Z])([A-Z][a-z])/g, "$1-$2")
+    .toLowerCase();
+}
+
+/** Which release an icon first appeared in (and was last changed in). */
+export interface IconRelease {
+  changedRelease: { version: string; date: string };
+  createdRelease: { version: string; date: string };
+  /** True when the icon exists in source but isn't in a tagged release yet. */
+  unreleased?: boolean;
+}
+
+// Generated from git tag history by `pnpm gen-releases`. Keyed by kebab-case
+// source name; values describe the icon's first/last release.
+const releases = iconReleases as Record<string, IconRelease>;
+
+/**
+ * Release info for an icon by its PascalCase component name (e.g. "ChevronRight").
+ * Returns null when no release metadata exists for the icon.
+ */
+export function getIconRelease(name: string): IconRelease | null {
+  return releases[pascalToKebab(name)] ?? null;
 }

@@ -4,15 +4,18 @@
   "type": "module",
   "sideEffects": false,
   "scripts": {
+    "gen-releases": "tsx ../../tools/build-icons/gen-releases.ts",
+    "predev": "pnpm gen-releases",
     "dev": "vite dev",
+    "prebuild": "pnpm gen-releases",
     "build": "vite build",
     "start": "vite preview",
     "preview": "vite preview",
     "deploy": "npm run build && wrangler deploy",
     "deploy:dry": "npm run build && wrangler deploy --dry-run",
     "cf-typegen": "wrangler types",
-    "types:check": "fumadocs-mdx && tsc --noEmit",
-    "postinstall": "fumadocs-mdx"
+    "types:check": "fumadocs-mdx && pnpm gen-releases && tsc --noEmit",
+    "postinstall": "fumadocs-mdx && pnpm gen-releases"
   },
   "dependencies": {
     "@tanstack/react-router": "catalog:",
@@ -40,6 +43,7 @@
     "@vitejs/plugin-react": "catalog:",
     "nitro": "catalog:",
     "tailwindcss": "catalog:",
+    "tsx": "catalog:",
     "typescript": "catalog:",
     "wrangler": "catalog:"
   }
