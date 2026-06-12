@@ -15,6 +15,7 @@ import { useId, useState } from "react";
 import {
   buildReactSnippet,
   buildVanillaSnippet,
+  getIconRelease,
   humanizeIconName,
   type SnippetOptions,
   VARIANT_MAPS,
@@ -58,6 +59,7 @@ function IconPage() {
 
   const [variant, setVariant] = useState<Variant>(initialVariant);
   const Component = VARIANT_MAPS[variant][name];
+  const release = getIconRelease(name);
 
   const [size, setSize] = useState(48);
   const [strokeWidth, setStrokeWidth] = useState(2);
@@ -118,6 +120,30 @@ function IconPage() {
             </div>
 
             <h1 className="font-heading text-2xl">{name}</h1>
+
+            {release && (
+              <p className="-mt-3 text-muted-foreground text-xs">
+                {release.unreleased ? (
+                  "Unreleased"
+                ) : (
+                  <>
+                    Added in{" "}
+                    <span
+                      className="font-medium text-foreground"
+                      title={new Date(
+                        release.createdRelease.date
+                      ).toLocaleDateString(undefined, {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    >
+                      v{release.createdRelease.version}
+                    </span>
+                  </>
+                )}
+              </p>
+            )}
 
             {availableVariants.length > 1 && (
               <Tabs
