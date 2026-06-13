@@ -1,5 +1,11 @@
 # @jedd-icons/core
 
+## 0.0.5
+
+### Patch Changes
+
+- [#21](https://github.com/jedd-labs/jedd-icons/pull/21) [`9283558`](https://github.com/jedd-labs/jedd-icons/commit/92835588aa759889f7fd356f3a6964fa59a15a1b) Thanks [@mnove](https://github.com/mnove)! - Fix contributor for arrow-down-left filled variant
+
 ## 0.0.4
 
 ### Patch Changes
