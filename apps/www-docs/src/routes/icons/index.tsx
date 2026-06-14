@@ -5,12 +5,6 @@ import { Input } from "@workspace/ui/components/input";
 import { Separator } from "@workspace/ui/components/separator";
 import { Slider } from "@workspace/ui/components/slider";
 import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@workspace/ui/components/tabs";
-import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -19,21 +13,21 @@ import { HomeLayout } from "fumadocs-ui/layouts/home";
 import { X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useMemo, useState } from "react";
-import { CodeSnippet } from "@/components/code-snippet";
+import { GridNode, SelectedCorners } from "@/components/grid-node";
 import { IconContributors } from "@/components/icon-contributors";
+import { IconPreview } from "@/components/icon-preview";
 import { IconReleaseInfo } from "@/components/icon-release-info";
+import { UsageTabs } from "@/components/usage-tabs";
 import {
-  buildReactSnippet,
-  buildVanillaSnippet,
   getIconContributors,
   getIconRelease,
-  type SnippetOptions,
   VARIANT_ICONS,
   VARIANT_MAPS,
   type Variant,
 } from "@/lib/icons";
 import { baseOptions } from "@/lib/layout.shared";
 import { appName, pageTitle, siteUrl } from "@/lib/shared";
+import { useIconCustomization } from "@/lib/use-icon-customization";
 
 export const Route = createFileRoute("/icons/")({
   component: IconsPage,
@@ -49,76 +43,25 @@ export const Route = createFileRoute("/icons/")({
   }),
 });
 
-// Decorative crosshair marker centered on a cell's top-left grid intersection.
-// The grid gap line sits at the cell's exact top/left edge (x=0, y=0). Each arm
-// is an odd-length 1px bar offset by whole integer pixels so it snaps to the
-// device pixel grid instead of landing on a half-pixel (which blurs / shifts it).
-const ARM = 7; // total arm length in px (odd, so the 1px line is dead-centered)
-const HALF = (ARM - 1) / 2; // 3px on each side of the center pixel
-
-function GridNode() {
-  return (
-    <span
-      aria-hidden
-      className="pointer-events-none absolute top-0 left-0 z-10"
-    >
-      {/* The gap line occupies the 1px immediately before the cell edge, i.e. at
-          x=-1 (vertical) and y=-1 (horizontal). Arms sit on that exact pixel. */}
-      {/* horizontal arm: 1px tall, on the gap line at y=-1 */}
-      <span
-        className="absolute bg-border"
-        style={{ left: -HALF - 1, top: -1, width: ARM, height: 1 }}
-      />
-      {/* vertical arm: 1px wide, on the gap line at x=-1 */}
-      <span
-        className="absolute bg-border"
-        style={{ left: -1, top: -HALF - 1, width: 1, height: ARM }}
-      />
-    </span>
-  );
-}
-
-// Bright registration brackets shown on the four corners of the selected cell.
-// Reuses the grid's own line language (1px arms, integer-pixel snapped) but at
-// full foreground strength and pointing INWARD from each corner — an L-bracket.
-const BRACKET = 10; // arm length in px
-
-function SelectedCorners() {
-  // Each corner = one horizontal + one vertical arm meeting at the cell corner.
-  // Coordinates are integer px relative to the cell box (0,0 top-left).
-  const corners = [
-    { id: "tl", h: { left: -1, top: -1 }, v: { left: -1, top: -1 } }, // top-left
-    { id: "tr", h: { right: -1, top: -1 }, v: { right: -1, top: -1 } }, // top-right
-    { id: "bl", h: { left: -1, bottom: -1 }, v: { left: -1, bottom: -1 } }, // bottom-left
-    { id: "br", h: { right: -1, bottom: -1 }, v: { right: -1, bottom: -1 } }, // bottom-right
-  ];
-  return (
-    <span aria-hidden className="pointer-events-none absolute inset-0 z-20">
-      {corners.map((c) => (
-        <span key={`corner-${c.id}`}>
-          <span
-            className="absolute bg-foreground"
-            style={{ ...c.h, width: BRACKET, height: 1 }}
-          />
-          <span
-            className="absolute bg-foreground"
-            style={{ ...c.v, width: 1, height: BRACKET }}
-          />
-        </span>
-      ))}
-    </span>
-  );
-}
-
 function IconsPage() {
   const [variant, setVariant] = useState<Variant>("stroke");
   const [query, setQuery] = useState("");
-  const [size, setSize] = useState(32);
-  const [strokeWidth, setStrokeWidth] = useState(2);
-  const [color, setColor] = useState<string | null>(null);
-  const [absolute, setAbsolute] = useState(false);
   const [showLabels, setShowLabels] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
+
+  const {
+    size,
+    setSize,
+    strokeWidth,
+    setStrokeWidth,
+    color,
+    setColor,
+    absolute,
+    setAbsolute,
+    reset,
+    reactSnippet,
+    vanillaSnippet,
+  } = useIconCustomization({ name: selected ?? "", variant, defaultSize: 32 });
 
   const allIcons = VARIANT_ICONS[variant];
   const iconsMap = VARIANT_MAPS[variant];
@@ -132,19 +75,6 @@ function IconsPage() {
   }, [query, allIcons]);
 
   const SelectedComponent = selected ? iconsMap[selected] : null;
-
-  const snippetOptions: SnippetOptions = {
-    name: selected ?? "",
-    variant,
-    size,
-    strokeWidth,
-    absolute,
-    color,
-  };
-  const reactSnippet = buildReactSnippet(snippetOptions);
-  const vanillaSnippet = buildVanillaSnippet(snippetOptions);
-
-  const [codeTab, setCodeTab] = useState<"react" | "vanilla">("react");
 
   const placeholderCount = Math.max(0, 60 - allIcons.length);
   const placeholders = Array.from({ length: placeholderCount }, (_, i) => ({
@@ -308,10 +238,7 @@ function IconsPage() {
               <button
                 className="shrink-0 text-muted-foreground hover:text-foreground"
                 onClick={() => {
-                  setSize(32);
-                  setStrokeWidth(2);
-                  setColor(null);
-                  setAbsolute(false);
+                  reset();
                   setShowLabels(false);
                 }}
                 type="button"
@@ -351,13 +278,14 @@ function IconsPage() {
                       }
                     >
                       <span className="flex">
-                        <Component
-                          size={size}
-                          {...(variant === "stroke"
-                            ? { strokeWidth, absoluteStrokeWidth: absolute }
-                            : {})}
-                          {...(color ? { color } : {})}
+                        <IconPreview
+                          absolute={absolute}
                           aria-hidden
+                          color={color}
+                          component={Component}
+                          size={size}
+                          strokeWidth={strokeWidth}
+                          variant={variant}
                         />
                       </span>
                       {showLabels && (
@@ -412,12 +340,13 @@ function IconsPage() {
           >
             <div className="mx-auto flex max-w-6xl items-start gap-6 px-6 py-4 sm:items-center">
               <div className="flex shrink-0 items-center justify-center rounded-none border border-border bg-muted/30 p-4">
-                <SelectedComponent
+                <IconPreview
+                  absolute={absolute}
+                  color={color}
+                  component={SelectedComponent}
                   size={48}
-                  {...(variant === "stroke"
-                    ? { strokeWidth, absoluteStrokeWidth: absolute }
-                    : {})}
-                  {...(color ? { color } : {})}
+                  strokeWidth={strokeWidth}
+                  variant={variant}
                 />
               </div>
 
@@ -456,23 +385,10 @@ function IconsPage() {
                     </Button>
                   </div>
                 </div>
-                <Tabs
-                  onValueChange={(value) =>
-                    setCodeTab(value as "react" | "vanilla")
-                  }
-                  value={codeTab}
-                >
-                  <TabsList variant="line">
-                    <TabsTrigger value="react">React</TabsTrigger>
-                    <TabsTrigger value="vanilla">Vanilla</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="react">
-                    <CodeSnippet code={reactSnippet} />
-                  </TabsContent>
-                  <TabsContent value="vanilla">
-                    <CodeSnippet code={vanillaSnippet} />
-                  </TabsContent>
-                </Tabs>
+                <UsageTabs
+                  reactSnippet={reactSnippet}
+                  vanillaSnippet={vanillaSnippet}
+                />
               </div>
             </div>
           </motion.div>

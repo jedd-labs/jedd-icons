@@ -3,29 +3,23 @@ import { Button } from "@workspace/ui/components/button";
 import { Checkbox } from "@workspace/ui/components/checkbox";
 import { Label } from "@workspace/ui/components/label";
 import { Slider } from "@workspace/ui/components/slider";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@workspace/ui/components/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@workspace/ui/components/tabs";
 import { HomeLayout } from "fumadocs-ui/layouts/home";
 import { useId, useState } from "react";
-import { CodeSnippet } from "@/components/code-snippet";
 import { IconContributors } from "@/components/icon-contributors";
+import { IconPreview } from "@/components/icon-preview";
 import { IconReleaseInfo } from "@/components/icon-release-info";
+import { UsageTabs } from "@/components/usage-tabs";
 import {
-  buildReactSnippet,
-  buildVanillaSnippet,
   getIconContributors,
   getIconRelease,
   humanizeIconName,
-  type SnippetOptions,
   VARIANT_MAPS,
   type Variant,
 } from "@/lib/icons";
 import { baseOptions } from "@/lib/layout.shared";
 import { appName, pageTitle, siteUrl } from "@/lib/shared";
+import { useIconCustomization } from "@/lib/use-icon-customization";
 
 export const Route = createFileRoute("/icons/$name")({
   component: IconPage,
@@ -65,35 +59,25 @@ function IconPage() {
   const release = getIconRelease(name);
   const contributors = getIconContributors(name, variant);
 
-  const [size, setSize] = useState(48);
-  const [strokeWidth, setStrokeWidth] = useState(2);
-  const [color, setColor] = useState<string | null>(null);
-  const [absolute, setAbsolute] = useState(false);
-  const [codeTab, setCodeTab] = useState<"react" | "vanilla">("react");
+  const {
+    size,
+    setSize,
+    strokeWidth,
+    setStrokeWidth,
+    color,
+    setColor,
+    absolute,
+    setAbsolute,
+    reset,
+    reactSnippet,
+    vanillaSnippet,
+  } = useIconCustomization({ name, variant, defaultSize: 48 });
 
   const absoluteId = useId();
-
-  const snippetOptions: SnippetOptions = {
-    name,
-    variant,
-    size,
-    strokeWidth,
-    absolute,
-    color,
-  };
-  const reactSnippet = buildReactSnippet(snippetOptions);
-  const vanillaSnippet = buildVanillaSnippet(snippetOptions);
 
   const availableVariants = (["stroke", "fill"] as const).filter(
     (v) => name in VARIANT_MAPS[v]
   );
-
-  const reset = () => {
-    setSize(48);
-    setStrokeWidth(2);
-    setColor(null);
-    setAbsolute(false);
-  };
 
   return (
     <HomeLayout {...baseOptions()}>
@@ -107,20 +91,14 @@ function IconPage() {
 
           <div className="mt-8 flex flex-col items-center gap-6">
             <div className="flex size-48 items-center justify-center border border-border bg-muted/30">
-              {Component ? (
-                <Component
-                  size={size}
-                  {...(variant === "stroke"
-                    ? { strokeWidth, absoluteStrokeWidth: absolute }
-                    : {})}
-                  {...(color ? { color } : {})}
-                />
-              ) : (
-                <div
-                  className="bg-muted/40"
-                  style={{ width: size, height: size }}
-                />
-              )}
+              <IconPreview
+                absolute={absolute}
+                color={color}
+                component={Component}
+                size={size}
+                strokeWidth={strokeWidth}
+                variant={variant}
+              />
             </div>
 
             <h1 className="font-heading text-2xl">{name}</h1>
@@ -219,24 +197,12 @@ function IconPage() {
             <span className="font-medium text-muted-foreground text-xs">
               Usage
             </span>
-            <Tabs
+            <UsageTabs
               className="mt-2"
-              onValueChange={(value) =>
-                setCodeTab(value as "react" | "vanilla")
-              }
-              value={codeTab}
-            >
-              <TabsList variant="line">
-                <TabsTrigger value="react">React</TabsTrigger>
-                <TabsTrigger value="vanilla">Vanilla</TabsTrigger>
-              </TabsList>
-              <TabsContent value="react">
-                <CodeSnippet code={reactSnippet} heightClassName="h-64" />
-              </TabsContent>
-              <TabsContent value="vanilla">
-                <CodeSnippet code={vanillaSnippet} heightClassName="h-64" />
-              </TabsContent>
-            </Tabs>
+              heightClassName="h-64"
+              reactSnippet={reactSnippet}
+              vanillaSnippet={vanillaSnippet}
+            />
           </div>
         </div>
       </div>

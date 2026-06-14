@@ -30,9 +30,6 @@ export const Route = createFileRoute("/")({
 const frameColumns = gridColumns(1);
 const previewColumns = responsiveGridColumns(4, 8);
 
-// Two full rows of an 8-wide grid. The preview is padded to this size with
-// "coming soon" cells when the package ships fewer icons, so the grid always
-// reads as a deliberate, complete block rather than a half-empty row.
 const PREVIEW_SLOTS = 16;
 const previewIcons = VARIANT_ICONS.stroke.slice(0, PREVIEW_SLOTS);
 const previewPlaceholders = Math.max(0, PREVIEW_SLOTS - previewIcons.length);
@@ -129,10 +126,6 @@ function HomePage() {
                 </TiltButton>
               </Link>
             </div>
-
-            {/* <div className="relative mt-12 flex justify-center">
-              <HeroBlueprint />
-            </div> */}
           </section>
 
           {/* Live icon preview grid — links to the full gallery */}
