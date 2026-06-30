@@ -56,6 +56,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Create Release PR or Publish
+        id: changesets
         uses: changesets/action@v1
         with:
           # Consumes pending changesets, bumps versions, writes CHANGELOG.md,
@@ -77,3 +78,18 @@ jobs:
           # tokens. Auth comes from the id-token: write permission above.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_PROVENANCE: "true"
+
+      # Rebuild the docs site AFTER publish. The Cloudflare Pages build runs
+      # `gen-releases`, which derives each icon's "Added in vX" line from the
+      # `@jedd-icons/react@*` git tags. Those tags are pushed by the publish
+      # step above — but the docs auto-deploy fires earlier, on the push that
+      # merges the Version PR, when the new tag does not yet exist. So that
+      # build marks the just-released icons "Unreleased". This hook re-triggers
+      # the build now that the tag is live, so they resolve to "Added in vX".
+      # Gated on `published` so it only runs on a real publish, not on the
+      # version-bump runs. Skips quietly if the deploy-hook secret is unset.
+      - name: Rebuild docs site so new icons show their release version
+        if: steps.changesets.outputs.published == 'true' && env.CF_PAGES_DEPLOY_HOOK != ''
+        env:
+          CF_PAGES_DEPLOY_HOOK: ${{ secrets.CF_PAGES_DEPLOY_HOOK }}
+        run: curl -fsS -X POST "$CF_PAGES_DEPLOY_HOOK"
