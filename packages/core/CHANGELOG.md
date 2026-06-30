@@ -1,5 +1,11 @@
 # @jedd-icons/core
 
+## 0.0.7
+
+### Patch Changes
+
+- [#28](https://github.com/jedd-labs/jedd-icons/pull/28) [`ed0c8b1`](https://github.com/jedd-labs/jedd-icons/commit/ed0c8b1e659f600f0d09303b4d3f5c0162090b1d) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add icons arrow-up, arrow-down, arrow-left, arrow-right
+
 ## 0.0.6
 
 ### Patch Changes
