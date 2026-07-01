@@ -1,5 +1,13 @@
 # @jedd-icons/core
 
+## 0.0.8
+
+### Patch Changes
+
+- [#31](https://github.com/jedd-labs/jedd-icons/pull/31) [`d7f66bb`](https://github.com/jedd-labs/jedd-icons/commit/d7f66bb1f427504c9f3c3907813ae8ac53632347) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add arrow-corner-down-left, arrow-corner-down-right, arrow-corner-left-up, arrow-corner-right-up
+
+- [#32](https://github.com/jedd-labs/jedd-icons/pull/32) [`3618c96`](https://github.com/jedd-labs/jedd-icons/commit/3618c96c570fe37d9555c983f1d909f8d70077ac) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add arrow-corner-left-down, arrow-corner-right-down, arrow-corner-up-left, arrow-corner-up-right
+
 ## 0.0.7
 
 ### Patch Changes
