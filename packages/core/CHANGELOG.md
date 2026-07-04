@@ -1,5 +1,11 @@
 # @jedd-icons/core
 
+## 0.0.10
+
+### Patch Changes
+
+- [#38](https://github.com/jedd-labs/jedd-icons/pull/38) [`793c9a4`](https://github.com/jedd-labs/jedd-icons/commit/793c9a498eef805f13fc331b06fa9d6112bedf42) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add chevron-down, chevron-left, chevron-right, chevron-up, chevrons-down, chevrons-left, chevrons-right, chevrons-up
+
 ## 0.0.9
 
 ### Patch Changes
