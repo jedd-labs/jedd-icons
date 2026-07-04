@@ -1,6 +1,6 @@
 {
   "$schema": "../../icon.schema.json",
   "contributors": ["mnove"],
-  "tags": ["down-left", "direction", "south-west"],
+  "tags": ["down-left", "direction", "south-west", "diagonal"],
   "categories": ["arrows"]
 }

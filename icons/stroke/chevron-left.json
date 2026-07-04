@@ -1,6 +1,15 @@
 {
   "$schema": "../../icon.schema.json",
   "contributors": ["agoscolantuoni"],
-  "tags": ["chevron", "left", "direction", "west"],
+  "tags": [
+    "chevron",
+    "left",
+    "direction",
+    "west",
+    "back",
+    "previous",
+    "menu",
+    "<"
+  ],
   "categories": ["arrows"]
 }
