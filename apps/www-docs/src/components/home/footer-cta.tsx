@@ -1,5 +1,5 @@
+import { ArrowRight } from "@jedd-icons/react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight } from "lucide-react";
 import { GridDots, gridColumns } from "@/components/grid-dots";
 import { TiltButton } from "@/components/tilt-button";
 import { appName } from "@/lib/shared";
@@ -18,7 +18,7 @@ export function FooterCta() {
           Install {appName} and drop sharp, consistent icons into your app in
           minutes.
         </p>
-        <Link params={{ _splat: "" }} to="/docs/$">
+        <Link className="inline-block" params={{ _splat: "" }} to="/docs/$">
           <TiltButton rounded={false} shortcut="R">
             <ArrowRight />
             Read the docs

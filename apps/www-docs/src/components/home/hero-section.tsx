@@ -1,6 +1,7 @@
+import { ArrowRight } from "@jedd-icons/react";
 import { Link } from "@tanstack/react-router";
 import { Badge } from "@workspace/ui/components/badge";
-import { ArrowRight, BoxIcon } from "lucide-react";
+import { BoxIcon } from "lucide-react";
 import { GridDots, gridColumns } from "@/components/grid-dots";
 import { TiltButton } from "@/components/tilt-button";
 
