@@ -2,13 +2,14 @@
   "$schema": "../../icon.schema.json",
   "contributors": ["agoscolantuoni"],
   "tags": [
-    "corner",
-    "down-right",
+    "chevron",
+    "left",
     "direction",
-    "south-east",
-    "arrow",
-    "tab",
-    "indent"
+    "west",
+    "back",
+    "previous",
+    "menu",
+    "<"
   ],
   "categories": ["arrows"]
 }
