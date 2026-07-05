@@ -22,6 +22,7 @@
       "items": {
         "type": "string",
         "enum": [
+          "actions",
           "arrows",
           "charts",
           "communication",
