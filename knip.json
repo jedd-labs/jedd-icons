@@ -3,7 +3,9 @@
   "tags": ["-lintignore"],
   "ignore": ["apps/www-docs/src/components/hero-blueprint.tsx"],
   "workspaces": {
-    ".": {},
+    ".": {
+      "ignoreDependencies": ["@biomejs/biome"]
+    },
     "packages/*": {},
     "packages/react": {
       "entry": ["src/fill.ts"]
