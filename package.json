@@ -3,6 +3,8 @@
     "@biomejs/biome": "catalog:",
     "@changesets/changelog-github": "catalog:",
     "@changesets/cli": "catalog:",
+    "@types/node": "catalog:",
+    "knip": "catalog:",
     "lefthook": "catalog:",
     "tsx": "catalog:",
     "turbo": "catalog:",
@@ -25,7 +27,8 @@
     "changeset": "changeset",
     "version": "changeset version",
     "release": "turbo build && changeset publish",
-    "prepare": "lefthook install"
+    "prepare": "lefthook install",
+    "knip": "knip"
   },
   "version": "0.0.1",
   "private": true,
