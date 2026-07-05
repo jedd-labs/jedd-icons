@@ -1,6 +1,6 @@
 {
   "$schema": "../../icon.schema.json",
   "contributors": ["agoscolantuoni"],
-  "tags": ["equal", "equals", "small", "math", "assignment", "="],
+  "tags": ["equal", "equals", "math", "assignment", "="],
   "categories": ["layout", "text"]
 }
