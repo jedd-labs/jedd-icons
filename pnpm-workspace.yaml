@@ -57,7 +57,6 @@ catalog:
   shadcn: ^4.7.0
   sugar-high: ^1.2.1
   vaul: ^1.1.2
-  zod: ^3.25.76
 
   # Fonts
   "@fontsource-variable/hubot-sans": ^5.2.8
@@ -70,7 +69,6 @@ catalog:
 
   # TanStack
   "@tanstack/react-router": 1.170.4
-  "@tanstack/react-router-devtools": 1.167.0
   "@tanstack/react-start": 1.168.6
 
   # Turbo gen

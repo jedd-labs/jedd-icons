@@ -19,8 +19,7 @@
     "shadcn": "catalog:",
     "tailwind-merge": "catalog:",
     "tw-animate-css": "catalog:",
-    "vaul": "catalog:",
-    "zod": "catalog:"
+    "vaul": "catalog:"
   },
   "devDependencies": {
     "@tailwindcss/vite": "catalog:",
