@@ -1,0 +1,15 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "refresh",
+    "reload",
+    "clockwise",
+    "sync",
+    "rotate",
+    "rerun",
+    "circular",
+    "cycle"
+  ],
+  "categories": ["actions"]
+}
