@@ -48,6 +48,11 @@ export const ALL_ICON_NAMES = Array.from(
 ).sort((a, b) => a.localeCompare(b));
 
 /** PascalCase component name → spaced words: "ChevronRight" → "Chevron Right". */
+/** Variants an icon exists in, in canonical order (stroke before fill). */
+export function getAvailableVariants(name: string): Variant[] {
+  return (["stroke", "fill"] as const).filter((v) => name in VARIANT_MAPS[v]);
+}
+
 export function humanizeIconName(name: string) {
   return name
     .replace(/([a-z0-9])([A-Z])/g, "$1 $2")

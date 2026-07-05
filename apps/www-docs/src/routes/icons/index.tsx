@@ -17,6 +17,7 @@ import { GridNode, SelectedCorners } from "@/components/grid-node";
 import { IconContributors } from "@/components/icon-contributors";
 import { IconPreview } from "@/components/icon-preview";
 import { IconReleaseInfo } from "@/components/icon-release-info";
+import { SiteFooter } from "@/components/site-footer";
 import { UsageTabs } from "@/components/usage-tabs";
 import {
   getIconContributors,
@@ -326,6 +327,10 @@ function IconsPage() {
             </ul>
           )}
         </main>
+      </div>
+
+      <div className="mx-auto w-full max-w-6xl border-border border-x">
+        <SiteFooter />
       </div>
 
       <AnimatePresence>

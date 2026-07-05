@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { FooterCta } from "@/components/home/footer-cta";
 import { HeroSection } from "@/components/home/hero-section";
 import { IconPreviewGrid } from "@/components/home/icon-preview-grid";
-import { SiteFooter } from "@/components/home/site-footer";
+import { SiteFooter } from "@/components/site-footer";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { VARIANT_ICONS } from "@/lib/icons";
 import { baseOptions } from "@/lib/layout.shared";
