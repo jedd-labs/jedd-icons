@@ -1,0 +1,15 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "pen",
+    "write",
+    "edit",
+    "draw",
+    "change",
+    "create",
+    "writer",
+    "writing"
+  ],
+  "categories": ["design", "tool", "text"]
+}
