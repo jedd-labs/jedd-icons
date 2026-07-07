@@ -1,5 +1,17 @@
 # @jedd-icons/react
 
+## 0.0.12
+
+### Patch Changes
+
+- [#54](https://github.com/jedd-labs/jedd-icons/pull/54) [`8f45615`](https://github.com/jedd-labs/jedd-icons/commit/8f4561512a639a8b7d2ab69d20629577234ecc02) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add bolt, cog, settings, settings-2, settings-3
+
+- [#50](https://github.com/jedd-labs/jedd-icons/pull/50) [`dc94c8f`](https://github.com/jedd-labs/jedd-icons/commit/dc94c8f588924b2a28db0e206f832d2f73fb077b) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add cancel, divider, equal, minus, plus
+
+- [#52](https://github.com/jedd-labs/jedd-icons/pull/52) [`524a1ef`](https://github.com/jedd-labs/jedd-icons/commit/524a1ef6ca1de9b119322ede6ac93794ccddeaac) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add check, check-double, badge-check
+
+- [#53](https://github.com/jedd-labs/jedd-icons/pull/53) [`b7c25ad`](https://github.com/jedd-labs/jedd-icons/commit/b7c25adf0c2267616f95736a6838a0669b438e6d) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add menu-2-lines, menu-3-lines, menu-fries-left, menu-fries-right, menu-hotdog, menu-line-left, menu-lines-right, menu-stairs, menu-strawberry
+
 ## 0.0.11
 
 ### Patch Changes
