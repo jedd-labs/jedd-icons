@@ -1,20 +1,6 @@
 import type { LoaderPlugin } from "fumadocs-core/source";
 import { createElement, type ReactElement } from "react";
 
-/**
- * Custom SVG icons for the framework selector tabs (and any other meta.json
- * `icon` reference that matches a key below).
- *
- * Add an entry here, then reference it by key from a `meta.json` `icon` field,
- * e.g. `"icon": "react"`. Any icon name NOT found here is left untouched so the
- * `lucideIconsPlugin` (registered after this plugin) can resolve it from Lucide.
- *
- * To use your own artwork: replace the inline <svg> below, or import an SVG
- * file as a component and put it here:
- *
- *   import ReactLogo from "@/assets/react.svg?react";   // (with an svgr-style loader)
- *   export const frameworkIcons = { react: <ReactLogo />, ... };
- */
 export const frameworkIcons: Record<string, ReactElement> = {
   // ── React tab ──────────────────────────────────────────────────────
   react: (
@@ -52,11 +38,6 @@ export const frameworkIcons: Record<string, ReactElement> = {
   ),
 };
 
-/**
- * A loader plugin that resolves the icon names in `frameworkIcons` to custom
- * SVG elements, leaving every other name as-is for the next icon plugin
- * (lucideIconsPlugin) to handle.
- */
 export function frameworkIconsPlugin(): LoaderPlugin {
   function replaceIcon<T extends { icon?: unknown }>(node: T): T {
     if (typeof node.icon === "string" && node.icon in frameworkIcons) {

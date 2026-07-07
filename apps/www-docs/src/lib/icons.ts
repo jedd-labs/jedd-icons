@@ -1,6 +1,7 @@
 import type { JeddIcon } from "@jedd-icons/react";
 import * as StrokeLib from "@jedd-icons/react";
 import * as FillLib from "@jedd-icons/react/fill";
+import iconCategories from "generated/icon-categories.json";
 import iconContributors from "generated/icon-contributors.json";
 import iconReleases from "generated/icon-releases.json";
 
@@ -19,8 +20,7 @@ function extractIcons(lib: Record<string, unknown>) {
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 
-/** Sorted icon list per variant. Single source of truth for the gallery,
- *  individual icon pages, and the sitemap. */
+/** Sorted icon list per variant. */
 export const VARIANT_ICONS: Record<
   Variant,
   { name: string; Component: JeddIcon }[]
@@ -88,12 +88,35 @@ const contributors = iconContributors as Record<
 >;
 
 /**
- * GitHub usernames who contributed a specific variant of an icon, by its
- * PascalCase component name. Stroke and fill can have different contributors.
- * Returns an empty array when none are recorded.
+ * GitHub usernames who contributed a specific variant of an icon
  */
 export function getIconContributors(name: string, variant: Variant): string[] {
   return contributors[name]?.[variant] ?? [];
+}
+
+/** PascalCase component name → kebab source name: "RefreshCw" → "refresh-cw". */
+function pascalToKebab(name: string): string {
+  return name
+    .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
+    .replace(/([A-Z]+)([A-Z][a-z])/g, "$1-$2")
+    .toLowerCase();
+}
+
+// Generated from the icon `.json` sidecars by `pnpm gen-categories`. Categories
+// are a closed enum (see icon.schema.json)
+const categoriesByIcon = (
+  iconCategories as { byIcon: Record<string, string[]> }
+).byIcon;
+
+export function getIconCategories(name: string): string[] {
+  return categoriesByIcon[pascalToKebab(name)] ?? [];
+}
+
+export function humanizeCategory(category: string): string {
+  return category
+    .split("-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 }
 
 export interface SnippetOptions {
@@ -105,7 +128,6 @@ export interface SnippetOptions {
   variant: Variant;
 }
 
-/** React (`@jedd-icons/react`) usage snippet for the gallery and icon pages. */
 export function buildReactSnippet({
   name,
   variant,

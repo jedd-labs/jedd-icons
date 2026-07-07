@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { Checkbox } from "@workspace/ui/components/checkbox";
 import { Label } from "@workspace/ui/components/label";
@@ -14,8 +15,10 @@ import { SiteFooter } from "@/components/site-footer";
 import { UsageTabs } from "@/components/usage-tabs";
 import {
   getAvailableVariants,
+  getIconCategories,
   getIconContributors,
   getIconRelease,
+  humanizeCategory,
   humanizeIconName,
   VARIANT_MAPS,
   type Variant,
@@ -25,10 +28,6 @@ import { appName, pageTitle, siteUrl } from "@/lib/shared";
 import { useIconCustomization } from "@/lib/use-icon-customization";
 
 const frameColumns = gridColumns(1);
-
-// Neutral swatch shown when no explicit color is set (icon renders with
-// `currentColor`). The native color input needs a concrete hex, not a token;
-// zinc-500 reads acceptably against both light and dark backgrounds.
 const DEFAULT_COLOR_SWATCH = "#71717a";
 
 export const Route = createFileRoute("/icons/$name")({
@@ -74,6 +73,7 @@ function IconPage() {
   const Component = VARIANT_MAPS[variant][name];
   const release = getIconRelease(name);
   const contributors = getIconContributors(name, variant);
+  const categories = getIconCategories(name);
 
   const {
     size,
@@ -134,6 +134,19 @@ function IconPage() {
                     {contributors.length > 1 ? "Contributors" : "Contributor"}
                   </span>
                   <IconContributors contributors={contributors} />
+                </div>
+              )}
+
+              {categories.length > 0 && (
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  <span className="text-muted-foreground text-xs">
+                    {categories.length > 1 ? "Categories" : "Category"}
+                  </span>
+                  {categories.map((category) => (
+                    <Badge key={category} variant="secondary">
+                      {humanizeCategory(category)}
+                    </Badge>
+                  ))}
                 </div>
               )}
 
