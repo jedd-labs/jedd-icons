@@ -5,5 +5,5 @@
     "noEmit": true,
     "strictNullChecks": true
   },
-  "include": ["./build.ts", "./clean-svgs.ts"]
+  "include": ["./build.ts", "./clean-svgs.ts", "./naming.ts"]
 }

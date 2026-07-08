@@ -1,0 +1,19 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "refresh",
+    "reload",
+    "clockwise",
+    "off",
+    "inactive",
+    "disabled",
+    "sync",
+    "circular",
+    "cycle",
+    "cancel",
+    "stop",
+    "disconnect"
+  ],
+  "categories": ["actions"]
+}

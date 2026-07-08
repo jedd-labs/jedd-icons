@@ -2,17 +2,6 @@
 // Derives, from git history, the release in which each icon first appeared
 // ("since version") and the release it was last changed in. The result is
 // written to apps/www-docs/.generated/icon-releases.json for the docs site.
-//
-// The version is computed, never hand-maintained: we walk the
-// @jedd-icons/react@* tags in semver order, diff each tag against the previous
-// one, and record the first tag that ADDED each icon's SVG. Icons that exist in
-// the working tree but haven't been tagged yet (i.e. queued for the next
-// release) fall back to the current package version, marked `unreleased`.
-//
-// Works in shallow CI clones (Cloudflare Pages, Vercel): those check out with no
-// tags and limited history, so we fetch tags WITH their history from the public
-// remote ourselves over HTTPS — no auth, since the repo is public.
-// Uses only the git CLI + Node built-ins; no extra dependencies.
 
 import { execFileSync } from "node:child_process";
 import {
@@ -24,6 +13,7 @@ import {
 } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { kebabToPascal } from "./naming";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..", "..");
@@ -64,7 +54,6 @@ function git(args: string[]): string {
   }).trim();
 }
 
-/** Run git but never throw — returns null on failure. For best-effort steps. */
 function tryGit(args: string[]): string | null {
   try {
     return git(args);
@@ -77,7 +66,6 @@ function isShallowClone(): boolean {
   return tryGit(["rev-parse", "--is-shallow-repository"]) === "true";
 }
 
-/** Count of react release tags currently visible to git. */
 function tagCount(): number {
   const out = tryGit(["tag", "-l", `${TAG_PREFIX}*`]);
   return out ? out.split("\n").filter(Boolean).length : 0;
@@ -88,8 +76,6 @@ function tagCount(): number {
  * (Cloudflare/Vercel) have neither, so we fetch tags from the public remote.
  * We unshallow when needed so the per-tag diffs can see full history — without
  * it, tag commits may be missing and an icon's "since" version gets misdated.
- * Best-effort: a failure (offline local dev) is non-fatal — main() warns if
- * tags are still absent.
  */
 function ensureTags() {
   // A full clone with tags already present needs nothing.
@@ -292,9 +278,16 @@ function main() {
   const releases = collectReleases(tags);
   markUnreleased(releases);
 
-  // Stable, name-sorted output for clean diffs.
+  // Key by PascalCase component name (matching the codegen's exports) so the
+  // docs site can look metadata up directly by component name — no lossy
+  // Pascal→kebab reverse transform. Convert only here, at the serialization
+  // boundary, so the kebab-keyed rename tracking above stays intact.
+  // NOTE: alias components (build.ts `aliasExportLines`) are not keyed here;
+  // safe today because no sidecar defines aliases.
   const sorted = Object.fromEntries(
-    Object.entries(releases).sort(([a], [b]) => a.localeCompare(b))
+    Object.entries(releases)
+      .map(([name, rel]) => [kebabToPascal(name), rel] as const)
+      .sort(([a], [b]) => a.localeCompare(b))
   );
 
   mkdirSync(OUTPUT_DIR, { recursive: true });

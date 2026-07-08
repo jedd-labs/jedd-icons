@@ -1,0 +1,6 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": ["minus", "subtract", "math", "decrease", "decrement", "-"],
+  "categories": ["layout", "text"]
+}

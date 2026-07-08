@@ -60,14 +60,6 @@ export function humanizeIconName(name: string) {
     .trim();
 }
 
-/** PascalCase component name → kebab-case source name: "ChevronRight" → "chevron-right". */
-function pascalToKebab(name: string) {
-  return name
-    .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
-    .replace(/([A-Z])([A-Z][a-z])/g, "$1-$2")
-    .toLowerCase();
-}
-
 /** Which release an icon first appeared in (and was last changed in). */
 export interface IconRelease {
   changedRelease: { version: string; date: string };
@@ -76,8 +68,8 @@ export interface IconRelease {
   unreleased?: boolean;
 }
 
-// Generated from git tag history by `pnpm gen-releases`. Keyed by kebab-case
-// source name; values describe the icon's first/last release.
+// Generated from git tag history by `pnpm gen-releases`. Keyed by PascalCase
+// component name; values describe the icon's first/last release.
 const releases = iconReleases as Record<string, IconRelease>;
 
 /**
@@ -85,11 +77,11 @@ const releases = iconReleases as Record<string, IconRelease>;
  * Returns null when no release metadata exists for the icon.
  */
 export function getIconRelease(name: string): IconRelease | null {
-  return releases[pascalToKebab(name)] ?? null;
+  return releases[name] ?? null;
 }
 
 // Generated from the icon `.json` sidecars by `pnpm gen-contributors`. Keyed by
-// kebab-case source name → variant → ordered, de-duplicated GitHub usernames.
+// PascalCase component name → variant → ordered, de-duplicated GitHub usernames.
 const contributors = iconContributors as Record<
   string,
   Partial<Record<Variant, string[]>>
@@ -101,7 +93,7 @@ const contributors = iconContributors as Record<
  * Returns an empty array when none are recorded.
  */
 export function getIconContributors(name: string, variant: Variant): string[] {
-  return contributors[pascalToKebab(name)]?.[variant] ?? [];
+  return contributors[name]?.[variant] ?? [];
 }
 
 export interface SnippetOptions {

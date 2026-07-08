@@ -1,0 +1,15 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "trash",
+    "delete",
+    "remove",
+    "bin",
+    "garbage",
+    "waste",
+    "discard",
+    "recycle"
+  ],
+  "categories": ["actions", "files"]
+}

@@ -9,6 +9,7 @@ import {
 } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { kebabToPascal } from "./naming";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..", "..");
@@ -37,8 +38,6 @@ type IconNode = IconNodeChild[];
 
 const kebabToCamel = (s: string) =>
   s.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
-const kebabToPascal = (s: string) =>
-  s.replace(/(^|-)([a-z0-9])/g, (_, __, c) => c.toUpperCase());
 
 // ── SVG Parser ────────────────────────────────────────────────────────
 

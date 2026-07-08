@@ -4,8 +4,7 @@
 // docs site. The sidecars are build-time only
 //
 // Contributors are kept PER VARIANT (stroke vs fill can differ), keyed
-// name → variant → [usernames], so the UI can show credit for the variant the
-// user is currently viewing.
+// name → variant → [usernames]
 
 import {
   existsSync,
@@ -16,6 +15,7 @@ import {
 } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { kebabToPascal } from "./naming";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..", "..");
@@ -78,9 +78,17 @@ function main() {
     }
   }
 
-  // Sort by name for stable diffs (icons with no contributors at all are absent).
+  // Key by PascalCase component name (matching the codegen's exports) so the
+  // docs site can look contributors up directly by component name — no lossy
+  // Pascal→kebab reverse transform. Convert only here, at the serialization
+  // boundary, so the kebab-keyed stroke/fill merge above stays intact.
+  // NOTE: alias components (build.ts `aliasExportLines`) are not keyed here;
+  // safe today because no sidecar defines aliases.
+  // (Icons with no contributors at all are absent.)
   const sorted = Object.fromEntries(
-    Object.entries(byIcon).sort(([a], [b]) => a.localeCompare(b))
+    Object.entries(byIcon)
+      .map(([name, variants]) => [kebabToPascal(name), variants] as const)
+      .sort(([a], [b]) => a.localeCompare(b))
   );
 
   mkdirSync(OUTPUT_DIR, { recursive: true });

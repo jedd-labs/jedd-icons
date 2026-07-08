@@ -1,5 +1,17 @@
 # @jedd-icons/react
 
+## 0.0.11
+
+### Patch Changes
+
+- [#47](https://github.com/jedd-labs/jedd-icons/pull/47) [`ebe7249`](https://github.com/jedd-labs/jedd-icons/commit/ebe7249d9b126cd190a8b9c7028a5a29fa7cf23c) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add pen, pen-line, pencil, pencil-line
+
+- [#48](https://github.com/jedd-labs/jedd-icons/pull/48) [`10cfcd3`](https://github.com/jedd-labs/jedd-icons/commit/10cfcd304fbde10b7da67a901460db7e2442a7ba) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add refresh-cw, refresh-ccw, refresh-cw-off
+
+- [#45](https://github.com/jedd-labs/jedd-icons/pull/45) [`ad35487`](https://github.com/jedd-labs/jedd-icons/commit/ad354871f4ca00b748a239911e267a40431500d6) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add trash, trash-2, trash-3, trash-delete
+
+- [#46](https://github.com/jedd-labs/jedd-icons/pull/46) [`3c87e35`](https://github.com/jedd-labs/jedd-icons/commit/3c87e3567f70438a03ae8b5842faae3b3de15998) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add columns-2, columns-2-dashed, columns-3, columns-3-dashed, rows-2, rows-2-dashed, rows-3, rows-3-dashed, panel-top, panel-bottom, panel-left, panel-right
+
 ## 0.0.10
 
 ### Patch Changes
