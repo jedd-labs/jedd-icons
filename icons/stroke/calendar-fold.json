@@ -1,0 +1,6 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": ["calendar", "fold", "collapse", "minimize", "birthday", "ics"],
+  "categories": ["time"]
+}
