@@ -1,0 +1,17 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "search",
+    "find",
+    "lookup",
+    "query",
+    "lens",
+    "scan",
+    "locate",
+    "explore",
+    "discover",
+    "zoom"
+  ],
+  "categories": ["actions"]
+}
