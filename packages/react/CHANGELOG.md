@@ -1,5 +1,19 @@
 # @jedd-icons/react
 
+## 0.0.13
+
+### Patch Changes
+
+- [#58](https://github.com/jedd-labs/jedd-icons/pull/58) [`6666042`](https://github.com/jedd-labs/jedd-icons/commit/6666042dace8ee52590ad4fc7e2b72bad7ab3b14) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add shield icons: shield, shield-alert, shield-ban, shield-check, shield-cog, shield-cog-corner, shield-half, shield-minus, shield-off, shield-plus, shield-question-mark, shield-star, shield-thunder, shield-user, shield-x
+
+- [#63](https://github.com/jedd-labs/jedd-icons/pull/63) [`34e1f1c`](https://github.com/jedd-labs/jedd-icons/commit/34e1f1c334d41b7932f5acd9cefc4ed5ad873921) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - add 17 calendar icons with metadata, calendar, calendar-arrow-down, calendar-arrow-up, calendar-cog, calendar-cog-corner, calendar-fold, calendar-heart, calendar-lock, calendar-number, calendar-off, calendar-plus, calendar-plus-corner, calendar-range, calendar-search, calendar-star, calendar-x, calendar-x-corner
+
+- [#61](https://github.com/jedd-labs/jedd-icons/pull/61) [`e5f04d8`](https://github.com/jedd-labs/jedd-icons/commit/e5f04d8b003792137d16e7f3d04f5707a2a50135) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add text alignment icons: text-align-left, text-align-center, text-align-right, text-align-justify, text-align-justify-left, text-align-justify-right
+
+- [#64](https://github.com/jedd-labs/jedd-icons/pull/64) [`aa6956e`](https://github.com/jedd-labs/jedd-icons/commit/aa6956e275c8d2d88e6cb75961357977b51ae483) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add search, search-alert, search-check, search-code, search-minus, search-plus, search-slash, search-x
+
+- [#59](https://github.com/jedd-labs/jedd-icons/pull/59) [`f290c00`](https://github.com/jedd-labs/jedd-icons/commit/f290c005279d5f78de8b921e95199bdc97e1d840) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add terminal, square-terminal
+
 ## 0.0.12
 
 ### Patch Changes

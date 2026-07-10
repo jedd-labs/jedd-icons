@@ -1,0 +1,15 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "shield",
+    "security",
+    "protection",
+    "safe",
+    "secure",
+    "safety",
+    "defense",
+    "antivirus"
+  ],
+  "categories": ["security", "account"]
+}
