@@ -1,0 +1,15 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "eye",
+    "view",
+    "visibility",
+    "visible",
+    "watch",
+    "see",
+    "vision",
+    "preview"
+  ],
+  "categories": ["actions"]
+}
