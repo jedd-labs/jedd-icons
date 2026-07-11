@@ -86,8 +86,9 @@ function IconsPage() {
       if (n.startsWith(q)) {
         return 1;
       }
-      // Humanize so multi-word names match the spaced form ("arrow left").
-      if (humanizeIconName(name).toLowerCase().includes(q)) {
+      // Raw PascalCase name ("arrowdownleft") so queries crossing a word
+      // boundary ("downl") still match;
+      if (n.includes(q) || humanizeIconName(name).toLowerCase().includes(q)) {
         return 2;
       }
       if (getIconTags(name).some((t) => t.toLowerCase().includes(q))) {
