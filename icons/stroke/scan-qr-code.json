@@ -1,0 +1,17 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "scan",
+    "qr-code",
+    "qr",
+    "detect",
+    "read",
+    "barcode",
+    "link",
+    "url",
+    "information",
+    "digital"
+  ],
+  "categories": ["actions"]
+}

@@ -1,0 +1,6 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": ["scan", "text", "ocr", "document", "read"],
+  "categories": ["actions"]
+}
