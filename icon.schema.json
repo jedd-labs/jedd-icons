@@ -22,8 +22,10 @@
       "items": {
         "type": "string",
         "enum": [
+          "account",
           "actions",
           "arrows",
+          "development",
           "charts",
           "communication",
           "design",
@@ -32,6 +34,7 @@
           "layout",
           "media",
           "navigation",
+          "security",
           "shapes",
           "social",
           "text",

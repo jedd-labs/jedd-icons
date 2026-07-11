@@ -1,0 +1,6 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": ["menu", "hamburger", "three-lines", "navigation", "bars", "options"],
+  "categories": ["navigation"]
+}

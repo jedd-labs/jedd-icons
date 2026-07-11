@@ -1,0 +1,13 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "shield",
+    "off",
+    "disabled",
+    "security",
+    "vulnerable",
+    "unprotected"
+  ],
+  "categories": ["security", "account"]
+}

@@ -1,0 +1,14 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "search",
+    "code",
+    "developer",
+    "programming",
+    "find",
+    "scan",
+    "grep"
+  ],
+  "categories": ["actions"]
+}

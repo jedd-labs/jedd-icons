@@ -4,6 +4,7 @@ packages:
   - "tools/*"
 catalogMode: prefer
 cleanupUnusedCatalogs: true
+minimumReleaseAge: 1440 # 24 hours
 allowBuilds:
   core-js-pure: false
   esbuild: true
@@ -36,10 +37,10 @@ catalog:
   tsdown: ^0.22.1
 
   # Vite / Cloudflare
-  vite: ^8.0.13
-  "@vitejs/plugin-react": ^6.0.1
-  "@cloudflare/vite-plugin": ^1.37.1
-  wrangler: ^4.92.0
+  vite: ^8.1.3
+  "@vitejs/plugin-react": ^6.0.3
+  "@cloudflare/vite-plugin": ^1.43.0
+  wrangler: ^4.107.0
 
   # Tailwind / styling
   tailwindcss: ^4.3.0
@@ -53,7 +54,7 @@ catalog:
   "@base-ui/react": ^1.4.1
   lucide-react: ^1.16.0
   motion: ^12.38.0
-  shadcn: ^4.7.0
+  shadcn: ^4.13.0
   sugar-high: ^1.2.1
   vaul: ^1.1.2
 
@@ -62,13 +63,13 @@ catalog:
   "@fontsource/iosevka": ^5.2.5
 
   # Fumadocs
-  fumadocs-core: 16.8.11
-  fumadocs-mdx: 15.0.6
-  fumadocs-ui: 16.8.11
+  fumadocs-core: 16.11.1
+  fumadocs-mdx: 15.1.0
+  fumadocs-ui: 16.11.1
 
   # TanStack
-  "@tanstack/react-router": 1.170.4
-  "@tanstack/react-start": 1.168.6
+  "@tanstack/react-router": 1.170.17
+  "@tanstack/react-start": 1.168.27
 
   "@fontsource-variable/figtree": ^5.2.10
   knip: ^6.24.0

@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import { cloudflare } from "@cloudflare/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
@@ -16,6 +17,7 @@ export default defineConfig({
     tanstackStart({
       prerender: {
         enabled: true,
+        crawlLinks: false,
       },
     }),
     react(),
@@ -23,6 +25,7 @@ export default defineConfig({
   resolve: {
     tsconfigPaths: true,
     alias: {
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
       tslib: "tslib/tslib.es6.js",
     },
   },

@@ -1,0 +1,13 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "badge",
+    "check",
+    "verified",
+    "badge-check",
+    "certified",
+    "approved"
+  ],
+  "categories": ["actions"]
+}
