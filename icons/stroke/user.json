@@ -1,0 +1,6 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": ["user", "account", "profile", "person", "avatar", "contact"],
+  "categories": ["account"]
+}
