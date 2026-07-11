@@ -76,4 +76,3 @@ export const variantDefaultsCamel: Record<
 // Backward compat
 const defaultAttributes = strokeDefaults;
 export default defaultAttributes;
-export const defaultAttributesCamel = strokeDefaultsCamel;
