@@ -1,0 +1,6 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": ["alert", "octagon", "warning", "stop", "prohibition"],
+  "categories": ["actions"]
+}
