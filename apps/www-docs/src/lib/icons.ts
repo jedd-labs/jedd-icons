@@ -4,6 +4,7 @@ import * as FillLib from "@jedd-icons/react/fill";
 import iconCategories from "generated/icon-categories.json";
 import iconContributors from "generated/icon-contributors.json";
 import iconReleases from "generated/icon-releases.json";
+import iconTags from "generated/icon-tags.json";
 
 export type Variant = "stroke" | "fill";
 
@@ -60,7 +61,6 @@ export function humanizeIconName(name: string) {
     .trim();
 }
 
-/** Which release an icon first appeared in (and was last changed in). */
 export interface IconRelease {
   changedRelease: { version: string; date: string };
   createdRelease: { version: string; date: string };
@@ -94,22 +94,29 @@ export function getIconContributors(name: string, variant: Variant): string[] {
   return contributors[name]?.[variant] ?? [];
 }
 
-/** PascalCase component name → kebab source name: "RefreshCw" → "refresh-cw". */
-function pascalToKebab(name: string): string {
-  return name
-    .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
-    .replace(/([A-Z]+)([A-Z][a-z])/g, "$1-$2")
-    .toLowerCase();
-}
-
 // Generated from the icon `.json` sidecars by `pnpm gen-categories`. Categories
-// are a closed enum (see icon.schema.json)
+// are a closed enum (see icon.schema.json). Keyed by PascalCase component name.
 const categoriesByIcon = (
   iconCategories as { byIcon: Record<string, string[]> }
 ).byIcon;
 
 export function getIconCategories(name: string): string[] {
-  return categoriesByIcon[pascalToKebab(name)] ?? [];
+  return categoriesByIcon[name] ?? [];
+}
+
+// Generated from the icon `.json` sidecars by `pnpm gen-tags`. Free-text search
+// keywords, keyed by PascalCase component name, plus an inverted tag → names index.
+const iconTagsData = iconTags as {
+  byIcon: Record<string, string[]>;
+  byTag: Record<string, string[]>;
+};
+
+export function getIconTags(name: string): string[] {
+  return iconTagsData.byIcon[name] ?? [];
+}
+
+export function getIconsByTag(tag: string): string[] {
+  return iconTagsData.byTag[tag] ?? [];
 }
 
 export function humanizeCategory(category: string): string {
