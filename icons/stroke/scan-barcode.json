@@ -1,6 +1,14 @@
 {
   "$schema": "../../icon.schema.json",
   "contributors": ["agoscolantuoni"],
-  "tags": ["scan", "barcode", "detect", "read", "product"],
+  "tags": [
+    "scan",
+    "barcode",
+    "detect",
+    "read",
+    "product",
+    "checkout",
+    "transaction"
+  ],
   "categories": ["actions"]
 }

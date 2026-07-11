@@ -1,6 +1,20 @@
 {
   "$schema": "../../icon.schema.json",
   "contributors": ["agoscolantuoni"],
-  "tags": ["scan", "search", "find", "detect", "analyze"],
+  "tags": [
+    "scan",
+    "search",
+    "find",
+    "detect",
+    "analyze",
+    "qr-code",
+    "barcode",
+    "checkout",
+    "ar",
+    "augmented reality",
+    "camera",
+    "focus",
+    "frame"
+  ],
   "categories": ["actions"]
 }
