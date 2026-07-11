@@ -18,6 +18,7 @@ import {
   getIconCategories,
   getIconContributors,
   getIconRelease,
+  getIconTags,
   humanizeCategory,
   humanizeIconName,
   VARIANT_MAPS,
@@ -74,6 +75,7 @@ function IconPage() {
   const release = getIconRelease(name);
   const contributors = getIconContributors(name, variant);
   const categories = getIconCategories(name);
+  const tags = getIconTags(name);
 
   const {
     size,
@@ -145,6 +147,19 @@ function IconPage() {
                   {categories.map((category) => (
                     <Badge key={category} variant="secondary">
                       {humanizeCategory(category)}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+
+              {tags.length > 0 && (
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  <span className="text-muted-foreground text-xs">
+                    {tags.length > 1 ? "Tags" : "Tag"}
+                  </span>
+                  {tags.map((tag) => (
+                    <Badge key={tag} variant="outline">
+                      {tag}
                     </Badge>
                   ))}
                 </div>

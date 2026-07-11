@@ -61,7 +61,6 @@ export function humanizeIconName(name: string) {
     .trim();
 }
 
-/** Which release an icon first appeared in (and was last changed in). */
 export interface IconRelease {
   changedRelease: { version: string; date: string };
   createdRelease: { version: string; date: string };
