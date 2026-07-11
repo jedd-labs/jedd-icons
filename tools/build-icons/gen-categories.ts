@@ -1,7 +1,4 @@
 #!/usr/bin/env node
-// Collects each icon's categories (a closed enum, see icon.schema.json) from its
-// `.json` sidecar and writes them to apps/www-docs/.generated/icon-categories.json
-// for the docs site.
 
 import {
   existsSync,
@@ -12,6 +9,7 @@ import {
 } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { kebabToPascal } from "./naming";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..", "..");
@@ -71,15 +69,16 @@ function main() {
     }
   }
 
-  // Sort categories within each icon, and icons by name, for stable diffs.
   const sortedByIcon: ByIcon = Object.fromEntries(
     Object.entries(byIcon)
+      .map(
+        ([name, categories]) =>
+          [kebabToPascal(name), [...categories].sort()] as const
+      )
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([name, categories]) => [name, [...categories].sort()])
   );
 
-  // Inverted index: category → sorted icon names. Derived from the by-icon map
-  // so the two are guaranteed consistent.
+  // Inverted index: category → sorted icon names
   const byCategory: Record<string, string[]> = {};
   for (const [name, categories] of Object.entries(sortedByIcon)) {
     for (const category of categories) {
