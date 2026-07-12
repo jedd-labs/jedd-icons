@@ -39,8 +39,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # Build first: typecheck depends on generated artifacts (generated icons/,
-      # shared/dist) that only exist after a build.
+      # Build first: typecheck depends on generated artifacts
       - name: Build
         run: pnpm build
 
