@@ -48,7 +48,7 @@ jobs:
         run: pnpm typecheck
 
       - name: Lint
-        run: pnpm lin
+        run: pnpm lint
 
       - name: Knip
         run: pnpm knip
