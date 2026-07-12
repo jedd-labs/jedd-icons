@@ -1,0 +1,6 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": ["scan", "heart", "health", "medical", "pulse"],
+  "categories": ["actions"]
+}

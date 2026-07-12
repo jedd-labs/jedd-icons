@@ -1,0 +1,15 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "lock",
+    "keyhole",
+    "security",
+    "key",
+    "access",
+    "password",
+    "secure",
+    "admin"
+  ],
+  "categories": ["tools"]
+}

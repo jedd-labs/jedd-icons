@@ -12,7 +12,7 @@ import {
   ViewOptionsPopover,
 } from "fumadocs-ui/layouts/docs/page";
 import { Suspense } from "react";
-import { useMDXComponents } from "@/components/mdx";
+import { getMDXComponents } from "@/components/mdx";
 import { baseOptions } from "@/lib/layout.shared";
 import { appDescription, gitConfig, pageTitle, siteUrl } from "@/lib/shared";
 import { slugsToMarkdownPath, source } from "@/lib/source";
@@ -47,7 +47,7 @@ export const Route = createFileRoute("/docs/$")({
 const serverLoader = createServerFn({
   method: "GET",
 })
-  .inputValidator((slugs: string[]) => slugs)
+  .validator((slugs: string[]) => slugs)
   .handler(async ({ data: slugs }) => {
     const page = source.getPage(slugs);
     if (!page) {
@@ -88,7 +88,7 @@ const clientLoader = browserCollections.docs.createClientLoader({
           />
         </div>
         <DocsBody>
-          <MDX components={useMDXComponents()} />
+          <MDX components={getMDXComponents()} />
         </DocsBody>
       </DocsPage>
     );

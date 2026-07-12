@@ -1,0 +1,6 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": ["user", "heart", "favorite", "like", "love"],
+  "categories": ["account"]
+}

@@ -63,9 +63,9 @@ catalog:
   "@fontsource/iosevka": ^5.2.5
 
   # Fumadocs
-  fumadocs-core: 16.8.11
-  fumadocs-mdx: 15.0.6
-  fumadocs-ui: 16.8.11
+  fumadocs-core: 16.11.1
+  fumadocs-mdx: 15.1.0
+  fumadocs-ui: 16.11.1
 
   # TanStack
   "@tanstack/react-router": 1.170.17

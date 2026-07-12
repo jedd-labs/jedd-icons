@@ -1,0 +1,6 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": ["scan", "face", "biometric", "recognition", "id"],
+  "categories": ["actions"]
+}

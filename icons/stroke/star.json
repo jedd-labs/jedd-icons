@@ -1,0 +1,16 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "star",
+    "favorite",
+    "rating",
+    "highlight",
+    "important",
+    "bookmark",
+    "favorite",
+    "like",
+    "review"
+  ],
+  "categories": ["actions"]
+}

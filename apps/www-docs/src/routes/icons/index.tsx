@@ -22,6 +22,8 @@ import { UsageTabs } from "@/components/usage-tabs";
 import {
   getIconContributors,
   getIconRelease,
+  getIconTags,
+  humanizeIconName,
   VARIANT_ICONS,
   VARIANT_MAPS,
   type Variant,
@@ -72,7 +74,36 @@ function IconsPage() {
     if (!q) {
       return allIcons;
     }
-    return allIcons.filter((i) => i.name.toLowerCase().includes(q));
+
+    // Rank name matches above tag-only matches: exact name (0) > name prefix
+    // (1) > name substring (2) > tag-only (3). MISS drops the icon entirely.
+    const MISS = 4;
+    const rank = (name: string) => {
+      const n = name.toLowerCase();
+      if (n === q) {
+        return 0;
+      }
+      if (n.startsWith(q)) {
+        return 1;
+      }
+      // Raw PascalCase name ("arrowdownleft") so queries crossing a word
+      // boundary ("downl") still match;
+      if (n.includes(q) || humanizeIconName(name).toLowerCase().includes(q)) {
+        return 2;
+      }
+      if (getIconTags(name).some((t) => t.toLowerCase().includes(q))) {
+        return 3;
+      }
+      return MISS;
+    };
+
+    return allIcons
+      .map((icon) => ({ icon, score: rank(icon.name) }))
+      .filter(({ score }) => score < MISS)
+      .sort(
+        (a, b) => a.score - b.score || a.icon.name.localeCompare(b.icon.name)
+      )
+      .map(({ icon }) => icon);
   }, [query, allIcons]);
 
   const SelectedComponent = selected ? iconsMap[selected] : null;

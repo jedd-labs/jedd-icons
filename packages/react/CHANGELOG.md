@@ -1,5 +1,39 @@
 # @jedd-icons/react
 
+## 0.0.15
+
+### Patch Changes
+
+- [#79](https://github.com/jedd-labs/jedd-icons/pull/79) [`d7780e6`](https://github.com/jedd-labs/jedd-icons/commit/d7780e60c9341f1d0b96e0525af54dea600cc5ca) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add save, save-check, save-plus, save-minus
+
+- [#83](https://github.com/jedd-labs/jedd-icons/pull/83) [`4ea4621`](https://github.com/jedd-labs/jedd-icons/commit/4ea462190ce09eb7b553395d50819db9b9b222b2) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add box icon
+
+- [#89](https://github.com/jedd-labs/jedd-icons/pull/89) [`4fc4981`](https://github.com/jedd-labs/jedd-icons/commit/4fc498155b6dedbabbce301b1b46d0937e97e81c) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add paintbrush icon
+
+- [#90](https://github.com/jedd-labs/jedd-icons/pull/90) [`7995460`](https://github.com/jedd-labs/jedd-icons/commit/7995460f0aad30f35522b441fdeea55c6f42f8c2) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add plug icon
+
+- [#81](https://github.com/jedd-labs/jedd-icons/pull/81) [`b5edd89`](https://github.com/jedd-labs/jedd-icons/commit/b5edd897ad0773677274b61eb1ad33256b891569) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add clipboard, clipboard-check, clipboard-copy, clipboard-paste, clipboard-plus, clipboard-minus, clipboard-x, clipboard-type
+
+- [#86](https://github.com/jedd-labs/jedd-icons/pull/86) [`803e8be`](https://github.com/jedd-labs/jedd-icons/commit/803e8be119602f8801ab5245329c7dd06d0b5291) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add external-link icon
+
+## 0.0.14
+
+### Patch Changes
+
+- [#74](https://github.com/jedd-labs/jedd-icons/pull/74) [`39bf990`](https://github.com/jedd-labs/jedd-icons/commit/39bf9907061006fbcb6b14f4018b8d4fb3f015fe) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add eye, eye-off, eye-close, eye-dashed, view
+
+- [#66](https://github.com/jedd-labs/jedd-icons/pull/66) [`c6e520c`](https://github.com/jedd-labs/jedd-icons/commit/c6e520cb3976c69c457363594b5d610b315d3dfc) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add scan, scan-barcode, scan-code, scan-eye, scan-face, scan-heart, scan-line, scan-qr-code, scan-search, scan-text
+
+- [#69](https://github.com/jedd-labs/jedd-icons/pull/69) [`e44c6b6`](https://github.com/jedd-labs/jedd-icons/commit/e44c6b6ddc86ebdee90bbf1e8f88dfbabe676862) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add heart, heart-off
+
+- [#71](https://github.com/jedd-labs/jedd-icons/pull/71) [`8b909ee`](https://github.com/jedd-labs/jedd-icons/commit/8b909eec0dcc9d50c694ada47e10eaab7d16686f) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add user, user-check, user-cog, user-heart, user-minus, user-plus, user-search, user-shield, user-star
+
+- [#68](https://github.com/jedd-labs/jedd-icons/pull/68) [`7508ead`](https://github.com/jedd-labs/jedd-icons/commit/7508ead502aab98f2948c14974415a1793d11973) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add star, star-off
+
+- [#73](https://github.com/jedd-labs/jedd-icons/pull/73) [`59319d0`](https://github.com/jedd-labs/jedd-icons/commit/59319d0ea5c178d8694c5861a7b3c72f83bb64cf) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add lock, lock-open, lock-keyhole, lock-keyhole-open
+
+- [#75](https://github.com/jedd-labs/jedd-icons/pull/75) [`252a516`](https://github.com/jedd-labs/jedd-icons/commit/252a51654aa6af6dc940a3f8584f8e8178e49d31) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add alert-circle, triangle-alert, octagon-alert
+
 ## 0.0.13
 
 ### Patch Changes

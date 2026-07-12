@@ -1,0 +1,16 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "eye",
+    "close",
+    "closed",
+    "hidden",
+    "blink",
+    "see",
+    "hide",
+    "conceal",
+    "vision"
+  ],
+  "categories": ["actions"]
+}
