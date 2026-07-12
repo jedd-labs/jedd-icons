@@ -1,0 +1,15 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "square",
+    "menu",
+    "list",
+    "hamburger",
+    "navigation",
+    "bars",
+    "options",
+    "panel"
+  ],
+  "categories": ["navigation", "layout"]
+}
