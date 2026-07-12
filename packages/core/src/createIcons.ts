@@ -11,7 +11,7 @@ export interface CreateIconsOptions {
 export function createIcons({
   icons = {},
   attrs = {},
-  nameAttr = "data-jedd",
+  nameAttr = "data-jedd-test",
   watch = false,
 }: CreateIconsOptions = {}): void {
   const replace = (root: ParentNode = document) => {
