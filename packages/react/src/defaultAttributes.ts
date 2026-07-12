@@ -1,3 +1,3 @@
-import { defaultAttributesCamel } from "@jedd-icons/shared";
+import { strokeDefaultsCamel } from "@jedd-icons/shared";
 
-export default defaultAttributesCamel;
+export default strokeDefaultsCamel;

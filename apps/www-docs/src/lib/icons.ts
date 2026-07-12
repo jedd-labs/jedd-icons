@@ -115,10 +115,6 @@ export function getIconTags(name: string): string[] {
   return iconTagsData.byIcon[name] ?? [];
 }
 
-export function getIconsByTag(tag: string): string[] {
-  return iconTagsData.byTag[tag] ?? [];
-}
-
 export function humanizeCategory(category: string): string {
   return category
     .split("-")
