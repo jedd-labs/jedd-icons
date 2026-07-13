@@ -1,0 +1,6 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": ["download", "arrow", "save", "disk", "file", "import", "export"],
+  "categories": ["arrows", "files"]
+}

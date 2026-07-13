@@ -1,0 +1,19 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "arrow",
+    "down",
+    "line",
+    "from",
+    "direction",
+    "backwards",
+    "reverse",
+    "south",
+    "download",
+    "expand",
+    "fold",
+    "vertical"
+  ],
+  "categories": ["arrows", "files"]
+}
