@@ -14,6 +14,7 @@ import { IconReleaseInfo } from "@/components/icon-release-info";
 import { SiteFooter } from "@/components/site-footer";
 import { UsageTabs } from "@/components/usage-tabs";
 import {
+  FILL_COMING_SOON,
   getAvailableVariants,
   getIconCategories,
   getIconContributors,
@@ -62,8 +63,12 @@ export const Route = createFileRoute("/icons/$name")({
 
 function IconPage() {
   const { name } = Route.useParams();
-  const { variant } = Route.useSearch();
+  const { variant: searchVariant } = Route.useSearch();
   const navigate = Route.useNavigate();
+
+  // While fill is "coming soon" its tab is disabled, so the effective variant is
+  // pinned to stroke — this also neutralizes any stale `?variant=fill` link.
+  const variant: Variant = FILL_COMING_SOON ? "stroke" : searchVariant;
 
   // The selected variant lives in the URL search param — the single source of
   // truth — so tab changes stay shareable and keep the canonical URL honest.
@@ -165,19 +170,40 @@ function IconPage() {
                 </div>
               )}
 
-              {availableVariants.length > 1 && (
-                <Tabs
-                  onValueChange={(value) => setVariant(value as Variant)}
-                  value={variant}
-                >
+              {FILL_COMING_SOON ? (
+                <Tabs value="stroke">
                   <TabsList>
-                    {availableVariants.map((v) => (
-                      <TabsTrigger className="capitalize" key={v} value={v}>
-                        {v}
-                      </TabsTrigger>
-                    ))}
+                    <TabsTrigger className="capitalize" value="stroke">
+                      stroke
+                    </TabsTrigger>
+                    <TabsTrigger
+                      className="capitalize"
+                      disabled
+                      title="Fill variants coming soon"
+                      value="fill"
+                    >
+                      fill
+                      <span className="ml-1.5 text-[10px] text-muted-foreground normal-case">
+                        soon
+                      </span>
+                    </TabsTrigger>
                   </TabsList>
                 </Tabs>
+              ) : (
+                availableVariants.length > 1 && (
+                  <Tabs
+                    onValueChange={(value) => setVariant(value as Variant)}
+                    value={variant}
+                  >
+                    <TabsList>
+                      {availableVariants.map((v) => (
+                        <TabsTrigger className="capitalize" key={v} value={v}>
+                          {v}
+                        </TabsTrigger>
+                      ))}
+                    </TabsList>
+                  </Tabs>
+                )
               )}
             </div>
           </section>
