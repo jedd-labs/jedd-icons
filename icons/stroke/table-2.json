@@ -1,0 +1,14 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "table",
+    "data",
+    "rows",
+    "columns",
+    "spreadsheet",
+    "variant",
+    "grid"
+  ],
+  "categories": ["layout", "text", "files"]
+}
