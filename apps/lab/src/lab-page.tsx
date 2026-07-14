@@ -7,7 +7,7 @@ import { Slider } from "@workspace/ui/components/slider";
 import { useId, useMemo, useState } from "react";
 import { LabCanvas } from "@/components/lab-canvas";
 import { LabLegend } from "@/components/lab-legend";
-import { PackageRender } from "@/components/package-render";
+import { IconGlyph, PackageRender } from "@/components/package-render";
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
   getIconGeometry,
@@ -220,6 +220,9 @@ export function LabPage() {
                         onClick={() => setIcon(name)}
                         type="button"
                       >
+                        <span className="flex size-4 shrink-0 items-center justify-center">
+                          <IconGlyph name={name} size={16} />
+                        </span>
                         <span className="flex-1 truncate">{name}</span>
                         {multiElement.has(name) && (
                           <span

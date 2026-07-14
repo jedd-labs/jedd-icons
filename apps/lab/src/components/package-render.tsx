@@ -18,6 +18,32 @@ const LIBS: Record<Variant, Record<string, unknown>> = {
   fill: FillLib as unknown as Record<string, unknown>,
 };
 
+/** Resolve the real published component for an icon name + variant, or null. */
+export function getIconComponent(
+  name: string,
+  variant: Variant
+): IconComponent | null {
+  const pascal = getPascalName(name, variant);
+  return (pascal ? LIBS[variant][pascal] : undefined) as IconComponent | null;
+}
+
+/** A small published-component preview, e.g. for the sidebar list rows. */
+export function IconGlyph({
+  name,
+  variant = "stroke",
+  size = 16,
+}: {
+  name: string;
+  variant?: Variant;
+  size?: number;
+}) {
+  const Component = getIconComponent(name, variant);
+  if (!Component) {
+    return <span aria-hidden style={{ width: size, height: size }} />;
+  }
+  return <Component aria-hidden size={size} />;
+}
+
 /** The real published sizes an icon is most often used at. */
 const SIZES = [16, 24, 32, 48] as const;
 
@@ -36,9 +62,7 @@ export function PackageRender({
   strokeWidth: number;
 }) {
   const pascal = getPascalName(name, variant);
-  const Component = (pascal ? LIBS[variant][pascal] : undefined) as
-    | IconComponent
-    | undefined;
+  const Component = getIconComponent(name, variant);
 
   if (!Component) {
     return (
