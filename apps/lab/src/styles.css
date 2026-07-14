@@ -1,0 +1,12 @@
+/* Pulls in Tailwind, the shared theme tokens, fonts, and the `font-heading`
+   utility from the workspace UI package — the same base www-docs uses. */
+@import "@workspace/ui/globals.css";
+
+/* Tailwind can't see class names inside the workspace UI package or the shared
+   Lab components unless we tell it to scan them. */
+@source "../src";
+@source "../../../packages/ui/src";
+
+html {
+  scrollbar-gutter: stable;
+}
