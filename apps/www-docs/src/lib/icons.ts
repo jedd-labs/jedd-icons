@@ -7,6 +7,7 @@ import iconReleases from "generated/icon-releases.json";
 import iconTags from "generated/icon-tags.json";
 
 export type Variant = "stroke" | "fill";
+export const FILL_COMING_SOON = true;
 
 // Non-icon exports of the package that must be filtered out.
 const RESERVED = new Set(["Icon", "createJeddIcon", "defaultAttributes"]);

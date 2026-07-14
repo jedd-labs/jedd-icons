@@ -20,6 +20,7 @@ import { IconReleaseInfo } from "@/components/icon-release-info";
 import { SiteFooter } from "@/components/site-footer";
 import { UsageTabs } from "@/components/usage-tabs";
 import {
+  FILL_COMING_SOON,
   getIconContributors,
   getIconRelease,
   getIconTags,
@@ -124,23 +125,33 @@ function IconsPage() {
             {/* Row 1: variant + search + count */}
             <div className="flex items-center gap-3 lg:shrink-0">
               <div className="flex shrink-0 overflow-hidden rounded-none border border-border">
-                {(["stroke", "fill"] as const).map((v) => (
-                  <button
-                    className={`px-2.5 py-1 text-xs capitalize transition-colors ${
-                      variant === v
-                        ? "bg-foreground text-background"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                    key={v}
-                    onClick={() => {
-                      setVariant(v);
-                      setSelected(null);
-                    }}
-                    type="button"
-                  >
-                    {v}
-                  </button>
-                ))}
+                {(["stroke", "fill"] as const).map((v) => {
+                  const disabled = FILL_COMING_SOON && v === "fill";
+                  return (
+                    <button
+                      className={`px-2.5 py-1 text-xs capitalize transition-colors ${
+                        variant === v
+                          ? "bg-foreground text-background"
+                          : "text-muted-foreground hover:text-foreground"
+                      } disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:text-muted-foreground`}
+                      disabled={disabled}
+                      key={v}
+                      onClick={() => {
+                        setVariant(v);
+                        setSelected(null);
+                      }}
+                      title={disabled ? "Fill variants coming soon" : undefined}
+                      type="button"
+                    >
+                      {v}
+                      {disabled && (
+                        <span className="ml-1 text-[10px] normal-case">
+                          soon
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
 
               <Input
