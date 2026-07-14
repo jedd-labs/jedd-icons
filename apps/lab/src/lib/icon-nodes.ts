@@ -40,9 +40,39 @@ export function getIconGeometry(
   return iconNodes[name]?.[variant]?.node ?? null;
 }
 
-/** PascalCase component name for a kebab icon name, or null. */
-export function getPascalName(name: string): string | null {
+/** PascalCase component name for a kebab icon name + variant, or null. */
+export function getPascalName(name: string, variant?: Variant): string | null {
   const entry = iconNodes[name];
-  const first = entry?.stroke ?? entry?.fill;
-  return first?.pascalName ?? null;
+  if (!entry) {
+    return null;
+  }
+  const chosen = variant ? entry[variant] : (entry.stroke ?? entry.fill);
+  return chosen?.pascalName ?? null;
+}
+
+/**
+ * True when the icon's geometry is split across more than one top-level SVG
+ * element (e.g. a `<path>` plus a separate `<circle>`) in any variant. Jedd
+ * icons should ideally be a single flat element, so these are worth surfacing.
+ */
+export function isMultiElement(name: string): boolean {
+  const entry = iconNodes[name];
+  if (!entry) {
+    return false;
+  }
+  return (["stroke", "fill"] as const).some(
+    (v) => (entry[v]?.node.length ?? 0) > 1
+  );
+}
+
+// Memoized set of every multi-element icon, so the picker can filter/badge
+// without rescanning geometry each render.
+let multiElementCache: Set<string> | null = null;
+
+export function getMultiElementIconNames(): Set<string> {
+  if (multiElementCache) {
+    return multiElementCache;
+  }
+  multiElementCache = new Set(ICON_NODE_NAMES.filter(isMultiElement));
+  return multiElementCache;
 }

@@ -142,7 +142,7 @@ export function LabCanvas({
 
   return (
     <div
-      className="relative select-none"
+      className="relative select-none bg-background"
       style={{ width: pixelSize, height: pixelSize }}
     >
       <svg
@@ -158,7 +158,7 @@ export function LabCanvas({
         {/* ── Pixel grid ─────────────────────────────────────────── */}
         {showGrid && (
           <g
-            className="text-border"
+            className="text-gray-500/50"
             stroke="currentColor"
             strokeWidth={hairline / 2}
           >
