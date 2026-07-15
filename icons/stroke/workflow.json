@@ -1,0 +1,19 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "workflow",
+    "process",
+    "diagram",
+    "automation",
+    "task",
+    "action",
+    "continuous integration",
+    "ci",
+    "devops",
+    "network",
+    "node",
+    "connection"
+  ],
+  "categories": ["development"]
+}

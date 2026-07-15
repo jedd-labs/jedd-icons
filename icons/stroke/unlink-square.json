@@ -1,0 +1,6 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": ["unlink", "disconnect", "broken link", "square", "unchain"],
+  "categories": ["text", "account", "communication"]
+}
