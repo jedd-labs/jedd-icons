@@ -2,7 +2,16 @@ import rawIconNodes from "generated/icon-nodes.json";
 import type { Variant } from "@/lib/icons";
 import type { IconNodeChild } from "@/lib/svg-path";
 
+export interface IconMeta {
+  categories?: unknown;
+  contributors?: unknown;
+  deprecated?: boolean;
+  tags?: unknown;
+}
+
 interface IconNodeEntry {
+  /** Raw sidecar metadata, or null when the `.json` is missing. */
+  meta: IconMeta | null;
   node: IconNodeChild[];
   pascalName: string;
   variant: string;
@@ -33,11 +42,19 @@ export function getVariantsWithGeometry(name: string): Variant[] {
 }
 
 /** Raw parsed geometry for an icon+variant, or null when absent. */
-export function getIconGeometry(
+export function getIconNode(
   name: string,
   variant: Variant
 ): IconNodeChild[] | null {
   return iconNodes[name]?.[variant]?.node ?? null;
+}
+
+/** Alias retained for existing callers. */
+export const getIconGeometry = getIconNode;
+
+/** Raw sidecar metadata for an icon+variant, or null when absent. */
+export function getIconMeta(name: string, variant: Variant): IconMeta | null {
+  return iconNodes[name]?.[variant]?.meta ?? null;
 }
 
 /** PascalCase component name for a kebab icon name + variant, or null. */
@@ -48,31 +65,4 @@ export function getPascalName(name: string, variant?: Variant): string | null {
   }
   const chosen = variant ? entry[variant] : (entry.stroke ?? entry.fill);
   return chosen?.pascalName ?? null;
-}
-
-/**
- * True when the icon's geometry is split across more than one top-level SVG
- * element (e.g. a `<path>` plus a separate `<circle>`) in any variant. Jedd
- * icons should ideally be a single flat element, so these are worth surfacing.
- */
-export function isMultiElement(name: string): boolean {
-  const entry = iconNodes[name];
-  if (!entry) {
-    return false;
-  }
-  return (["stroke", "fill"] as const).some(
-    (v) => (entry[v]?.node.length ?? 0) > 1
-  );
-}
-
-// Memoized set of every multi-element icon, so the picker can filter/badge
-// without rescanning geometry each render.
-let multiElementCache: Set<string> | null = null;
-
-export function getMultiElementIconNames(): Set<string> {
-  if (multiElementCache) {
-    return multiElementCache;
-  }
-  multiElementCache = new Set(ICON_NODE_NAMES.filter(isMultiElement));
-  return multiElementCache;
 }
