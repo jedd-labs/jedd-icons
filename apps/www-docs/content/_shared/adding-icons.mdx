@@ -44,11 +44,13 @@ set on the root `<svg>` and inherited at render time so the `color` and
 
 ### Add metadata
 
-Create `icons/<variant>/<name>.json` next to the SVG:
+Create `icons/<variant>/<name>.json` next to the SVG. The required fields are
+`$schema`, `contributors`, `tags`, and `categories`:
 
 ```json
 {
   "$schema": "../../icon.schema.json",
+  "contributors": ["yourname"],
   "tags": ["search-keyword-1", "search-keyword-2"],
   "categories": ["shapes"]
 }
@@ -60,7 +62,6 @@ optional fields:
 ```json
 {
   "aliases": [{ "name": "older-name" }],
-  "contributors": ["yourname"],
   "deprecated": true,
   "deprecationReason": "Use new-name instead"
 }
