@@ -121,26 +121,79 @@ function isOffGrid(node: IconNodeChild[]): boolean {
   return false;
 }
 
-function hasMetadataIssue(name: string, variant: Variant): boolean {
+/** Specific, human-readable metadata problems for one icon variant. */
+function metadataIssues(name: string, variant: Variant): string[] {
   const meta = getIconMeta(name, variant);
   if (!meta) {
-    return true; // sidecar missing entirely
+    return ["Sidecar .json is missing"];
   }
-  const contributors = meta.contributors;
-  const tags = meta.tags;
-  const categories = meta.categories;
+  const issues: string[] = [];
+  const { contributors, tags, categories } = meta;
+
   if (!(Array.isArray(contributors) && contributors.length > 0)) {
-    return true;
+    issues.push("Missing required field: contributors");
   }
   if (!(Array.isArray(tags) && tags.length > 0)) {
-    return true;
+    issues.push("Missing required field: tags");
   }
-  if (!(Array.isArray(categories) && categories.length > 0)) {
-    return true;
+  if (Array.isArray(categories) && categories.length > 0) {
+    const invalid = categories.filter(
+      (c) => typeof c !== "string" || !VALID_CATEGORIES.has(c)
+    );
+    if (invalid.length > 0) {
+      issues.push(
+        `Invalid categor${invalid.length > 1 ? "ies" : "y"}: ${invalid.join(", ")}`
+      );
+    }
+  } else {
+    issues.push("Missing required field: categories");
   }
-  return categories.some(
-    (c) => typeof c !== "string" || !VALID_CATEGORIES.has(c)
-  );
+  return issues;
+}
+
+function hasMetadataIssue(name: string, variant: Variant): boolean {
+  return metadataIssues(name, variant).length > 0;
+}
+
+/** The forbidden element tags present in an icon's tree, de-duplicated. */
+function forbiddenTags(
+  node: IconNodeChild[],
+  acc = new Set<string>()
+): Set<string> {
+  for (const [tag, , children] of node) {
+    if (FORBIDDEN_TAGS.has(tag.toLowerCase())) {
+      acc.add(tag);
+    }
+    if (children) {
+      forbiddenTags(children, acc);
+    }
+  }
+  return acc;
+}
+
+export interface IconCheckDetail {
+  elementCount: number;
+  forbiddenTags: string[];
+  marginOverflow: number;
+  meta: ReturnType<typeof getIconMeta>;
+  metadataIssues: string[];
+  offGrid: boolean;
+}
+
+/** Full check breakdown for one icon (default/first variant) for the panel. */
+export function getIconCheckDetail(
+  name: string,
+  variant: Variant
+): IconCheckDetail {
+  const node = getIconNode(name, variant) ?? [];
+  return {
+    meta: getIconMeta(name, variant),
+    metadataIssues: metadataIssues(name, variant),
+    forbiddenTags: [...forbiddenTags(node)],
+    elementCount: node.length,
+    offGrid: isOffGrid(node),
+    marginOverflow: marginReportFor(name, variant).worst,
+  };
 }
 
 /** Run all checks for one icon across its variants; returns the set that fail. */

@@ -5,6 +5,7 @@ import { Label } from "@workspace/ui/components/label";
 import { Separator } from "@workspace/ui/components/separator";
 import { Slider } from "@workspace/ui/components/slider";
 import { useId, useMemo, useState } from "react";
+import { IconInspector } from "@/components/icon-inspector";
 import { LabCanvas } from "@/components/lab-canvas";
 import { LabLegend } from "@/components/lab-legend";
 import { IconGlyph, PackageRender } from "@/components/package-render";
@@ -280,7 +281,18 @@ export function LabPage() {
         </aside>
 
         {/* ── Center: canvas ────────────────────────────────── */}
-        <main className="flex min-w-0 flex-1 flex-col items-center gap-6 overflow-auto border-border border-b bg-muted p-6 lg:border-r lg:border-b-0">
+        <main className="relative flex min-w-0 flex-1 flex-col items-center gap-6 overflow-auto border-border border-b bg-muted p-6 lg:border-r lg:border-b-0">
+          {/* Legend — pinned to the top-right corner of the canvas area. */}
+          <div className="absolute top-4 right-4 z-10">
+            <LabLegend
+              showAnchors={showAnchors}
+              showBounds={showBounds}
+              showControls={showControls}
+              showGrid={showGrid}
+              showKeylines={showKeylines}
+            />
+          </div>
+
           <div className="flex w-full items-center justify-between gap-3">
             <div className="flex flex-col">
               <h2 className="font-medium text-sm">
@@ -441,14 +453,8 @@ export function LabPage() {
 
             <Separator />
 
-            {/* Marker legend */}
-            <LabLegend
-              showAnchors={showAnchors}
-              showBounds={showBounds}
-              showControls={showControls}
-              showGrid={showGrid}
-              showKeylines={showKeylines}
-            />
+            {/* Checks + sidecar metadata for the current icon */}
+            <IconInspector name={iconName} variant={variant} />
 
             <Separator />
 

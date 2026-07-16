@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 export interface LabLegendProps {
   showAnchors: boolean;
   showBounds: boolean;
@@ -162,25 +164,39 @@ export function LabLegend({
     },
   ];
 
+  const [open, setOpen] = useState(true);
+
   return (
-    <div className="flex flex-col gap-2">
-      <span className="font-medium text-muted-foreground">Legend</span>
-      <ul className="flex flex-col gap-1.5">
-        {entries.map((e) => (
-          <li
-            className={`flex items-center gap-2 ${e.active ? "" : "opacity-40"}`}
-            key={e.kind}
-          >
-            <span className="flex size-3 shrink-0 items-center justify-center">
-              <LegendSwatch kind={e.kind} />
-            </span>
-            <span className="text-foreground">{e.label}</span>
-            <span className="ml-auto text-[10px] text-muted-foreground">
-              {e.hint}
-            </span>
-          </li>
-        ))}
-      </ul>
+    <div className="w-52 shrink-0 rounded-none border border-border bg-background text-xs">
+      <button
+        aria-expanded={open}
+        className="flex w-full items-center justify-between px-2.5 py-1.5 font-medium text-muted-foreground transition-colors hover:text-foreground"
+        onClick={() => setOpen((v) => !v)}
+        type="button"
+      >
+        <span>Legend</span>
+        <span aria-hidden className="text-[10px]">
+          {open ? "▾" : "▸"}
+        </span>
+      </button>
+      {open && (
+        <ul className="flex flex-col gap-1.5 border-border border-t px-2.5 py-2">
+          {entries.map((e) => (
+            <li
+              className={`flex items-center gap-2 ${e.active ? "" : "opacity-40"}`}
+              key={e.kind}
+            >
+              <span className="flex size-3 shrink-0 items-center justify-center">
+                <LegendSwatch kind={e.kind} />
+              </span>
+              <span className="text-foreground">{e.label}</span>
+              <span className="ml-auto text-[10px] text-muted-foreground">
+                {e.hint}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
