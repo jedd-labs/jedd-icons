@@ -139,13 +139,43 @@ function stripInheritedAttrs(nodes: IconNode): IconNode {
 
 // ── Main ───────────────────────────────────────────────────────────────
 
+/** The sidecar `.json` fields the Lab's metadata checks care about. */
+interface IconMeta {
+  categories?: unknown;
+  contributors?: unknown;
+  deprecated?: boolean;
+  tags?: unknown;
+}
+
 interface IconNodeEntry {
+  /** Raw sidecar metadata (present: true) or absence marker for the checks. */
+  meta: IconMeta | null;
   /** Parsed IconNode tuples (kebab-cased attrs, as in the source SVG). */
   node: IconNode;
   /** PascalCase component name, e.g. "AlertCircle". */
   pascalName: string;
   /** Variant this geometry belongs to. */
   variant: string;
+}
+
+function readMeta(dir: string, name: string): IconMeta | null {
+  const path = join(dir, `${name}.json`);
+  if (!existsSync(path)) {
+    return null;
+  }
+  try {
+    const raw = JSON.parse(readFileSync(path, "utf8")) as IconMeta;
+    return {
+      contributors: raw.contributors,
+      tags: raw.tags,
+      categories: raw.categories,
+      deprecated: raw.deprecated,
+    };
+  } catch {
+    // A malformed sidecar surfaces as "invalid metadata" in the Lab rather
+    // than crashing the whole generation.
+    return {};
+  }
 }
 
 function collectVariant(
@@ -168,6 +198,7 @@ function collectVariant(
       pascalName: kebabToPascal(name),
       variant,
       node,
+      meta: readMeta(dir, name),
     };
   }
 

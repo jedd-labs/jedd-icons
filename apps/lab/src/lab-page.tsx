@@ -5,18 +5,23 @@ import { Label } from "@workspace/ui/components/label";
 import { Separator } from "@workspace/ui/components/separator";
 import { Slider } from "@workspace/ui/components/slider";
 import { useId, useMemo, useState } from "react";
+import { IconInspector } from "@/components/icon-inspector";
 import { LabCanvas } from "@/components/lab-canvas";
 import { LabLegend } from "@/components/lab-legend";
 import { IconGlyph, PackageRender } from "@/components/package-render";
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
+  CHECKS,
+  type CheckId,
+  getCheckCounts,
+  getIconFlags,
+} from "@/lib/checks";
+import {
   getIconGeometry,
-  getMultiElementIconNames,
   getVariantsWithGeometry,
   ICON_NODE_NAMES,
 } from "@/lib/icon-nodes";
 import { humanizeIconName, type Variant } from "@/lib/icons";
-import { getViolatingIconNames } from "@/lib/margin";
 import { flattenPieces } from "@/lib/svg-path";
 import { useTheme } from "@/lib/use-theme";
 
@@ -35,6 +40,7 @@ const PIECE_COLORS = [
   "#eab308",
 ];
 
+// Accent styling per check color. Full class strings so Tailwind keeps them.
 const FILTER_ACCENTS = {
   rose: {
     active: "border-rose-500 bg-rose-500/10 text-rose-600 dark:text-rose-400",
@@ -45,6 +51,20 @@ const FILTER_ACCENTS = {
       "border-amber-500 bg-amber-500/10 text-amber-600 dark:text-amber-400",
     dot: "bg-amber-500",
   },
+  violet: {
+    active:
+      "border-violet-500 bg-violet-500/10 text-violet-600 dark:text-violet-400",
+    dot: "bg-violet-500",
+  },
+  sky: {
+    active: "border-sky-500 bg-sky-500/10 text-sky-600 dark:text-sky-400",
+    dot: "bg-sky-500",
+  },
+  orange: {
+    active:
+      "border-orange-500 bg-orange-500/10 text-orange-600 dark:text-orange-400",
+    dot: "bg-orange-500",
+  },
 } as const;
 
 /** A pill that filters the icon list to a flagged subset. Disabled at count 0. */
@@ -53,12 +73,14 @@ function FilterToggle({
   count,
   active,
   accent,
+  hint,
   onToggle,
 }: {
   label: string;
   count: number;
   active: boolean;
   accent: keyof typeof FILTER_ACCENTS;
+  hint?: string;
   onToggle: () => void;
 }) {
   const a = FILTER_ACCENTS[accent];
@@ -71,6 +93,7 @@ function FilterToggle({
       }`}
       disabled={count === 0}
       onClick={onToggle}
+      title={hint}
       type="button"
     >
       <span aria-hidden className={`size-2 shrink-0 rounded-full ${a.dot}`} />
@@ -102,21 +125,39 @@ export function LabPage() {
   const [showBounds, setShowBounds] = useState(false);
   const [perPiece, setPerPiece] = useState(false);
   const [isolatedPiece, setIsolatedPiece] = useState<number | null>(null);
-  const [marginOnly, setMarginOnly] = useState(false);
-  const [multiOnly, setMultiOnly] = useState(false);
+  // Which check filters are active. Empty = show all icons.
+  const [activeChecks, setActiveChecks] = useState<Set<CheckId>>(new Set());
 
   const pieces = useMemo(() => (node ? flattenPieces(node) : []), [node]);
-  const violating = useMemo(() => getViolatingIconNames(), []);
-  const multiElement = useMemo(() => getMultiElementIconNames(), []);
+  const checkCounts = useMemo(() => getCheckCounts(), []);
+
+  const toggleCheck = (id: CheckId) => {
+    setActiveChecks((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     let names = ICON_NODE_NAMES;
-    if (marginOnly) {
-      names = names.filter((n) => violating.has(n));
-    }
-    if (multiOnly) {
-      names = names.filter((n) => multiElement.has(n));
+    if (activeChecks.size > 0) {
+      // An icon passes the filter if it fails EVERY active check (intersection),
+      // so stacking filters narrows to icons with all selected problems.
+      names = names.filter((n) => {
+        const flags = getIconFlags(n);
+        for (const id of activeChecks) {
+          if (!flags.has(id)) {
+            return false;
+          }
+        }
+        return true;
+      });
     }
     if (!q) {
       return names;
@@ -124,7 +165,7 @@ export function LabPage() {
     return names.filter(
       (n) => n.includes(q) || humanizeIconName(n).toLowerCase().includes(q)
     );
-  }, [query, marginOnly, multiOnly, violating, multiElement]);
+  }, [query, activeChecks]);
 
   const setIcon = (name: string) => {
     setIsolatedPiece(null);
@@ -184,22 +225,19 @@ export function LabPage() {
               value={query}
             />
 
-            {/* Quality filters — each narrows the list to a flagged subset. */}
+            {/* Spec-check filters — each narrows the list to a flagged subset. */}
             <div className="mb-2 flex flex-col gap-1.5">
-              <FilterToggle
-                accent="rose"
-                active={marginOnly}
-                count={violating.size}
-                label="Margin issues"
-                onToggle={() => setMarginOnly((v) => !v)}
-              />
-              <FilterToggle
-                accent="amber"
-                active={multiOnly}
-                count={multiElement.size}
-                label="Multi-element"
-                onToggle={() => setMultiOnly((v) => !v)}
-              />
+              {CHECKS.map((check) => (
+                <FilterToggle
+                  accent={check.accent}
+                  active={activeChecks.has(check.id)}
+                  count={checkCounts[check.id]}
+                  hint={check.hint}
+                  key={check.id}
+                  label={check.label}
+                  onToggle={() => toggleCheck(check.id)}
+                />
+              ))}
             </div>
 
             <div className="min-h-0 flex-1 overflow-y-auto pr-1">
@@ -224,17 +262,14 @@ export function LabPage() {
                           <IconGlyph name={name} size={16} />
                         </span>
                         <span className="flex-1 truncate">{name}</span>
-                        {multiElement.has(name) && (
-                          <span
-                            className="size-1.5 shrink-0 rounded-full bg-amber-500"
-                            title="Made of multiple SVG elements"
-                          />
-                        )}
-                        {violating.has(name) && (
-                          <span
-                            className="size-1.5 shrink-0 rounded-full bg-rose-500"
-                            title="Breaks the 1px margin"
-                          />
+                        {CHECKS.filter((c) => getIconFlags(name).has(c.id)).map(
+                          (c) => (
+                            <span
+                              className={`size-1.5 shrink-0 rounded-full ${FILTER_ACCENTS[c.accent].dot}`}
+                              key={c.id}
+                              title={c.hint}
+                            />
+                          )
                         )}
                       </button>
                     </li>
@@ -246,7 +281,18 @@ export function LabPage() {
         </aside>
 
         {/* ── Center: canvas ────────────────────────────────── */}
-        <main className="flex min-w-0 flex-1 flex-col items-center gap-6 overflow-auto border-border border-b bg-muted p-6 lg:border-r lg:border-b-0">
+        <main className="relative flex min-w-0 flex-1 flex-col items-center gap-6 overflow-auto border-border border-b bg-muted p-6 lg:border-r lg:border-b-0">
+          {/* Legend — pinned to the top-right corner of the canvas area. */}
+          <div className="absolute top-4 right-4 z-10">
+            <LabLegend
+              showAnchors={showAnchors}
+              showBounds={showBounds}
+              showControls={showControls}
+              showGrid={showGrid}
+              showKeylines={showKeylines}
+            />
+          </div>
+
           <div className="flex w-full items-center justify-between gap-3">
             <div className="flex flex-col">
               <h2 className="font-medium text-sm">
@@ -407,14 +453,8 @@ export function LabPage() {
 
             <Separator />
 
-            {/* Marker legend */}
-            <LabLegend
-              showAnchors={showAnchors}
-              showBounds={showBounds}
-              showControls={showControls}
-              showGrid={showGrid}
-              showKeylines={showKeylines}
-            />
+            {/* Checks + sidecar metadata for the current icon */}
+            <IconInspector name={iconName} variant={variant} />
 
             <Separator />
 
