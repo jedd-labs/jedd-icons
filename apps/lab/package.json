@@ -15,9 +15,11 @@
   },
   "dependencies": {
     "@jedd-icons/react": "workspace:*",
+    "@jedd-icons/shared": "workspace:*",
     "@workspace/ui": "workspace:*",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "sugar-high": "catalog:"
   },
   "devDependencies": {
     "@tailwindcss/vite": "catalog:",

@@ -167,6 +167,9 @@ importers:
       '@jedd-icons/react':
         specifier: workspace:*
         version: link:../../packages/react
+      '@jedd-icons/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@workspace/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -176,6 +179,9 @@ importers:
       react-dom:
         specifier: 'catalog:'
         version: 19.2.6(react@19.2.6)
+      sugar-high:
+        specifier: 'catalog:'
+        version: 1.2.1
     devDependencies:
       '@tailwindcss/vite':
         specifier: 'catalog:'
