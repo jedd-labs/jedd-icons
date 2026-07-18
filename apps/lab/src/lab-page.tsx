@@ -9,6 +9,7 @@ import { IconInspector } from "@/components/icon-inspector";
 import { LabCanvas } from "@/components/lab-canvas";
 import { LabLegend } from "@/components/lab-legend";
 import { IconGlyph, PackageRender } from "@/components/package-render";
+import { SvgCodeView } from "@/components/svg-code-view";
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
   CHECKS,
@@ -355,18 +356,20 @@ export function LabPage() {
             <span className="text-emerald-500">{totalControls} controls</span>
           </div>
 
-          {/* Ground-truth reference: the actual published component render. */}
+          {/* Output split: shipped SVG code (left) + published renders (right). */}
           {node && (
-            <>
-              <Separator className="w-full max-w-md" />
-              <div className="rounded-none border border-border bg-muted/10 px-6 py-4">
+            <div className="grid w-full max-w-4xl gap-4 md:grid-cols-2">
+              <div className="rounded-none border border-border bg-background p-3">
+                <SvgCodeView name={iconName} variant={variant} />
+              </div>
+              <div className="flex items-center justify-center rounded-none border border-border bg-muted/10 p-4">
                 <PackageRender
                   name={iconName}
                   strokeWidth={strokeWidth}
                   variant={variant}
                 />
               </div>
-            </>
+            </div>
           )}
         </main>
 
