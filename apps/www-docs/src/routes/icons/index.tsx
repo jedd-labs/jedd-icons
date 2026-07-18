@@ -55,20 +55,10 @@ function IconsPage() {
   const [query, setQuery] = useState("");
   const [showLabels, setShowLabels] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
-  const [activeCategories, setActiveCategories] = useState<Set<string>>(
-    () => new Set()
-  );
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
   const toggleCategory = (category: string) => {
-    setActiveCategories((prev) => {
-      const next = new Set(prev);
-      if (next.has(category)) {
-        next.delete(category);
-      } else {
-        next.add(category);
-      }
-      return next;
-    });
+    setActiveCategory((prev) => (prev === category ? null : category));
   };
 
   const {
@@ -89,14 +79,13 @@ function IconsPage() {
   const iconsMap = VARIANT_MAPS[variant];
 
   const filtered = useMemo(() => {
-    // Narrow to the selected categories first (union among them), then apply
-    // the search ranking within that set.
-    const byCategory =
-      activeCategories.size === 0
-        ? allIcons
-        : allIcons.filter((icon) =>
-            getIconCategories(icon.name).some((c) => activeCategories.has(c))
-          );
+    // Narrow to the selected category first, then apply the search ranking
+    // within that set.
+    const byCategory = activeCategory
+      ? allIcons.filter((icon) =>
+          getIconCategories(icon.name).includes(activeCategory)
+        )
+      : allIcons;
 
     const q = query.trim().toLowerCase();
     if (!q) {
@@ -132,11 +121,11 @@ function IconsPage() {
         (a, b) => a.score - b.score || a.icon.name.localeCompare(b.icon.name)
       )
       .map(({ icon }) => icon);
-  }, [query, allIcons, activeCategories]);
+  }, [query, allIcons, activeCategory]);
 
   const SelectedComponent = selected ? iconsMap[selected] : null;
 
-  const showPlaceholders = !query && activeCategories.size === 0;
+  const showPlaceholders = !(query || activeCategory);
   const placeholderCount = Math.max(0, 60 - allIcons.length);
   const placeholders = Array.from({ length: placeholderCount }, (_, i) => ({
     name: `icon-${i + allIcons.length + 1}`,
@@ -328,29 +317,34 @@ function IconsPage() {
                 <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
                   Categories
                 </h2>
-                {activeCategories.size > 0 && (
-                  <button
-                    className="text-[10px] text-muted-foreground hover:text-foreground"
-                    onClick={() => setActiveCategories(new Set())}
-                    type="button"
+                {activeCategory && (
+                  <Button
+                    className="h-auto p-0 text-[10px] text-muted-foreground hover:text-foreground"
+                    onClick={() => setActiveCategory(null)}
+                    size="xs"
+                    variant="link"
                   >
                     Clear
-                  </button>
+                  </Button>
                 )}
               </div>
-              <ul className="flex flex-col">
+              {/* border-l draws the guide line the whole list follows; each
+                  button carries a 1px indicator that colors primary when active. */}
+              <ul className="flex flex-col border-border/60 border-l">
                 {CATEGORIES.map(({ name, count }) => {
-                  const active = activeCategories.has(name);
+                  const active = activeCategory === name;
                   return (
-                    <li key={name}>
-                      <button
-                        className={`flex w-full items-center justify-between px-2 py-1.5 text-left text-xs transition-colors ${
+                    <li className="-ml-px" key={name}>
+                      <Button
+                        aria-pressed={active}
+                        className={`w-full justify-between border-l ${
                           active
-                            ? "bg-foreground text-background"
-                            : "text-muted-foreground hover:bg-muted/40 hover:text-foreground"
+                            ? "border-l-primary bg-muted/50"
+                            : "border-l-transparent"
                         }`}
                         onClick={() => toggleCategory(name)}
-                        type="button"
+                        size="sm"
+                        variant="ghost"
                       >
                         <span className="truncate">
                           {humanizeCategory(name)}
@@ -358,13 +352,13 @@ function IconsPage() {
                         <span
                           className={`shrink-0 tabular-nums ${
                             active
-                              ? "text-background/70"
+                              ? "text-foreground/70"
                               : "text-muted-foreground/60"
                           }`}
                         >
                           {count}
                         </span>
-                      </button>
+                      </Button>
                     </li>
                   );
                 })}
