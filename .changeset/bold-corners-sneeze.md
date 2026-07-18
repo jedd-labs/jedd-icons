@@ -3,4 +3,4 @@
 "@jedd-icons/react": patch
 ---
 
-ix icons multi elements, fix icons metada
+Fix icons multi elements, fix icons metadata, fix margin issues
