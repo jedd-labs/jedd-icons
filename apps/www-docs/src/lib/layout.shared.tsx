@@ -3,7 +3,7 @@ import { appName, gitConfig } from "./shared";
 
 export function baseOptions(): BaseLayoutProps & { className?: string } {
   return {
-    className: "[--fd-layout-width:72rem] [&_#nd-nav_nav]:px-6",
+    className: "[--fd-layout-width:80rem] [&_#nd-nav_nav]:px-6",
     nav: {
       title: (
         <>
