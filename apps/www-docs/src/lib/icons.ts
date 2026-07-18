@@ -96,13 +96,28 @@ export function getIconContributors(name: string, variant: Variant): string[] {
 }
 
 // Generated from the icon `.json` sidecars by `pnpm gen-categories`. Categories
-// are a closed enum (see icon.schema.json). Keyed by PascalCase component name.
-const categoriesByIcon = (
-  iconCategories as { byIcon: Record<string, string[]> }
-).byIcon;
+// are a closed enum (see icon.schema.json). `byIcon` maps a PascalCase component
+// name → its categories; `byCategory` is the inverted category → names index.
+const iconCategoriesData = iconCategories as {
+  byCategory: Record<string, string[]>;
+  byIcon: Record<string, string[]>;
+};
+const categoriesByIcon = iconCategoriesData.byIcon;
 
 export function getIconCategories(name: string): string[] {
   return categoriesByIcon[name] ?? [];
+}
+
+/** Every category with at least one icon, sorted, with its icon count. */
+export const CATEGORIES: { count: number; name: string }[] = Object.entries(
+  iconCategoriesData.byCategory
+)
+  .map(([name, names]) => ({ name, count: names.length }))
+  .sort((a, b) => a.name.localeCompare(b.name));
+
+/** PascalCase icon names belonging to a category. */
+export function getCategoryIcons(category: string): string[] {
+  return iconCategoriesData.byCategory[category] ?? [];
 }
 
 // Generated from the icon `.json` sidecars by `pnpm gen-tags`. Free-text search

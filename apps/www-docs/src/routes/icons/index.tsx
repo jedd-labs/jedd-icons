@@ -20,10 +20,13 @@ import { IconReleaseInfo } from "@/components/icon-release-info";
 import { SiteFooter } from "@/components/site-footer";
 import { UsageTabs } from "@/components/usage-tabs";
 import {
+  CATEGORIES,
   FILL_COMING_SOON,
+  getIconCategories,
   getIconContributors,
   getIconRelease,
   getIconTags,
+  humanizeCategory,
   humanizeIconName,
   VARIANT_ICONS,
   VARIANT_MAPS,
@@ -52,6 +55,21 @@ function IconsPage() {
   const [query, setQuery] = useState("");
   const [showLabels, setShowLabels] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
+  const [activeCategories, setActiveCategories] = useState<Set<string>>(
+    () => new Set()
+  );
+
+  const toggleCategory = (category: string) => {
+    setActiveCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(category)) {
+        next.delete(category);
+      } else {
+        next.add(category);
+      }
+      return next;
+    });
+  };
 
   const {
     size,
@@ -71,9 +89,18 @@ function IconsPage() {
   const iconsMap = VARIANT_MAPS[variant];
 
   const filtered = useMemo(() => {
+    // Narrow to the selected categories first (union among them), then apply
+    // the search ranking within that set.
+    const byCategory =
+      activeCategories.size === 0
+        ? allIcons
+        : allIcons.filter((icon) =>
+            getIconCategories(icon.name).some((c) => activeCategories.has(c))
+          );
+
     const q = query.trim().toLowerCase();
     if (!q) {
-      return allIcons;
+      return byCategory;
     }
 
     // Rank name matches above tag-only matches: exact name (0) > name prefix
@@ -98,17 +125,18 @@ function IconsPage() {
       return MISS;
     };
 
-    return allIcons
+    return byCategory
       .map((icon) => ({ icon, score: rank(icon.name) }))
       .filter(({ score }) => score < MISS)
       .sort(
         (a, b) => a.score - b.score || a.icon.name.localeCompare(b.icon.name)
       )
       .map(({ icon }) => icon);
-  }, [query, allIcons]);
+  }, [query, allIcons, activeCategories]);
 
   const SelectedComponent = selected ? iconsMap[selected] : null;
 
+  const showPlaceholders = !query && activeCategories.size === 0;
   const placeholderCount = Math.max(0, 60 - allIcons.length);
   const placeholders = Array.from({ length: placeholderCount }, (_, i) => ({
     name: `icon-${i + allIcons.length + 1}`,
@@ -292,82 +320,138 @@ function IconsPage() {
           </div>
         </div>
 
-        <main className="mx-auto max-w-6xl px-6 py-6">
-          {filtered.length === 0 ? (
-            <p className="py-12 text-center text-muted-foreground text-sm">
-              No icons match &ldquo;{query}&rdquo;.
-            </p>
-          ) : (
-            <ul className="grid grid-cols-[repeat(auto-fill,minmax(112px,1fr))] gap-px border border-border/40 bg-border/40">
-              {filtered.map(({ name, Component }) => (
-                <li className="relative" key={name}>
-                  <GridNode />
-                  {selected === name && <SelectedCorners />}
-                  <Tooltip>
-                    <TooltipTrigger
-                      render={
-                        <button
-                          aria-label={`Select ${name}`}
-                          className={`group relative flex aspect-square w-full flex-col items-center justify-center gap-2 p-3 transition-colors focus-visible:z-10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/50 ${
-                            selected === name
-                              ? "z-10 bg-muted/30"
-                              : "bg-background hover:bg-muted/10"
-                          }`}
-                          onClick={() =>
-                            setSelected((prev) => (prev === name ? null : name))
-                          }
-                          type="button"
-                        />
-                      }
-                    >
-                      <span className="flex">
-                        <IconPreview
-                          absolute={absolute}
-                          aria-hidden
-                          color={color}
-                          component={Component}
-                          size={size}
-                          strokeWidth={strokeWidth}
-                          variant={variant}
-                        />
-                      </span>
-                      {showLabels && (
+        <main className="mx-auto flex max-w-6xl gap-6 px-6 py-6">
+          {/* Category filter sidebar */}
+          <aside className="hidden w-44 shrink-0 lg:block">
+            <div className="sticky top-28">
+              <div className="mb-2 flex items-center justify-between px-1">
+                <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
+                  Categories
+                </h2>
+                {activeCategories.size > 0 && (
+                  <button
+                    className="text-[10px] text-muted-foreground hover:text-foreground"
+                    onClick={() => setActiveCategories(new Set())}
+                    type="button"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+              <ul className="flex flex-col">
+                {CATEGORIES.map(({ name, count }) => {
+                  const active = activeCategories.has(name);
+                  return (
+                    <li key={name}>
+                      <button
+                        className={`flex w-full items-center justify-between px-2 py-1.5 text-left text-xs transition-colors ${
+                          active
+                            ? "bg-foreground text-background"
+                            : "text-muted-foreground hover:bg-muted/40 hover:text-foreground"
+                        }`}
+                        onClick={() => toggleCategory(name)}
+                        type="button"
+                      >
+                        <span className="truncate">
+                          {humanizeCategory(name)}
+                        </span>
                         <span
-                          className={`overflow-hidden truncate text-[10px] leading-none transition-colors ${
-                            selected === name
-                              ? "text-foreground"
-                              : "text-muted-foreground group-hover:text-foreground"
+                          className={`shrink-0 tabular-nums ${
+                            active
+                              ? "text-background/70"
+                              : "text-muted-foreground/60"
                           }`}
                         >
-                          {name}
+                          {count}
                         </span>
-                      )}
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom">{name}</TooltipContent>
-                  </Tooltip>
-                </li>
-              ))}
-              {!query &&
-                placeholders.map(({ name }) => (
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </aside>
+
+          {/* Grid */}
+          <div className="min-w-0 flex-1">
+            {filtered.length === 0 ? (
+              <p className="py-12 text-center text-muted-foreground text-sm">
+                No icons match your filters.
+              </p>
+            ) : (
+              <ul className="grid grid-cols-[repeat(auto-fill,minmax(112px,1fr))] gap-px border border-border/40 bg-border/40">
+                {filtered.map(({ name, Component }) => (
                   <li className="relative" key={name}>
                     <GridNode />
-                    <div className="flex aspect-square w-full flex-col items-center justify-center gap-2 bg-muted/10 p-3">
-                      <span className="flex">
-                        <span
-                          className="rounded-sm bg-muted/40"
-                          style={{ width: size, height: size }}
-                        />
-                      </span>
-                      {showLabels && (
-                        <span className="overflow-hidden text-[10px] text-muted-foreground/50 leading-none">
-                          coming soon
+                    {selected === name && <SelectedCorners />}
+                    <Tooltip>
+                      <TooltipTrigger
+                        render={
+                          <button
+                            aria-label={`Select ${name}`}
+                            className={`group relative flex aspect-square w-full flex-col items-center justify-center gap-2 p-3 transition-colors focus-visible:z-10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/50 ${
+                              selected === name
+                                ? "z-10 bg-muted/30"
+                                : "bg-background hover:bg-muted/10"
+                            }`}
+                            onClick={() =>
+                              setSelected((prev) =>
+                                prev === name ? null : name
+                              )
+                            }
+                            type="button"
+                          />
+                        }
+                      >
+                        <span className="flex">
+                          <IconPreview
+                            absolute={absolute}
+                            aria-hidden
+                            color={color}
+                            component={Component}
+                            size={size}
+                            strokeWidth={strokeWidth}
+                            variant={variant}
+                          />
                         </span>
-                      )}
-                    </div>
+                        {showLabels && (
+                          <span
+                            className={`overflow-hidden truncate text-[10px] leading-none transition-colors ${
+                              selected === name
+                                ? "text-foreground"
+                                : "text-muted-foreground group-hover:text-foreground"
+                            }`}
+                          >
+                            {name}
+                          </span>
+                        )}
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">{name}</TooltipContent>
+                    </Tooltip>
                   </li>
                 ))}
-            </ul>
-          )}
+                {showPlaceholders &&
+                  placeholders.map(({ name }) => (
+                    <li className="relative" key={name}>
+                      <GridNode />
+                      <div className="flex aspect-square w-full flex-col items-center justify-center gap-2 bg-muted/10 p-3">
+                        <span className="flex">
+                          <span
+                            className="rounded-sm bg-muted/40"
+                            style={{ width: size, height: size }}
+                          />
+                        </span>
+                        {showLabels && (
+                          <span className="overflow-hidden text-[10px] text-muted-foreground/50 leading-none">
+                            coming soon
+                          </span>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+              </ul>
+            )}
+          </div>
         </main>
       </div>
 
