@@ -1,5 +1,13 @@
 # @jedd-icons/core
 
+## 0.0.17
+
+### Patch Changes
+
+- [#105](https://github.com/jedd-labs/jedd-icons/pull/105) [`34607e8`](https://github.com/jedd-labs/jedd-icons/commit/34607e8fe9f5e7250b6d3a7ef4571754dd26ab2c) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Fix icons multi elements, fix icons metadata, fix margin issues
+
+- [#107](https://github.com/jedd-labs/jedd-icons/pull/107) [`85a32bf`](https://github.com/jedd-labs/jedd-icons/commit/85a32bf756ede82a98208d84328fcef5de30cee0) Thanks [@mnove](https://github.com/mnove)! - Fix multi elements icons
+
 ## 0.0.16
 
 ### Patch Changes
