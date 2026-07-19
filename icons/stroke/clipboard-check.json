@@ -1,0 +1,19 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "clipboard",
+    "check",
+    "verified",
+    "success",
+    "completed",
+    "copied",
+    "pasted",
+    "done",
+    "todo",
+    "tick",
+    "complete",
+    "task"
+  ],
+  "categories": ["actions"]
+}

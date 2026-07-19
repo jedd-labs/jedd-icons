@@ -1,0 +1,15 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "folder",
+    "cog",
+    "settings",
+    "configuration",
+    "control",
+    "preferences",
+    "edit",
+    "gear"
+  ],
+  "categories": ["files", "tools"]
+}

@@ -1,0 +1,21 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "database",
+    "x",
+    "close",
+    "delete",
+    "remove",
+    "cancel",
+    "storage",
+    "memory",
+    "server",
+    "error",
+    "invalid",
+    "rejected",
+    "denied",
+    "disconnect"
+  ],
+  "categories": ["development", "devices"]
+}

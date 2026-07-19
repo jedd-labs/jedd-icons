@@ -1,5 +1,51 @@
 # @jedd-icons/react
 
+## 0.0.17
+
+### Patch Changes
+
+- [#105](https://github.com/jedd-labs/jedd-icons/pull/105) [`34607e8`](https://github.com/jedd-labs/jedd-icons/commit/34607e8fe9f5e7250b6d3a7ef4571754dd26ab2c) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Fix icons multi elements, fix icons metadata, fix margin issues
+
+- [#107](https://github.com/jedd-labs/jedd-icons/pull/107) [`85a32bf`](https://github.com/jedd-labs/jedd-icons/commit/85a32bf756ede82a98208d84328fcef5de30cee0) Thanks [@mnove](https://github.com/mnove)! - Fix multi elements icons
+
+## 0.0.16
+
+### Patch Changes
+
+- [#94](https://github.com/jedd-labs/jedd-icons/pull/94) [`3d5407f`](https://github.com/jedd-labs/jedd-icons/commit/3d5407f6167e7d7c8c821e7a4a84ca9abcbec16d) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add file-code-corner, file-code
+
+- [#91](https://github.com/jedd-labs/jedd-icons/pull/91) [`aed9155`](https://github.com/jedd-labs/jedd-icons/commit/aed915555568aa2345cd23e5380931ea5330f94e) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add arrow-down-from-line, arrow-down-to-line, arrow-up-from-line, arrow-up-to-line, download, upload
+
+- [#95](https://github.com/jedd-labs/jedd-icons/pull/95) [`2004760`](https://github.com/jedd-labs/jedd-icons/commit/200476001b4607012a6ab36c4304d5839097f09e) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add folder-closed, folder-code, folder-cog, folder-down-corner, folder-heart-corner, folder-kanban, folder-minus, folder-plus, folder-search-corner, folder-star-corner, folder-up-corner, folder
+
+- [#97](https://github.com/jedd-labs/jedd-icons/pull/97) [`d17e777`](https://github.com/jedd-labs/jedd-icons/commit/d17e7774ca6f3de509e1584e13c92cf4206c5567) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add grid-2x2, grid-3x3, table, table-2
+
+- [#93](https://github.com/jedd-labs/jedd-icons/pull/93) [`fe73fae`](https://github.com/jedd-labs/jedd-icons/commit/fe73faea768518ac1116462c3bd8809ae42eeb33) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add square-arrow-out-down-left, square-arrow-out-down-right, square-arrow-out-up-left, square-arrow-out-up-right, square-arrow-right-enter, square-arrow-right-exit, square-check-2, square-check, square-funtion, square-kanban, square-library, square-menu, square
+
+- [#92](https://github.com/jedd-labs/jedd-icons/pull/92) [`55958d0`](https://github.com/jedd-labs/jedd-icons/commit/55958d0f1c6f32a8347188947c2ae9a490ea7dcf) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add database-check, database-down, database-minus, database-plus, database-search, database-up, database-x, database
+
+- [#99](https://github.com/jedd-labs/jedd-icons/pull/99) [`d6c7e2b`](https://github.com/jedd-labs/jedd-icons/commit/d6c7e2bab5fcb79f0da743b655442f68ef1db268) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add moon, sparkles, sun
+
+- [#96](https://github.com/jedd-labs/jedd-icons/pull/96) [`5ef143f`](https://github.com/jedd-labs/jedd-icons/commit/5ef143f7d076e6b51845253974087aaa7fe88219) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add link-1-off-rounded, link-1-off-square, link-1-rounded, link-1-square, link-2-rounded, link-2-square, link-3-rounded, link-3-square, link-4-rounded, link-4-square, unlink-2-rounded, unlink-2-square, unlink-rounded, unlink-square, workflow
+
+- [#98](https://github.com/jedd-labs/jedd-icons/pull/98) [`e83aae6`](https://github.com/jedd-labs/jedd-icons/commit/e83aae6646ae93ee150f655561244df04083efba) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add loader, loader-2
+
+## 0.0.15
+
+### Patch Changes
+
+- [#79](https://github.com/jedd-labs/jedd-icons/pull/79) [`d7780e6`](https://github.com/jedd-labs/jedd-icons/commit/d7780e60c9341f1d0b96e0525af54dea600cc5ca) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add save, save-check, save-plus, save-minus
+
+- [#83](https://github.com/jedd-labs/jedd-icons/pull/83) [`4ea4621`](https://github.com/jedd-labs/jedd-icons/commit/4ea462190ce09eb7b553395d50819db9b9b222b2) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add box icon
+
+- [#89](https://github.com/jedd-labs/jedd-icons/pull/89) [`4fc4981`](https://github.com/jedd-labs/jedd-icons/commit/4fc498155b6dedbabbce301b1b46d0937e97e81c) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add paintbrush icon
+
+- [#90](https://github.com/jedd-labs/jedd-icons/pull/90) [`7995460`](https://github.com/jedd-labs/jedd-icons/commit/7995460f0aad30f35522b441fdeea55c6f42f8c2) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add plug icon
+
+- [#81](https://github.com/jedd-labs/jedd-icons/pull/81) [`b5edd89`](https://github.com/jedd-labs/jedd-icons/commit/b5edd897ad0773677274b61eb1ad33256b891569) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add clipboard, clipboard-check, clipboard-copy, clipboard-paste, clipboard-plus, clipboard-minus, clipboard-x, clipboard-type
+
+- [#86](https://github.com/jedd-labs/jedd-icons/pull/86) [`803e8be`](https://github.com/jedd-labs/jedd-icons/commit/803e8be119602f8801ab5245329c7dd06d0b5291) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add external-link icon
+
 ## 0.0.14
 
 ### Patch Changes

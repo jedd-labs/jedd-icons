@@ -1,6 +1,5 @@
 export {
   default as defaultAttributes,
-  defaultAttributesCamel,
   fillDefaults,
   fillDefaultsCamel,
   strokeDefaults,

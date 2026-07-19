@@ -1,7 +1,7 @@
 import type { LoaderPlugin } from "fumadocs-core/source";
 import { createElement, type ReactElement } from "react";
 
-export const frameworkIcons: Record<string, ReactElement> = {
+const frameworkIcons: Record<string, ReactElement> = {
   // ── React tab ──────────────────────────────────────────────────────
   react: (
     <svg

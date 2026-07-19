@@ -1,0 +1,14 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "square",
+    "function",
+    "code",
+    "math",
+    "fx",
+    "programming",
+    "automation"
+  ],
+  "categories": ["development"]
+}

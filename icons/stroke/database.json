@@ -1,0 +1,15 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "database",
+    "data",
+    "storage",
+    "server",
+    "backend",
+    "memory",
+    "bytes",
+    "servers"
+  ],
+  "categories": ["development", "devices"]
+}

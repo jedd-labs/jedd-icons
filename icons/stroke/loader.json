@@ -1,0 +1,15 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "loader",
+    "loading",
+    "spinner",
+    "progress",
+    "wait",
+    "busy",
+    "spinning",
+    "throbber"
+  ],
+  "categories": ["actions", "layout", "design"]
+}

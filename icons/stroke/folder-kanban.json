@@ -1,0 +1,23 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "folder",
+    "kanban",
+    "board",
+    "task",
+    "workflow",
+    "projects",
+    "manage",
+    "overview",
+    "tickets",
+    "issues",
+    "roadmap",
+    "plan",
+    "agile",
+    "coding",
+    "project",
+    "root"
+  ],
+  "categories": ["files", "development", "charts", "design"]
+}

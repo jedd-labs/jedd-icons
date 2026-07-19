@@ -1,0 +1,35 @@
+{
+  "name": "lab",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "scripts": {
+    "gen-icon-nodes": "tsx ../../tools/build-icons/gen-icon-nodes.ts",
+    "gen-data": "pnpm gen-icon-nodes",
+    "predev": "pnpm gen-data",
+    "dev": "vite dev",
+    "prebuild": "pnpm gen-data",
+    "build": "vite build",
+    "preview": "vite preview",
+    "types:check": "pnpm gen-data && tsc --noEmit"
+  },
+  "dependencies": {
+    "@jedd-icons/react": "workspace:*",
+    "@jedd-icons/shared": "workspace:*",
+    "@workspace/ui": "workspace:*",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "sugar-high": "catalog:"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
+    "tailwindcss": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:"
+  }
+}

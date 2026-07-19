@@ -5,24 +5,53 @@
 const ARM = 7; // total arm length in px (odd, so the 1px line is dead-centered)
 const HALF = (ARM - 1) / 2; // 3px on each side of the center pixel
 
-export function GridNode() {
+// A single crosshair (horizontal + vertical arm) anchored to one cell corner.
+// `x`/`y` pick which corner: 0 = the leading edge (gap line at -1), 1 = the
+// trailing edge (gap line just past the cell, at 100%). Cells on the grid's
+// outer right/bottom edges use the trailing variants so those intersections —
+// which no neighbouring cell owns — still get a crosshair.
+function Crosshair({ x, y }: { x: 0 | 1; y: 0 | 1 }) {
+  // The outer border line sits 1px outside the cell box on every side, so both
+  // the leading and trailing edges live at -1 — the trailing arms mirror the
+  // leading ones exactly (same -HALF - 1 centering, just anchored right/bottom).
+  const hStyle =
+    x === 0 ? { left: -HALF - 1 } : ({ right: -HALF - 1 } as const);
+  const vStyle =
+    y === 0 ? { top: -HALF - 1 } : ({ bottom: -HALF - 1 } as const);
+  const hEdge = y === 0 ? { top: -1 } : ({ bottom: -1 } as const);
+  const vEdge = x === 0 ? { left: -1 } : ({ right: -1 } as const);
   return (
-    <span
-      aria-hidden
-      className="pointer-events-none absolute top-0 left-0 z-10"
-    >
-      {/* The gap line occupies the 1px immediately before the cell edge, i.e. at
-          x=-1 (vertical) and y=-1 (horizontal). Arms sit on that exact pixel. */}
-      {/* horizontal arm: 1px tall, on the gap line at y=-1 */}
+    <>
+      {/* horizontal arm: 1px tall, centered on the corner, on the edge line */}
       <span
         className="absolute bg-border"
-        style={{ left: -HALF - 1, top: -1, width: ARM, height: 1 }}
+        style={{ ...hStyle, ...hEdge, width: ARM, height: 1 }}
       />
-      {/* vertical arm: 1px wide, on the gap line at x=-1 */}
+      {/* vertical arm: 1px wide, centered on the corner, on the edge line */}
       <span
         className="absolute bg-border"
-        style={{ left: -1, top: -HALF - 1, width: 1, height: ARM }}
+        style={{ ...vEdge, ...vStyle, width: 1, height: ARM }}
       />
+    </>
+  );
+}
+
+// Draws the top-left crosshair of every cell, plus the mirrored right/bottom
+// crosshairs for cells that sit on the grid's outer edges (`lastCol`/`lastRow`)
+// so the whole perimeter is decorated, not just the interior intersections.
+export function GridNode({
+  lastCol = false,
+  lastRow = false,
+}: {
+  lastCol?: boolean;
+  lastRow?: boolean;
+} = {}) {
+  return (
+    <span aria-hidden className="pointer-events-none absolute inset-0 z-10">
+      <Crosshair x={0} y={0} />
+      {lastCol && <Crosshair x={1} y={0} />}
+      {lastRow && <Crosshair x={0} y={1} />}
+      {lastCol && lastRow && <Crosshair x={1} y={1} />}
     </span>
   );
 }

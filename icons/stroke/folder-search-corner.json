@@ -1,0 +1,15 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "folder",
+    "search",
+    "find",
+    "magnifying glass",
+    "corner",
+    "lost",
+    "browser",
+    "lens"
+  ],
+  "categories": ["files"]
+}

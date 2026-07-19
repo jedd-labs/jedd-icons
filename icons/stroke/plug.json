@@ -1,0 +1,17 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "plug",
+    "power",
+    "electricity",
+    "connector",
+    "device",
+    "cable",
+    "socket",
+    "voltage",
+    "current",
+    "charger"
+  ],
+  "categories": ["devices"]
+}

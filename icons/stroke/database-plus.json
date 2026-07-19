@@ -1,0 +1,17 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "database",
+    "plus",
+    "add",
+    "create",
+    "insert",
+    "storage",
+    "memory",
+    "server",
+    "new",
+    "expand"
+  ],
+  "categories": ["development", "devices"]
+}

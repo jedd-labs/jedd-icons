@@ -1,0 +1,35 @@
+/* Pulls in Tailwind, the shared theme tokens, fonts, and the `font-heading`
+   utility from the workspace UI package — the same base www-docs uses. */
+@import "@workspace/ui/globals.css";
+
+/* Tailwind can't see class names inside the workspace UI package or the shared
+   Lab components unless we tell it to scan them. */
+@source "../src";
+@source "../../../packages/ui/src";
+
+html {
+  scrollbar-gutter: stable;
+}
+
+/* sugar-high syntax tokens for the SVG code viewer. Maps the highlighter's
+   --sh-* variables onto the theme so highlighting adapts to light/dark. */
+:root {
+  --sh-identifier: var(--foreground);
+  --sh-keyword: oklch(0.55 0.18 280);
+  --sh-string: oklch(0.55 0.13 150);
+  --sh-class: oklch(0.6 0.15 50);
+  --sh-property: oklch(0.55 0.14 230);
+  --sh-entity: oklch(0.55 0.14 230);
+  --sh-jsxliterals: oklch(0.6 0.15 50);
+  --sh-sign: var(--muted-foreground);
+  --sh-comment: var(--muted-foreground);
+}
+
+.dark {
+  --sh-keyword: oklch(0.74 0.13 300);
+  --sh-string: oklch(0.78 0.13 150);
+  --sh-class: oklch(0.8 0.12 70);
+  --sh-property: oklch(0.74 0.12 230);
+  --sh-entity: oklch(0.74 0.12 230);
+  --sh-jsxliterals: oklch(0.8 0.12 70);
+}

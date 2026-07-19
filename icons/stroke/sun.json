@@ -1,0 +1,15 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "sun",
+    "day",
+    "light mode",
+    "theme",
+    "bright",
+    "brightness",
+    "light",
+    "summer"
+  ],
+  "categories": ["weather"]
+}

@@ -1,0 +1,6 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": ["save", "store", "persist", "file", "floppy", "disk"],
+  "categories": ["actions"]
+}

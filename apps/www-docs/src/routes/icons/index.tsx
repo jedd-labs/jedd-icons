@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
 import { Checkbox } from "@workspace/ui/components/checkbox";
 import { Input } from "@workspace/ui/components/input";
-import { Separator } from "@workspace/ui/components/separator";
 import { Slider } from "@workspace/ui/components/slider";
 import {
   Tooltip,
@@ -12,7 +11,7 @@ import {
 import { HomeLayout } from "fumadocs-ui/layouts/home";
 import { X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { GridNode, SelectedCorners } from "@/components/grid-node";
 import { IconContributors } from "@/components/icon-contributors";
 import { IconPreview } from "@/components/icon-preview";
@@ -20,9 +19,13 @@ import { IconReleaseInfo } from "@/components/icon-release-info";
 import { SiteFooter } from "@/components/site-footer";
 import { UsageTabs } from "@/components/usage-tabs";
 import {
+  CATEGORIES,
+  FILL_COMING_SOON,
+  getIconCategories,
   getIconContributors,
   getIconRelease,
   getIconTags,
+  humanizeCategory,
   humanizeIconName,
   VARIANT_ICONS,
   VARIANT_MAPS,
@@ -51,6 +54,77 @@ function IconsPage() {
   const [query, setQuery] = useState("");
   const [showLabels, setShowLabels] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+
+  // Non-sticky ref: the toolbar is sticky, so its rect.top is useless here.
+  const mainRef = useRef<HTMLElement>(null);
+
+  const scrollToGridTop = () => {
+    const el = mainRef.current;
+    if (!el) {
+      return;
+    }
+    const HEADER_AND_TOOLBAR = 56 + 45;
+    const y =
+      window.scrollY + el.getBoundingClientRect().top - HEADER_AND_TOOLBAR;
+    window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+  };
+
+  const toggleCategory = (category: string) => {
+    setActiveCategory((prev) => (prev === category ? null : category));
+    // Filtering shrinks the page; keep the results in view.
+    scrollToGridTop();
+  };
+
+  // auto-fill columns are responsive; read the live track count off the element.
+  const gridRef = useRef<HTMLUListElement>(null);
+  const [columns, setColumns] = useState(1);
+  useEffect(() => {
+    const el = gridRef.current;
+    if (!el) {
+      return;
+    }
+    const measure = () => {
+      const tracks = getComputedStyle(el)
+        .gridTemplateColumns.split(" ")
+        .filter(Boolean).length;
+      setColumns(Math.max(1, tracks));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const variantToggle = (
+    <div className="flex shrink-0 overflow-hidden rounded-none border border-border">
+      {(["stroke", "fill"] as const).map((v) => {
+        const disabled = FILL_COMING_SOON && v === "fill";
+        return (
+          <button
+            className={`px-2.5 py-1 text-xs capitalize transition-colors ${
+              variant === v
+                ? "bg-foreground text-background"
+                : "text-muted-foreground hover:text-foreground"
+            } disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:text-muted-foreground`}
+            disabled={disabled}
+            key={v}
+            onClick={() => {
+              setVariant(v);
+              setSelected(null);
+            }}
+            title={disabled ? "Fill variants coming soon" : undefined}
+            type="button"
+          >
+            {v}
+            {disabled && (
+              <span className="ml-1 text-[10px] normal-case">soon</span>
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
 
   const {
     size,
@@ -70,13 +144,18 @@ function IconsPage() {
   const iconsMap = VARIANT_MAPS[variant];
 
   const filtered = useMemo(() => {
+    const byCategory = activeCategory
+      ? allIcons.filter((icon) =>
+          getIconCategories(icon.name).includes(activeCategory)
+        )
+      : allIcons;
+
     const q = query.trim().toLowerCase();
     if (!q) {
-      return allIcons;
+      return byCategory;
     }
 
-    // Rank name matches above tag-only matches: exact name (0) > name prefix
-    // (1) > name substring (2) > tag-only (3). MISS drops the icon entirely.
+    // Rank: exact name (0) > prefix (1) > substring (2) > tag-only (3); MISS drops.
     const MISS = 4;
     const rank = (name: string) => {
       const n = name.toLowerCase();
@@ -86,8 +165,7 @@ function IconsPage() {
       if (n.startsWith(q)) {
         return 1;
       }
-      // Raw PascalCase name ("arrowdownleft") so queries crossing a word
-      // boundary ("downl") still match;
+      // Match both raw ("arrowdownleft") and humanized so cross-word queries hit.
       if (n.includes(q) || humanizeIconName(name).toLowerCase().includes(q)) {
         return 2;
       }
@@ -97,21 +175,29 @@ function IconsPage() {
       return MISS;
     };
 
-    return allIcons
+    return byCategory
       .map((icon) => ({ icon, score: rank(icon.name) }))
       .filter(({ score }) => score < MISS)
       .sort(
         (a, b) => a.score - b.score || a.icon.name.localeCompare(b.icon.name)
       )
       .map(({ icon }) => icon);
-  }, [query, allIcons]);
+  }, [query, allIcons, activeCategory]);
 
   const SelectedComponent = selected ? iconsMap[selected] : null;
 
+  const showPlaceholders = !(query || activeCategory);
   const placeholderCount = Math.max(0, 60 - allIcons.length);
   const placeholders = Array.from({ length: placeholderCount }, (_, i) => ({
     name: `icon-${i + allIcons.length + 1}`,
   }));
+
+  // Edge cells get perimeter crosshairs (see GridNode).
+  const totalCells =
+    filtered.length + (showPlaceholders ? placeholders.length : 0);
+  const isLastCol = (i: number) =>
+    (i + 1) % columns === 0 || i === totalCells - 1;
+  const isLastRow = (i: number) => i + columns >= totalCells;
 
   return (
     <HomeLayout {...baseOptions()}>
@@ -120,33 +206,20 @@ function IconsPage() {
           className="sticky top-14 z-30 scroll-mt-14 border-b bg-background/80 backdrop-blur"
           id="icons"
         >
-          <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-3 text-xs lg:flex-row lg:items-center lg:gap-4">
-            {/* Row 1: variant + search + count */}
-            <div className="flex items-center gap-3 lg:shrink-0">
-              <div className="flex shrink-0 overflow-hidden rounded-none border border-border">
-                {(["stroke", "fill"] as const).map((v) => (
-                  <button
-                    className={`px-2.5 py-1 text-xs capitalize transition-colors ${
-                      variant === v
-                        ? "bg-foreground text-background"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                    key={v}
-                    onClick={() => {
-                      setVariant(v);
-                      setSelected(null);
-                    }}
-                    type="button"
-                  >
-                    {v}
-                  </button>
-                ))}
-              </div>
+          {/* 3-column layout mirroring <main> so search aligns with the grid. */}
+          <div className="mx-auto flex max-w-7xl gap-6 px-6 py-3 text-xs">
+            <div className="hidden w-44 shrink-0 items-center lg:flex">
+              {variantToggle}
+            </div>
+
+            <div className="flex min-w-0 flex-1 items-center gap-3 lg:gap-4">
+              {/* Toggle rides with search once the left column is hidden. */}
+              <div className="lg:hidden">{variantToggle}</div>
 
               <Input
-                className="min-w-0 flex-1 lg:w-48 lg:flex-none"
+                className="min-w-0 flex-1"
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search icons..."
+                placeholder={`Search ${allIcons.length} icons...`}
                 type="search"
                 value={query}
               />
@@ -155,61 +228,210 @@ function IconsPage() {
               </span>
             </div>
 
-            {/* Row 2: numeric/toggle controls — wraps on small screens */}
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-3 lg:flex-1 lg:flex-nowrap">
-              <Separator
-                className="hidden h-4 lg:block"
-                orientation="vertical"
-              />
+            {/* Spacer matching the Customize sidebar. */}
+            <div className="hidden w-56 shrink-0 lg:block" />
+          </div>
+        </div>
 
-              <div className="flex flex-1 items-center gap-2">
-                <span className="shrink-0 text-muted-foreground">Size</span>
+        <main
+          className="mx-auto flex min-h-[calc(100svh-3.5rem)] max-w-7xl gap-6 px-6 py-6"
+          ref={mainRef}
+        >
+          <aside className="hidden w-44 shrink-0 lg:block">
+            <div className="sticky top-32 max-h-[calc(100svh-9rem)] overflow-y-auto">
+              <div className="mb-2 flex items-center justify-between px-1">
+                <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
+                  Categories
+                </h2>
+                {activeCategory && (
+                  <Button
+                    className="h-auto p-0 text-[10px] text-muted-foreground hover:text-foreground"
+                    onClick={() => setActiveCategory(null)}
+                    size="xs"
+                    variant="link"
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
+              {/* border-l is the guide line; each button's left border is the marker. */}
+              <ul className="flex flex-col border-border/60 border-l">
+                {CATEGORIES.map(({ name, count }) => {
+                  const active = activeCategory === name;
+                  return (
+                    <li className="-ml-px" key={name}>
+                      <Button
+                        aria-pressed={active}
+                        className={`w-full justify-between border-l ${
+                          active
+                            ? "border-l-primary bg-muted/50"
+                            : "border-l-transparent"
+                        }`}
+                        onClick={() => toggleCategory(name)}
+                        size="sm"
+                        variant="ghost"
+                      >
+                        <span className="truncate">
+                          {humanizeCategory(name)}
+                        </span>
+                        <span
+                          className={`shrink-0 tabular-nums ${
+                            active
+                              ? "text-foreground/70"
+                              : "text-muted-foreground/60"
+                          }`}
+                        >
+                          {count}
+                        </span>
+                      </Button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </aside>
+
+          <div className="min-w-0 flex-1">
+            {filtered.length === 0 ? (
+              <p className="py-12 text-center text-muted-foreground text-sm">
+                No icons match your filters.
+              </p>
+            ) : (
+              <ul
+                className="grid grid-cols-[repeat(auto-fill,minmax(88px,1fr))] gap-px border border-border/40 bg-border/40"
+                ref={gridRef}
+              >
+                {filtered.map(({ name, Component }, i) => (
+                  <li className="relative" key={name}>
+                    <GridNode lastCol={isLastCol(i)} lastRow={isLastRow(i)} />
+                    {selected === name && <SelectedCorners />}
+                    <Tooltip>
+                      <TooltipTrigger
+                        render={
+                          <button
+                            aria-label={`Select ${name}`}
+                            className={`group relative flex aspect-square w-full flex-col items-center justify-center gap-2 p-3 transition-colors focus-visible:z-10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/50 ${
+                              selected === name
+                                ? "z-10 bg-muted/30"
+                                : "bg-background hover:bg-muted/10"
+                            }`}
+                            onClick={() =>
+                              setSelected((prev) =>
+                                prev === name ? null : name
+                              )
+                            }
+                            type="button"
+                          />
+                        }
+                      >
+                        <span className="flex">
+                          <IconPreview
+                            absolute={absolute}
+                            aria-hidden
+                            color={color}
+                            component={Component}
+                            size={size}
+                            strokeWidth={strokeWidth}
+                            variant={variant}
+                          />
+                        </span>
+                        {showLabels && (
+                          <span
+                            className={`overflow-hidden truncate text-[10px] leading-none transition-colors ${
+                              selected === name
+                                ? "text-foreground"
+                                : "text-muted-foreground group-hover:text-foreground"
+                            }`}
+                          >
+                            {name}
+                          </span>
+                        )}
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">{name}</TooltipContent>
+                    </Tooltip>
+                  </li>
+                ))}
+                {showPlaceholders &&
+                  placeholders.map(({ name }, i) => (
+                    <li className="relative" key={name}>
+                      <GridNode
+                        lastCol={isLastCol(filtered.length + i)}
+                        lastRow={isLastRow(filtered.length + i)}
+                      />
+                      <div className="flex aspect-square w-full flex-col items-center justify-center gap-2 bg-muted/10 p-3">
+                        <span className="flex">
+                          <span
+                            className="rounded-sm bg-muted/40"
+                            style={{ width: size, height: size }}
+                          />
+                        </span>
+                        {showLabels && (
+                          <span className="overflow-hidden text-[10px] text-muted-foreground/50 leading-none">
+                            coming soon
+                          </span>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+              </ul>
+            )}
+          </div>
+
+          <aside className="hidden w-56 shrink-0 lg:block">
+            <div className="sticky top-32 flex flex-col gap-4 border-border/60 border-l pl-4 text-xs">
+              <div className="flex items-center justify-between">
+                <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
+                  Customize
+                </h2>
+                <Button
+                  className="h-auto p-0 text-[10px] text-muted-foreground hover:text-foreground"
+                  onClick={() => {
+                    reset();
+                    setShowLabels(false);
+                  }}
+                  size="xs"
+                  variant="link"
+                >
+                  Reset
+                </Button>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Size</span>
+                  <span className="tabular-nums">{size}</span>
+                </div>
                 <Slider
-                  className="min-w-16 flex-1"
                   max={96}
                   min={16}
                   onValueChange={(v) => setSize(Array.isArray(v) ? v[0] : v)}
                   step={1}
                   value={[size]}
                 />
-                <span className="w-6 shrink-0 tabular-nums">{size}</span>
               </div>
 
               {variant === "stroke" && (
-                <>
-                  <Separator
-                    className="hidden h-4 lg:block"
-                    orientation="vertical"
-                  />
-
-                  <div className="flex flex-1 items-center gap-2">
-                    <span className="shrink-0 text-muted-foreground">
-                      Stroke
-                    </span>
-                    <Slider
-                      className="min-w-16 flex-1"
-                      max={3}
-                      min={0.5}
-                      onValueChange={(v) =>
-                        setStrokeWidth(Array.isArray(v) ? v[0] : v)
-                      }
-                      step={0.25}
-                      value={[strokeWidth]}
-                    />
-                    <span className="w-8 shrink-0 tabular-nums">
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Stroke</span>
+                    <span className="tabular-nums">
                       {strokeWidth.toFixed(2)}
                     </span>
                   </div>
-                </>
+                  <Slider
+                    max={3}
+                    min={0.5}
+                    onValueChange={(v) =>
+                      setStrokeWidth(Array.isArray(v) ? v[0] : v)
+                    }
+                    step={0.25}
+                    value={[strokeWidth]}
+                  />
+                </div>
               )}
 
-              <Separator
-                className="hidden h-4 lg:block"
-                orientation="vertical"
-              />
-
               <label
-                className="flex shrink-0 items-center gap-2"
+                className="flex items-center justify-between"
                 htmlFor="icon-color"
               >
                 <span className="text-muted-foreground">Color</span>
@@ -223,37 +445,22 @@ function IconsPage() {
               </label>
 
               {variant === "stroke" && (
-                <>
-                  <Separator
-                    className="hidden h-4 lg:block"
-                    orientation="vertical"
+                <label
+                  className="flex items-center gap-2"
+                  htmlFor="absolute-stroke-width"
+                >
+                  <Checkbox
+                    checked={absolute}
+                    id="absolute-stroke-width"
+                    onCheckedChange={(checked) => setAbsolute(!!checked)}
                   />
-
-                  <label
-                    className="flex shrink-0 items-center gap-2"
-                    htmlFor="absolute-stroke-width"
-                  >
-                    <Checkbox
-                      checked={absolute}
-                      id="absolute-stroke-width"
-                      onCheckedChange={(checked) => setAbsolute(!!checked)}
-                    />
-                    <span className="text-muted-foreground">
-                      absoluteStrokeWidth
-                    </span>
-                  </label>
-                </>
+                  <span className="text-muted-foreground">
+                    absoluteStrokeWidth
+                  </span>
+                </label>
               )}
 
-              <Separator
-                className="hidden h-4 lg:block"
-                orientation="vertical"
-              />
-
-              <label
-                className="flex shrink-0 items-center gap-2"
-                htmlFor="show-labels"
-              >
+              <label className="flex items-center gap-2" htmlFor="show-labels">
                 <Checkbox
                   checked={showLabels}
                   id="show-labels"
@@ -261,106 +468,12 @@ function IconsPage() {
                 />
                 <span className="text-muted-foreground">Labels</span>
               </label>
-
-              <Separator
-                className="hidden h-4 lg:block"
-                orientation="vertical"
-              />
-
-              <button
-                className="shrink-0 text-muted-foreground hover:text-foreground"
-                onClick={() => {
-                  reset();
-                  setShowLabels(false);
-                }}
-                type="button"
-              >
-                Reset
-              </button>
             </div>
-          </div>
-        </div>
-
-        <main className="mx-auto max-w-6xl px-6 py-6">
-          {filtered.length === 0 ? (
-            <p className="py-12 text-center text-muted-foreground text-sm">
-              No icons match &ldquo;{query}&rdquo;.
-            </p>
-          ) : (
-            <ul className="grid grid-cols-[repeat(auto-fill,minmax(112px,1fr))] gap-px border border-border/40 bg-border/40">
-              {filtered.map(({ name, Component }) => (
-                <li className="relative" key={name}>
-                  <GridNode />
-                  {selected === name && <SelectedCorners />}
-                  <Tooltip>
-                    <TooltipTrigger
-                      render={
-                        <button
-                          aria-label={`Select ${name}`}
-                          className={`group relative flex aspect-square w-full flex-col items-center justify-center gap-2 p-3 transition-colors focus-visible:z-10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/50 ${
-                            selected === name
-                              ? "z-10 bg-muted/30"
-                              : "bg-background hover:bg-muted/10"
-                          }`}
-                          onClick={() =>
-                            setSelected((prev) => (prev === name ? null : name))
-                          }
-                          type="button"
-                        />
-                      }
-                    >
-                      <span className="flex">
-                        <IconPreview
-                          absolute={absolute}
-                          aria-hidden
-                          color={color}
-                          component={Component}
-                          size={size}
-                          strokeWidth={strokeWidth}
-                          variant={variant}
-                        />
-                      </span>
-                      {showLabels && (
-                        <span
-                          className={`overflow-hidden truncate text-[10px] leading-none transition-colors ${
-                            selected === name
-                              ? "text-foreground"
-                              : "text-muted-foreground group-hover:text-foreground"
-                          }`}
-                        >
-                          {name}
-                        </span>
-                      )}
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom">{name}</TooltipContent>
-                  </Tooltip>
-                </li>
-              ))}
-              {!query &&
-                placeholders.map(({ name }) => (
-                  <li className="relative" key={name}>
-                    <GridNode />
-                    <div className="flex aspect-square w-full flex-col items-center justify-center gap-2 bg-muted/10 p-3">
-                      <span className="flex">
-                        <span
-                          className="rounded-sm bg-muted/40"
-                          style={{ width: size, height: size }}
-                        />
-                      </span>
-                      {showLabels && (
-                        <span className="overflow-hidden text-[10px] text-muted-foreground/50 leading-none">
-                          coming soon
-                        </span>
-                      )}
-                    </div>
-                  </li>
-                ))}
-            </ul>
-          )}
+          </aside>
         </main>
       </div>
 
-      <div className="mx-auto w-full max-w-6xl border-border border-x">
+      <div className="mx-auto w-full max-w-7xl border-border border-x">
         <SiteFooter />
       </div>
 
@@ -374,7 +487,7 @@ function IconsPage() {
             key={`${variant}-${selected}`}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
           >
-            <div className="mx-auto flex max-w-6xl items-start gap-6 px-6 py-4 sm:items-center">
+            <div className="mx-auto flex max-w-7xl items-start gap-6 px-6 py-4 sm:items-center">
               <div className="flex shrink-0 items-center justify-center rounded-none border border-border bg-muted/30 p-4">
                 <IconPreview
                   absolute={absolute}

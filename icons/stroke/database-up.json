@@ -1,0 +1,6 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": ["database", "up", "arrow", "upload", "increase"],
+  "categories": ["development", "arrows"]
+}

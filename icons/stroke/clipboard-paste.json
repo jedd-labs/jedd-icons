@@ -1,0 +1,6 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": ["clipboard", "paste", "insert", "text", "content"],
+  "categories": ["actions"]
+}
