@@ -56,13 +56,27 @@ function IconsPage() {
   const [selected, setSelected] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  const toggleCategory = (category: string) => {
-    setActiveCategory((prev) => (prev === category ? null : category));
+  // Non-sticky ref: the toolbar is sticky, so its rect.top is useless here.
+  const mainRef = useRef<HTMLElement>(null);
+
+  const scrollToGridTop = () => {
+    const el = mainRef.current;
+    if (!el) {
+      return;
+    }
+    const HEADER_AND_TOOLBAR = 56 + 45;
+    const y =
+      window.scrollY + el.getBoundingClientRect().top - HEADER_AND_TOOLBAR;
+    window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
   };
 
-  // The grid uses auto-fill, so the column count is responsive. Read the actual
-  // rendered track count off the element's computed grid-template-columns; this
-  // drives which cells sit on the outer right/bottom edges (for edge crosshairs).
+  const toggleCategory = (category: string) => {
+    setActiveCategory((prev) => (prev === category ? null : category));
+    // Filtering shrinks the page; keep the results in view.
+    scrollToGridTop();
+  };
+
+  // auto-fill columns are responsive; read the live track count off the element.
   const gridRef = useRef<HTMLUListElement>(null);
   const [columns, setColumns] = useState(1);
   useEffect(() => {
@@ -130,8 +144,6 @@ function IconsPage() {
   const iconsMap = VARIANT_MAPS[variant];
 
   const filtered = useMemo(() => {
-    // Narrow to the selected category first, then apply the search ranking
-    // within that set.
     const byCategory = activeCategory
       ? allIcons.filter((icon) =>
           getIconCategories(icon.name).includes(activeCategory)
@@ -143,8 +155,7 @@ function IconsPage() {
       return byCategory;
     }
 
-    // Rank name matches above tag-only matches: exact name (0) > name prefix
-    // (1) > name substring (2) > tag-only (3). MISS drops the icon entirely.
+    // Rank: exact name (0) > prefix (1) > substring (2) > tag-only (3); MISS drops.
     const MISS = 4;
     const rank = (name: string) => {
       const n = name.toLowerCase();
@@ -154,8 +165,7 @@ function IconsPage() {
       if (n.startsWith(q)) {
         return 1;
       }
-      // Raw PascalCase name ("arrowdownleft") so queries crossing a word
-      // boundary ("downl") still match;
+      // Match both raw ("arrowdownleft") and humanized so cross-word queries hit.
       if (n.includes(q) || humanizeIconName(name).toLowerCase().includes(q)) {
         return 2;
       }
@@ -182,9 +192,7 @@ function IconsPage() {
     name: `icon-${i + allIcons.length + 1}`,
   }));
 
-  // Edge detection for the perimeter crosshairs (see GridNode). A cell is in the
-  // last column when it's the final track of its row; in the last row when no
-  // cell exists `columns` slots further along the flattened grid.
+  // Edge cells get perimeter crosshairs (see GridNode).
   const totalCells =
     filtered.length + (showPlaceholders ? placeholders.length : 0);
   const isLastCol = (i: number) =>
@@ -198,17 +206,14 @@ function IconsPage() {
           className="sticky top-14 z-30 scroll-mt-14 border-b bg-background/80 backdrop-blur"
           id="icons"
         >
-          {/* Mirrors <main>'s 3-column layout so the variant toggle sits over
-              the Categories column and the search aligns with the grid. */}
+          {/* 3-column layout mirroring <main> so search aligns with the grid. */}
           <div className="mx-auto flex max-w-7xl gap-6 px-6 py-3 text-xs">
-            {/* Left: variant toggle, aligned to the Categories sidebar */}
             <div className="hidden w-44 shrink-0 items-center lg:flex">
               {variantToggle}
             </div>
 
-            {/* Middle: search, aligned to the grid */}
             <div className="flex min-w-0 flex-1 items-center gap-3 lg:gap-4">
-              {/* On small screens the variant toggle rides alongside search */}
+              {/* Toggle rides with search once the left column is hidden. */}
               <div className="lg:hidden">{variantToggle}</div>
 
               <Input
@@ -223,15 +228,17 @@ function IconsPage() {
               </span>
             </div>
 
-            {/* Right: spacer matching the Customize sidebar */}
+            {/* Spacer matching the Customize sidebar. */}
             <div className="hidden w-56 shrink-0 lg:block" />
           </div>
         </div>
 
-        <main className="mx-auto flex max-w-7xl gap-6 px-6 py-6">
-          {/* Category filter sidebar */}
+        <main
+          className="mx-auto flex min-h-[calc(100svh-3.5rem)] max-w-7xl gap-6 px-6 py-6"
+          ref={mainRef}
+        >
           <aside className="hidden w-44 shrink-0 lg:block">
-            <div className="sticky top-28">
+            <div className="sticky top-32 max-h-[calc(100svh-9rem)] overflow-y-auto">
               <div className="mb-2 flex items-center justify-between px-1">
                 <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
                   Categories
@@ -247,8 +254,7 @@ function IconsPage() {
                   </Button>
                 )}
               </div>
-              {/* border-l draws the guide line the whole list follows; each
-                  button carries a 1px indicator that colors primary when active. */}
+              {/* border-l is the guide line; each button's left border is the marker. */}
               <ul className="flex flex-col border-border/60 border-l">
                 {CATEGORIES.map(({ name, count }) => {
                   const active = activeCategory === name;
@@ -285,7 +291,6 @@ function IconsPage() {
             </div>
           </aside>
 
-          {/* Grid */}
           <div className="min-w-0 flex-1">
             {filtered.length === 0 ? (
               <p className="py-12 text-center text-muted-foreground text-sm">
@@ -372,9 +377,8 @@ function IconsPage() {
             )}
           </div>
 
-          {/* Customization tools sidebar */}
           <aside className="hidden w-56 shrink-0 lg:block">
-            <div className="sticky top-28 flex flex-col gap-4 border-border/60 border-l pl-4 text-xs">
+            <div className="sticky top-32 flex flex-col gap-4 border-border/60 border-l pl-4 text-xs">
               <div className="flex items-center justify-between">
                 <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
                   Customize
