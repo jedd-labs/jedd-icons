@@ -19,7 +19,7 @@ const LIBS: Record<Variant, Record<string, unknown>> = {
 };
 
 /** Resolve the real published component for an icon name + variant, or null. */
-export function getIconComponent(
+function getIconComponent(
   name: string,
   variant: Variant
 ): IconComponent | null {

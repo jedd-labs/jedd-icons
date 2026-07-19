@@ -18,7 +18,7 @@ import {
   getIconFlags,
 } from "@/lib/checks";
 import {
-  getIconGeometry,
+  getIconNode,
   getVariantsWithGeometry,
   ICON_NODE_NAMES,
 } from "@/lib/icon-nodes";
@@ -114,7 +114,7 @@ export function LabPage() {
     ? variantState
     : (availableVariants[0] ?? "stroke");
 
-  const node = getIconGeometry(iconName, variant);
+  const node = getIconNode(iconName, variant);
 
   const [query, setQuery] = useState("");
   const [pixelSize, setPixelSize] = useState(480);

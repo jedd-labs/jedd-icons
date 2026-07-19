@@ -1,4 +1,4 @@
-import { getIconGeometry, ICON_NODE_NAMES } from "@/lib/icon-nodes";
+import { getIconNode } from "@/lib/icon-nodes";
 import type { Variant } from "@/lib/icons";
 import {
   type BBox,
@@ -8,8 +8,8 @@ import {
 } from "@/lib/svg-path";
 
 /** The icon canvas is 24×24 and artwork must keep a 1px margin on every side. */
-export const VIEW = 24;
-export const MARGIN = 1;
+const VIEW = 24;
+const MARGIN = 1;
 /** Coordinates within this of the boundary count as touching, not crossing. */
 const EPS = 0.01;
 
@@ -50,27 +50,6 @@ export function marginReport(pieces: IconPiece[]): MarginReport {
 
 /** Convenience: report for an icon looked up by name + variant. */
 export function marginReportFor(name: string, variant: Variant): MarginReport {
-  const node = getIconGeometry(name, variant);
+  const node = getIconNode(name, variant);
   return node ? marginReport(flattenPieces(node)) : CLEAN;
-}
-
-// Memoized set of every icon name that violates the margin in any variant, so
-// the picker can filter/badge without recomputing geometry on each render.
-let violatingCache: Set<string> | null = null;
-
-export function getViolatingIconNames(): Set<string> {
-  if (violatingCache) {
-    return violatingCache;
-  }
-  const set = new Set<string>();
-  for (const name of ICON_NODE_NAMES) {
-    for (const variant of ["stroke", "fill"] as const) {
-      if (marginReportFor(name, variant).violates) {
-        set.add(name);
-        break;
-      }
-    }
-  }
-  violatingCache = set;
-  return set;
 }
