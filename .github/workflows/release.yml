@@ -1,0 +1,95 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+  # Manual "launch" trigger. Publishing to npm ONLY happens via this path
+  # (Actions tab -> Release -> Run workflow). Plain pushes to main never
+  # publish; they only open/update the "Version Packages" PR when changesets
+  # are pending. This prevents an accidental publish of the current version
+  # (e.g. 0.0.1) before we are ready to cut the first real release.
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Publish to npm (only check this when cutting a real release)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write # create tags + GitHub releases
+  pull-requests: write # open/update the "Version Packages" PR
+  id-token: write # npm provenance
+
+jobs:
+  release:
+    name: Version or Publish
+    runs-on: ubuntu-latest
+    env:
+      # Skip lefthook git hooks in CI. The changesets action makes internal
+      # commits/pushes; the pre-push hook runs `turbo typecheck`, which fails in
+      # this job because it never builds the generated artifacts that typecheck
+      # needs (shared/dist, generated icons/). Hooks are a local-dev gate only.
+      LEFTHOOK: "0"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history so changeset version/publish can tag correctly
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          # Node 24 ships npm >= 11.5.1, which is required for OIDC trusted
+          node-version: 24
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Create Release PR or Publish
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          # Consumes pending changesets, bumps versions, writes CHANGELOG.md,
+          # and opens/updates the "Version Packages" PR. Always safe to run.
+          version: pnpm run version
+          # `publish` is passed ONLY on a manual run with the publish input
+          # checked. On every other run (plain push to main, or a dispatch
+          # without the box checked) this is empty, so the action never
+          # publishes — it only manages the Version PR.
+          publish: ${{ (github.event_name == 'workflow_dispatch' && inputs.publish) && 'pnpm run release' || '' }}
+          commit: "chore: version packages"
+          title: "chore: version packages"
+          # Create a GitHub Release per published package@version, with the
+          # package's changelog entry as the body. Only fires when publish runs.
+          createGithubReleases: true
+        env:
+          # No NPM_TOKEN: this repo uses npm OIDC trusted publishing (configured
+          # per-package on npmjs.com), and the packages are set to disallow
+          # tokens. Auth comes from the id-token: write permission above.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_CONFIG_PROVENANCE: "true"
+
+      # Rebuild the docs site AFTER publish. The Cloudflare Pages build runs
+      # `gen-releases`, which derives each icon's "Added in vX" line from the
+      # `@jedd-icons/react@*` git tags. Those tags are pushed by the publish
+      # step above — but the docs auto-deploy fires earlier, on the push that
+      # merges the Version PR, when the new tag does not yet exist. So that
+      # build marks the just-released icons "Unreleased". This hook re-triggers
+      # the build now that the tag is live, so they resolve to "Added in vX".
+      # Gated on `published` so it only runs on a real publish, not on the
+      # version-bump runs. Skips quietly if the deploy-hook secret is unset.
+      - name: Rebuild docs site so new icons show their release version
+        if: steps.changesets.outputs.published == 'true' && env.CF_PAGES_DEPLOY_HOOK != ''
+        env:
+          CF_PAGES_DEPLOY_HOOK: ${{ secrets.CF_PAGES_DEPLOY_HOOK }}
+        run: curl -fsS -X POST "$CF_PAGES_DEPLOY_HOOK"
