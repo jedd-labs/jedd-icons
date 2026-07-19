@@ -12,9 +12,9 @@
 // only need the command set the source SVGs actually use: M/L/H/V/C/S/Q/T/A/Z
 // (absolute + relative). This is intentionally not a full SVG path engine.
 
-export type Point = { x: number; y: number };
+type Point = { x: number; y: number };
 
-export type PathCommand = {
+type PathCommand = {
   /** Absolute command letter (M, L, C, Q, A, Z, …). */
   command: string;
   /** Original letter as authored, preserving relative (lowercase) casing. */
@@ -27,7 +27,7 @@ export type PathCommand = {
   args: number[];
 };
 
-export type ParsedPath = {
+type ParsedPath = {
   commands: PathCommand[];
   /** All on-curve vertices, de-duplicated by position. */
   anchors: Point[];
@@ -59,7 +59,7 @@ const round = (n: number) => Math.round(n * 1000) / 1000;
  * points. Multiple `M` commands (compound paths) are handled — Z closes back to
  * the most recent subpath start.
  */
-export function parsePath(d: string): ParsedPath {
+function parsePath(d: string): ParsedPath {
   const commands: PathCommand[] = [];
   const anchors: Point[] = [];
   const controls: Point[] = [];

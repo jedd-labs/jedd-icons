@@ -49,9 +49,6 @@ export function getIconNode(
   return iconNodes[name]?.[variant]?.node ?? null;
 }
 
-/** Alias retained for existing callers. */
-export const getIconGeometry = getIconNode;
-
 /** Raw sidecar metadata for an icon+variant, or null when absent. */
 export function getIconMeta(name: string, variant: Variant): IconMeta | null {
   return iconNodes[name]?.[variant]?.meta ?? null;

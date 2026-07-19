@@ -197,7 +197,7 @@ export function getIconCheckDetail(
 }
 
 /** Run all checks for one icon across its variants; returns the set that fail. */
-export function checkIcon(name: string): Set<CheckId> {
+function checkIcon(name: string): Set<CheckId> {
   const failed = new Set<CheckId>();
   const variants = getVariantsWithGeometry(name);
 
