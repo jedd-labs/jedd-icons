@@ -6,9 +6,11 @@ import { Label } from "@workspace/ui/components/label";
 import { Slider } from "@workspace/ui/components/slider";
 import { Tabs, TabsList, TabsTrigger } from "@workspace/ui/components/tabs";
 import { HomeLayout } from "fumadocs-ui/layouts/home";
-import { useId } from "react";
+import { Check, Copy, Download } from "lucide-react";
+import { useId, useRef, useState } from "react";
 import { GridDots, gridColumns } from "@/components/grid-dots";
 import { IconContributors } from "@/components/icon-contributors";
+import { IconInContext } from "@/components/icon-in-context";
 import { IconPreview } from "@/components/icon-preview";
 import { IconReleaseInfo } from "@/components/icon-release-info";
 import { SiteFooter } from "@/components/site-footer";
@@ -31,6 +33,8 @@ import { useIconCustomization } from "@/lib/use-icon-customization";
 
 const frameColumns = gridColumns(1);
 const DEFAULT_COLOR_SWATCH = "#71717a";
+const SIZE_LADDER = [16, 24, 40] as const;
+const COPY_RESET_DELAY_MS = 1200;
 
 export const Route = createFileRoute("/icons/$name")({
   component: IconPage,
@@ -97,8 +101,37 @@ function IconPage() {
   } = useIconCustomization({ name, variant, defaultSize: 48 });
 
   const absoluteId = useId();
-
   const availableVariants = getAvailableVariants(name);
+
+  const previewRef = useRef<HTMLDivElement>(null);
+  const [copiedSvg, setCopiedSvg] = useState(false);
+
+  const getSvgMarkup = () =>
+    previewRef.current?.querySelector("svg")?.outerHTML;
+
+  const copySvg = async () => {
+    const markup = getSvgMarkup();
+    if (!markup) {
+      return;
+    }
+    await navigator.clipboard.writeText(markup);
+    setCopiedSvg(true);
+    setTimeout(() => setCopiedSvg(false), COPY_RESET_DELAY_MS);
+  };
+
+  const downloadSvg = () => {
+    const markup = getSvgMarkup();
+    if (!markup) {
+      return;
+    }
+    const blob = new Blob([markup], { type: "image/svg+xml" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${name}.svg`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <HomeLayout {...baseOptions()}>
@@ -114,180 +147,236 @@ function IconPage() {
             />
           </div>
 
-          {/* Preview + metadata */}
-          <section className="relative border-border border-b px-6 py-12">
+          {/* Preview + controls + metadata */}
+          <section className="relative border-border border-b px-6 py-10">
             <GridDots columns={frameColumns} row="100%" y="outer-bottom" />
-            <div className="mx-auto flex max-w-2xl flex-col items-center gap-6">
-              <div className="flex size-48 items-center justify-center border border-border bg-muted/30">
-                <IconPreview
-                  absolute={absolute}
-                  color={color}
-                  component={Component}
-                  size={size}
-                  strokeWidth={strokeWidth}
-                  variant={variant}
-                />
-              </div>
+            <div className="mx-auto grid max-w-5xl gap-y-6 lg:grid-cols-[380px_1fr] lg:gap-x-10 lg:gap-y-0">
+              {/*
+                Each column below is `contents` on mobile (its box disappears, so
+                its children flatten into the outer grid and follow the `order-*`
+                classes) and becomes a real flex column at `lg`, restoring the
+                original two-column desktop layout in source order (`lg:order-none`
+                cancels the mobile ordering).
+              */}
 
-              <h1 className="font-heading text-2xl">
-                {humanizeIconName(name)}
-              </h1>
-
-              <IconReleaseInfo className="-mt-3" release={release} />
-
-              {contributors.length > 0 && (
-                <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground text-xs">
-                    {contributors.length > 1 ? "Contributors" : "Contributor"}
-                  </span>
-                  <IconContributors contributors={contributors} />
-                </div>
-              )}
-
-              {categories.length > 0 && (
-                <div className="flex flex-wrap items-center justify-center gap-2">
-                  <span className="text-muted-foreground text-xs">
-                    {categories.length > 1 ? "Categories" : "Category"}
-                  </span>
-                  {categories.map((category) => (
-                    <Badge key={category} variant="secondary">
-                      {humanizeCategory(category)}
-                    </Badge>
-                  ))}
-                </div>
-              )}
-
-              {tags.length > 0 && (
-                <div className="flex flex-wrap items-center justify-center gap-2">
-                  <span className="text-muted-foreground text-xs">
-                    {tags.length > 1 ? "Tags" : "Tag"}
-                  </span>
-                  {tags.map((tag) => (
-                    <Badge key={tag} variant="outline">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              )}
-
-              {FILL_COMING_SOON ? (
-                <Tabs value="stroke">
-                  <TabsList>
-                    <TabsTrigger className="capitalize" value="stroke">
-                      stroke
-                    </TabsTrigger>
-                    <TabsTrigger
-                      className="capitalize"
-                      disabled
-                      title="Fill variants coming soon"
-                      value="fill"
-                    >
-                      fill
-                      <span className="ml-1.5 text-[10px] text-muted-foreground normal-case">
-                        soon
-                      </span>
-                    </TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              ) : (
-                availableVariants.length > 1 && (
-                  <Tabs
-                    onValueChange={(value) => setVariant(value as Variant)}
-                    value={variant}
+              {/* Left column (desktop): preview + size ladder, then controls */}
+              <div className="contents lg:col-start-1 lg:flex lg:flex-col lg:gap-4">
+                <div className="order-3 flex gap-3 lg:order-none">
+                  <div
+                    className="relative flex aspect-square flex-1 items-center justify-center border border-border bg-muted/20 [&>svg]:h-full [&>svg]:w-full"
+                    ref={previewRef}
+                    style={{
+                      backgroundImage:
+                        "linear-gradient(to right, var(--border) 1px, transparent 1px), linear-gradient(to bottom, var(--border) 1px, transparent 1px)",
+                      backgroundSize: "calc(100% / 24) calc(100% / 24)",
+                    }}
                   >
-                    <TabsList>
-                      {availableVariants.map((v) => (
-                        <TabsTrigger className="capitalize" key={v} value={v}>
-                          {v}
-                        </TabsTrigger>
-                      ))}
-                    </TabsList>
-                  </Tabs>
-                )
-              )}
-            </div>
-          </section>
-
-          {/* Customization controls */}
-          <section className="relative border-border border-b px-6 py-8">
-            <GridDots columns={frameColumns} row="100%" y="outer-bottom" />
-            <div className="mx-auto flex max-w-2xl flex-wrap items-center gap-6 text-xs">
-              <div className="flex items-center gap-2">
-                <span className="text-muted-foreground">Size</span>
-                <div className="w-32">
-                  <Slider
-                    max={96}
-                    min={16}
-                    onValueChange={(v) => setSize(Array.isArray(v) ? v[0] : v)}
-                    step={1}
-                    value={[size]}
-                  />
-                </div>
-                <span className="w-8 tabular-nums">{size}</span>
-              </div>
-
-              {variant === "stroke" && (
-                <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground">Stroke</span>
-                  <div className="w-32">
-                    <Slider
-                      max={3}
-                      min={0.5}
-                      onValueChange={(v) =>
-                        setStrokeWidth(Array.isArray(v) ? v[0] : v)
-                      }
-                      step={0.25}
-                      value={[strokeWidth]}
+                    <IconPreview
+                      absolute={absolute}
+                      color={color}
+                      component={Component}
+                      size={size}
+                      strokeWidth={strokeWidth}
+                      variant={variant}
                     />
                   </div>
-                  <span className="w-10 tabular-nums">
-                    {strokeWidth.toFixed(2)}
-                  </span>
-                </div>
-              )}
 
-              <div className="flex items-center gap-2">
-                <span className="text-muted-foreground">Color</span>
-                <input
-                  className="h-6 w-8 cursor-pointer border border-input bg-transparent p-0"
-                  onChange={(e) => setColor(e.target.value)}
-                  type="color"
-                  value={color ?? DEFAULT_COLOR_SWATCH}
-                />
+                  <div className="flex flex-col gap-2">
+                    {SIZE_LADDER.map((s) => (
+                      <div className="flex flex-col items-center gap-1" key={s}>
+                        <div className="flex size-[72px] items-center justify-center border border-border bg-muted/20">
+                          <IconPreview
+                            absolute={absolute}
+                            color={color}
+                            component={Component}
+                            size={s}
+                            strokeWidth={strokeWidth}
+                            variant={variant}
+                          />
+                        </div>
+                        <span className="font-mono text-[10px] text-muted-foreground">
+                          {s}px
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="order-4 border border-border p-5 lg:order-none">
+                  <div className="grid gap-5 sm:grid-cols-2">
+                    <div className="flex flex-col gap-4">
+                      <div className="flex flex-col gap-1.5">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-foreground">Size</span>
+                          <span className="font-mono text-muted-foreground">
+                            {size}px
+                          </span>
+                        </div>
+                        <Slider
+                          max={96}
+                          min={16}
+                          onValueChange={(v) =>
+                            setSize(Array.isArray(v) ? v[0] : v)
+                          }
+                          step={1}
+                          value={[size]}
+                        />
+                      </div>
+
+                      {variant === "stroke" && (
+                        <div className="flex flex-col gap-1.5">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-foreground">
+                              Stroke width
+                            </span>
+                            <span className="font-mono text-muted-foreground">
+                              {strokeWidth.toFixed(1)}px
+                            </span>
+                          </div>
+                          <Slider
+                            max={3}
+                            min={0.5}
+                            onValueChange={(v) =>
+                              setStrokeWidth(Array.isArray(v) ? v[0] : v)
+                            }
+                            step={0.25}
+                            value={[strokeWidth]}
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex flex-col gap-4">
+                      {variant === "stroke" && (
+                        <Label
+                          className="flex items-center justify-between text-xs"
+                          htmlFor={absoluteId}
+                        >
+                          <span className="text-foreground">
+                            Absolute stroke width
+                          </span>
+                          <Checkbox
+                            checked={absolute}
+                            id={absoluteId}
+                            onCheckedChange={(checked) =>
+                              setAbsolute(checked === true)
+                            }
+                          />
+                        </Label>
+                      )}
+
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className="text-foreground">Color</span>
+                        <input
+                          className="h-6 w-8 cursor-pointer border border-input bg-transparent p-0"
+                          onChange={(e) => setColor(e.target.value)}
+                          type="color"
+                          value={color ?? DEFAULT_COLOR_SWATCH}
+                        />
+                        <span className="font-mono text-muted-foreground">
+                          {(color ?? DEFAULT_COLOR_SWATCH).toUpperCase()}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 flex justify-end border-border border-t pt-3">
+                    <Button onClick={reset} size="sm" variant="ghost">
+                      Reset
+                    </Button>
+                  </div>
+                </div>
               </div>
 
-              {variant === "stroke" && (
-                <Label htmlFor={absoluteId}>
-                  <Checkbox
-                    checked={absolute}
-                    id={absoluteId}
-                    onCheckedChange={(checked) => setAbsolute(checked === true)}
-                  />
-                  <span className="text-muted-foreground">
-                    absoluteStrokeWidth
-                  </span>
-                </Label>
-              )}
+              {/* Right column (desktop): title, metadata, actions, usage */}
+              <div className="contents lg:col-start-2 lg:flex lg:min-w-0 lg:flex-col lg:gap-6">
+                <div className="order-1 flex flex-col gap-3 lg:order-none">
+                  <div>
+                    <h1 className="font-heading text-3xl">
+                      {humanizeIconName(name)}
+                    </h1>
+                    {tags.length > 0 && (
+                      <p className="text-muted-foreground text-sm">
+                        {tags.join(" · ")}
+                      </p>
+                    )}
+                  </div>
 
-              <Button onClick={reset} size="sm" variant="ghost">
-                Reset
-              </Button>
+                  {!FILL_COMING_SOON && availableVariants.length > 1 && (
+                    <Tabs
+                      onValueChange={(value) => setVariant(value as Variant)}
+                      value={variant}
+                    >
+                      <TabsList>
+                        {availableVariants.map((v) => (
+                          <TabsTrigger className="capitalize" key={v} value={v}>
+                            {v}
+                          </TabsTrigger>
+                        ))}
+                      </TabsList>
+                    </Tabs>
+                  )}
+                </div>
+
+                <div className="order-2 flex flex-wrap items-start justify-between gap-4 border-border border-t pt-4 lg:order-none">
+                  <div className="flex flex-wrap items-center gap-2">
+                    {categories.map((category) => (
+                      <Badge key={category} variant="secondary">
+                        {humanizeCategory(category)}
+                      </Badge>
+                    ))}
+                  </div>
+
+                  <div className="flex shrink-0 items-center gap-3">
+                    <IconReleaseInfo release={release} />
+                    {contributors.length > 0 && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground text-xs">
+                          {contributors.length > 1
+                            ? "Contributors"
+                            : "Contributor"}
+                        </span>
+                        <IconContributors contributors={contributors} />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="order-5 flex flex-wrap gap-3 lg:order-none">
+                  <Button onClick={downloadSvg} variant="outline">
+                    <Download />
+                    Download SVG
+                  </Button>
+                  <Button onClick={copySvg} variant="outline">
+                    {copiedSvg ? <Check /> : <Copy />}
+                    Copy SVG
+                  </Button>
+                </div>
+
+                <div className="order-6 flex min-h-0 flex-col lg:order-none lg:flex-1">
+                  <h2 className="font-heading text-lg">Usage</h2>
+                  <UsageTabs
+                    className="mt-3 lg:min-h-0 lg:flex-1"
+                    heightClassName="h-56 lg:h-full"
+                    reactSnippet={reactSnippet}
+                    snippetClassName="lg:h-full"
+                    vanillaSnippet={vanillaSnippet}
+                  />
+                </div>
+              </div>
             </div>
           </section>
 
-          {/* Usage snippets */}
-          <section className="relative border-border border-b px-6 py-8">
+          {/* In context */}
+          <section className="relative border-border border-b px-6 py-12">
             <GridDots columns={frameColumns} row="100%" y="outer-bottom" />
-            <div className="mx-auto max-w-2xl">
-              <span className="font-medium text-muted-foreground text-xs">
-                Usage
-              </span>
-              <UsageTabs
-                className="mt-2"
-                heightClassName="h-64"
-                reactSnippet={reactSnippet}
-                vanillaSnippet={vanillaSnippet}
-              />
+            <div className="mx-auto max-w-5xl">
+              <h2 className="font-heading text-lg">In context</h2>
+              <p className="mt-1 text-muted-foreground text-sm">
+                A few ways this icon shows up across real UI, at different sizes
+                and pairings.
+              </p>
+              <IconInContext className="mt-6" component={Component} />
             </div>
           </section>
 

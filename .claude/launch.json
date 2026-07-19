@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "www-docs",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "www-docs", "dev"],
+      "port": 3000
+    }
+  ]
+}
