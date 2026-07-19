@@ -163,7 +163,7 @@ function IconPage() {
               <div className="contents lg:col-start-1 lg:flex lg:flex-col lg:gap-4">
                 <div className="order-3 flex gap-3 lg:order-none">
                   <div
-                    className="relative flex aspect-square flex-1 items-center justify-center border border-border bg-muted/20 p-10"
+                    className="relative flex aspect-square flex-1 items-center justify-center border border-border bg-muted/20 [&>svg]:h-full [&>svg]:w-full"
                     ref={previewRef}
                     style={{
                       backgroundImage:
@@ -171,16 +171,14 @@ function IconPage() {
                       backgroundSize: "calc(100% / 24) calc(100% / 24)",
                     }}
                   >
-                    <div className="flex size-full items-center justify-center [&>svg]:h-full [&>svg]:w-full">
-                      <IconPreview
-                        absolute={absolute}
-                        color={color}
-                        component={Component}
-                        size={size}
-                        strokeWidth={strokeWidth}
-                        variant={variant}
-                      />
-                    </div>
+                    <IconPreview
+                      absolute={absolute}
+                      color={color}
+                      component={Component}
+                      size={size}
+                      strokeWidth={strokeWidth}
+                      variant={variant}
+                    />
                   </div>
 
                   <div className="flex flex-col gap-2">
@@ -333,7 +331,7 @@ function IconPage() {
                     <IconReleaseInfo release={release} />
                     {contributors.length > 0 && (
                       <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground text-xs uppercase tracking-widest">
+                        <span className="text-muted-foreground text-xs">
                           {contributors.length > 1
                             ? "Contributors"
                             : "Contributor"}
