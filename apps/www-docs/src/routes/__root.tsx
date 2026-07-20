@@ -7,7 +7,7 @@ import {
 import { TooltipProvider } from "@workspace/ui/components/tooltip";
 import { RootProvider } from "fumadocs-ui/provider/tanstack";
 import SearchDialog from "@/components/search";
-import { appDescription, pageTitle } from "@/lib/shared";
+import { appDescription, pageTitle, siteUrl, socialMeta } from "@/lib/shared";
 import appCss from "@/styles/app.css?url";
 
 export const Route = createRootRoute({
@@ -27,6 +27,13 @@ export const Route = createRootRoute({
         name: "description",
         content: appDescription,
       },
+      // Site-wide defaults. Routes with their own head() override these by
+      // emitting og/twitter tags with the same property/name (last wins).
+      ...socialMeta({
+        title: pageTitle(),
+        description: appDescription,
+        url: siteUrl,
+      }),
     ],
     links: [
       { rel: "stylesheet", href: appCss },

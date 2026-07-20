@@ -6,6 +6,59 @@ export const appDescription =
 // Open Graph tags, and the sitemap. No trailing slash.
 export const siteUrl = "https://jeddicons.com";
 
+// Default social-share image (1200×630). Absolute URL so crawlers on other
+// hosts (Slack, X, Discord) can resolve it. Lives in public/.
+export const ogImageUrl = `${siteUrl}/og.png`;
+// The X/Twitter handle to attribute shared cards to. Empty string = omit.
+export const twitterHandle = "";
+
+interface SocialMetaInput {
+  /** One-to-two sentence share-card description. */
+  description: string;
+  /** Absolute image URL; defaults to the site-wide OG image. */
+  image?: string;
+  /** Page title as it should appear on the share card. */
+  title: string;
+  /** og:type — "website" for landing/index pages, "article" for docs. */
+  type?: "website" | "article";
+  /** Absolute canonical URL of the page (e.g. `${siteUrl}/icons`). */
+  url: string;
+}
+
+/**
+ * Builds the Open Graph + Twitter Card meta tags for a page. Spread the result
+ * into a route's `head().meta` array alongside its title/description entries.
+ */
+export function socialMeta({
+  title,
+  description,
+  url,
+  image = ogImageUrl,
+  type = "website",
+}: SocialMetaInput) {
+  return [
+    { content: appName, property: "og:site_name" },
+    { content: type, property: "og:type" },
+    { content: title, property: "og:title" },
+    { content: description, property: "og:description" },
+    { content: url, property: "og:url" },
+    { content: image, property: "og:image" },
+    { content: "1200", property: "og:image:width" },
+    { content: "630", property: "og:image:height" },
+    { content: title, property: "og:image:alt" },
+    { content: "summary_large_image", name: "twitter:card" },
+    { content: title, name: "twitter:title" },
+    { content: description, name: "twitter:description" },
+    { content: image, name: "twitter:image" },
+    ...(twitterHandle
+      ? [
+          { content: twitterHandle, name: "twitter:site" },
+          { content: twitterHandle, name: "twitter:creator" },
+        ]
+      : []),
+  ];
+}
+
 export const docsRoute = "/docs";
 
 // fill this with your actual GitHub info, for example:

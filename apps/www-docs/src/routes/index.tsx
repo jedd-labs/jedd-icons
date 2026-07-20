@@ -8,17 +8,22 @@ import { SiteFooter } from "@/components/site-footer";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { VARIANT_ICONS } from "@/lib/icons";
 import { baseOptions } from "@/lib/layout.shared";
-import { appName, pageTitle, siteUrl } from "@/lib/shared";
+import { appName, pageTitle, siteUrl, socialMeta } from "@/lib/shared";
+
+const homeTitle = pageTitle("Sharp, squared icons for modern interfaces");
+const homeDescription = `${appName} — sharp, squared, open-source SVG icons for React and vanilla JS. Browse the full set, customize size, stroke, and color, then copy the code.`;
 
 export const Route = createFileRoute("/")({
   component: HomePage,
   head: () => ({
     meta: [
-      { title: pageTitle("Sharp, squared icons for modern interfaces") },
-      {
-        name: "description",
-        content: `${appName} — sharp, squared, open-source SVG icons for React and vanilla JS. Browse the full set, customize size, stroke, and color, then copy the code.`,
-      },
+      { title: homeTitle },
+      { name: "description", content: homeDescription },
+      ...socialMeta({
+        title: homeTitle,
+        description: homeDescription,
+        url: `${siteUrl}/`,
+      }),
     ],
     links: [{ rel: "canonical", href: `${siteUrl}/` }],
   }),

@@ -32,18 +32,23 @@ import {
   type Variant,
 } from "@/lib/icons";
 import { baseOptions } from "@/lib/layout.shared";
-import { appName, pageTitle, siteUrl } from "@/lib/shared";
+import { appName, pageTitle, siteUrl, socialMeta } from "@/lib/shared";
 import { useIconCustomization } from "@/lib/use-icon-customization";
+
+const iconsTitle = pageTitle("Browse all icons");
+const iconsDescription = `Browse the full ${appName} set — sharp, squared, open-source SVG icons for React and vanilla JS. Search, customize size, stroke, and color, then copy the code.`;
 
 export const Route = createFileRoute("/icons/")({
   component: IconsPage,
   head: () => ({
     meta: [
-      { title: pageTitle("Browse all icons") },
-      {
-        name: "description",
-        content: `Browse the full ${appName} set — sharp, squared, open-source SVG icons for React and vanilla JS. Search, customize size, stroke, and color, then copy the code.`,
-      },
+      { title: iconsTitle },
+      { name: "description", content: iconsDescription },
+      ...socialMeta({
+        title: iconsTitle,
+        description: iconsDescription,
+        url: `${siteUrl}/icons`,
+      }),
     ],
     links: [{ rel: "canonical", href: `${siteUrl}/icons` }],
   }),
