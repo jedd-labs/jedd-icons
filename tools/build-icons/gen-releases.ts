@@ -107,10 +107,14 @@ function ensureTags() {
 }
 
 // Minimal x.y.z(-pre)? comparator — enough for our simple version scheme.
+// Pre-release suffixes are intentionally ignored (we never tag pre-releases).
 function compareSemver(a: string, b: string): number {
-  const parse = (v: string) => {
+  const parse = (v: string): [number, number, number] => {
     const [core] = v.split("-", 1);
-    return core.split(".").map((n) => Number.parseInt(n, 10) || 0);
+    const parts = core.split(".").map((n) => Number.parseInt(n, 10) || 0);
+    // Pad missing segments to 0 so a short version like "1" compares as
+    // "1.0.0" instead of yielding NaN (undefined - number) and corrupting sort.
+    return [parts[0] ?? 0, parts[1] ?? 0, parts[2] ?? 0];
   };
   const [a1, a2, a3] = parse(a);
   const [b1, b2, b3] = parse(b);
@@ -118,7 +122,9 @@ function compareSemver(a: string, b: string): number {
 }
 
 function isValidSemver(v: string): boolean {
-  return /^\d+\.\d+\.\d+/.test(v);
+  // Anchored at both ends so trailing junk (e.g. "1.2.3foo", "1.2.3.4") is
+  // rejected rather than silently accepted.
+  return /^\d+\.\d+\.\d+$/.test(v);
 }
 
 /** Sorted react release tags (oldest → newest) with their version + commit date. */
