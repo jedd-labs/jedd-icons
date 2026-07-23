@@ -28,7 +28,7 @@ import {
   type Variant,
 } from "@/lib/icons";
 import { baseOptions } from "@/lib/layout.shared";
-import { appName, pageTitle, siteUrl } from "@/lib/shared";
+import { appName, pageTitle, siteUrl, socialMeta } from "@/lib/shared";
 import { useIconCustomization } from "@/lib/use-icon-customization";
 
 const frameColumns = gridColumns(1);
@@ -50,17 +50,18 @@ export const Route = createFileRoute("/icons/$name")({
   },
   head: ({ params }) => {
     const label = humanizeIconName(params.name);
+    const title = pageTitle(`${label} icon`);
+    const description = `${label} (${params.name}) — a free, open-source ${appName} SVG icon for React and vanilla JS. Preview it live and copy the code, with adjustable size, stroke, and color.`;
+    const url = `${siteUrl}/icons/${params.name}`;
     return {
       meta: [
-        { title: pageTitle(`${label} icon`) },
-        {
-          name: "description",
-          content: `${label} (${params.name}) — a free, open-source ${appName} SVG icon for React and vanilla JS. Preview it live and copy the code, with adjustable size, stroke, and color.`,
-        },
+        { title },
+        { name: "description", content: description },
+        ...socialMeta({ title, description, url }),
       ],
       // Canonical without the ?variant search param so stroke/fill variants
       // collapse to a single indexable URL.
-      links: [{ rel: "canonical", href: `${siteUrl}/icons/${params.name}` }],
+      links: [{ rel: "canonical", href: url }],
     };
   },
 });
