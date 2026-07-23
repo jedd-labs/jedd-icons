@@ -1,0 +1,19 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "ellipsis",
+    "horizontal",
+    "more",
+    "menu",
+    "actions",
+    "options",
+    "etc",
+    "spread",
+    "further",
+    "extra",
+    "overflow",
+    "dots"
+  ],
+  "categories": ["navigation", "layout", "development"]
+}
