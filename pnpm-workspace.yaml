@@ -73,3 +73,6 @@ catalog:
 
   "@fontsource-variable/figtree": ^5.2.10
   knip: ^6.24.0
+
+  # Testing
+  vitest: ^4.1.10

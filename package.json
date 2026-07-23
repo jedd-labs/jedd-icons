@@ -9,7 +9,8 @@
     "tsx": "catalog:",
     "turbo": "catalog:",
     "typescript": "catalog:",
-    "ultracite": "catalog:"
+    "ultracite": "catalog:",
+    "vitest": "catalog:"
   },
   "name": "jedd-icons",
   "scripts": {
@@ -24,6 +25,8 @@
     "typecheck": "turbo typecheck",
     "check": "ultracite check",
     "fix": "ultracite fix",
+    "test": "turbo test",
+    "test:watch": "vitest",
     "changeset": "changeset",
     "version": "changeset version",
     "release": "turbo build && changeset publish",
