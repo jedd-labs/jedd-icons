@@ -118,7 +118,6 @@ const INHERITED_ATTRS = new Set([
   "fill",
   "stroke-width",
   "stroke-linecap",
-  "stroke-linejoin",
   "stroke-dasharray",
   "stroke-dashoffset",
   "stroke-miterlimit",
@@ -127,10 +126,22 @@ const INHERITED_ATTRS = new Set([
   "opacity",
 ]);
 
+// stroke-linejoin is kept per element only when it overrides the root default.
+const DEFAULT_LINEJOIN = "miter";
+
+/** True when an attr should be dropped from a child (inherited from the root). */
+function isStripped(key: string, value: string | number): boolean {
+  if (INHERITED_ATTRS.has(key)) {
+    return true;
+  }
+  // Redundant default join is stripped; a real override (bevel/round) is kept.
+  return key === "stroke-linejoin" && value === DEFAULT_LINEJOIN;
+}
+
 function stripInheritedAttrs(nodes: IconNode): IconNode {
   return nodes.map(([tag, attrs, children]) => {
     const cleaned = Object.fromEntries(
-      Object.entries(attrs).filter(([k]) => !INHERITED_ATTRS.has(k))
+      Object.entries(attrs).filter(([k, v]) => !isStripped(k, v))
     );
     if (children) {
       return [tag, cleaned, stripInheritedAttrs(children)];

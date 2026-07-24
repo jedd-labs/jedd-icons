@@ -116,7 +116,6 @@ const INHERITED_ATTRS = new Set([
   "fill",
   "stroke-width",
   "stroke-linecap",
-  "stroke-linejoin",
   "stroke-dasharray",
   "stroke-dashoffset",
   "stroke-miterlimit",
@@ -125,10 +124,21 @@ const INHERITED_ATTRS = new Set([
   "opacity",
 ]);
 
+// stroke-linejoin is kept per element only when it overrides the root default,
+// matching build.ts so the Lab reflects what actually ships.
+const DEFAULT_LINEJOIN = "miter";
+
+function isStripped(key: string, value: string | number): boolean {
+  if (INHERITED_ATTRS.has(key)) {
+    return true;
+  }
+  return key === "stroke-linejoin" && value === DEFAULT_LINEJOIN;
+}
+
 function stripInheritedAttrs(nodes: IconNode): IconNode {
   return nodes.map(([tag, attrs, children]) => {
     const cleaned = Object.fromEntries(
-      Object.entries(attrs).filter(([k]) => !INHERITED_ATTRS.has(k))
+      Object.entries(attrs).filter(([k, v]) => !isStripped(k, v))
     );
     if (children) {
       return [tag, cleaned, stripInheritedAttrs(children)];

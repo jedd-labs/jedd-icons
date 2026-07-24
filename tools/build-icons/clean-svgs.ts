@@ -37,8 +37,17 @@ const VARIANT_ROOT_ATTRS: Record<string, string> = {
   ].join(" "),
 };
 
+// Presentation attributes stripped from child elements (they're set on the root
+// and inherited). `stroke-linejoin` is intentionally NOT here — it's handled
+// separately so a non-default join (e.g. bevel) can be kept per element.
 const INHERITED_ATTRS =
-  /\s+(?:stroke|fill|stroke-width|stroke-linecap|stroke-linejoin|stroke-dasharray|stroke-dashoffset|stroke-miterlimit|stroke-opacity|fill-opacity|opacity|class)="[^"]*"/g;
+  /\s+(?:stroke|fill|stroke-width|stroke-linecap|stroke-dasharray|stroke-dashoffset|stroke-miterlimit|stroke-opacity|fill-opacity|opacity|class)="[^"]*"/g;
+
+// The default stroke-linejoin every icon inherits from the root. A child join
+// equal to this is redundant and stripped; any other value is a deliberate
+// per-element override and preserved (with a warning).
+const DEFAULT_LINEJOIN = "miter";
+const CHILD_LINEJOIN = /\s+stroke-linejoin="([^"]*)"/g;
 
 /**
  * Flattens design-tool export artifacts: removes `<defs>` blocks (which hold
@@ -89,7 +98,7 @@ function mergePaths(inner: string): string {
   return `\n<path d="${ds.join(" ")}"/>\n`;
 }
 
-function cleanSvg(svg: string, rootAttrs: string): string {
+function cleanSvg(svg: string, rootAttrs: string, label: string): string {
   const openMatch = svg.match(/^<svg[^>]*>/);
   if (!openMatch) {
     return svg;
@@ -104,10 +113,37 @@ function cleanSvg(svg: string, rootAttrs: string): string {
   // Flatten export artifacts (defs/clip-path groups) before anything else.
   inner = unwrapGroups(inner);
 
+  // The root is about to be replaced by the canonical template (miter). If the
+  // source declared a non-default join on the root hoist it onto child elements first so it survives as a
+  // per-element override rather than being lost.
+  const rootJoin = openMatch[0].match(/stroke-linejoin="([^"]*)"/)?.[1];
+  if (rootJoin && rootJoin !== DEFAULT_LINEJOIN) {
+    inner = inner.replace(
+      /<(path|circle|rect|line|polygon|polyline|ellipse)\b((?:(?!\/?>)[\s\S])*?)(\/?>)/g,
+      (full, tag: string, attrs: string, close: string) =>
+        attrs.includes("stroke-linejoin")
+          ? full
+          : `<${tag}${attrs} stroke-linejoin="${rootJoin}"${close}`
+    );
+  }
+
   // Strip inherited presentation attributes from child elements
   inner = inner.replace(/<([a-zA-Z][\w-]*)\s+([^>]*?)\s*\/?>/g, (match) =>
     match.replace(INHERITED_ATTRS, "")
   );
+
+  // Handle stroke-linejoin on children: drop the redundant default (miter),
+  // keep any deliberate override (bevel/round) and warn so accidental exports
+  // are surfaced rather than silently shipped.
+  inner = inner.replace(CHILD_LINEJOIN, (full, value: string) => {
+    if (value === DEFAULT_LINEJOIN) {
+      return "";
+    }
+    console.warn(
+      `[clean-svgs] ${label}: kept non-default stroke-linejoin="${value}" — verify this is intentional`
+    );
+    return full;
+  });
 
   // Merge sibling <path>s into one (only when nothing but paths remain).
   inner = mergePaths(inner);
@@ -157,7 +193,7 @@ for (const variant of variants) {
   for (const file of files) {
     const path = join(variantDir, file);
     const original = readFileSync(path, "utf8");
-    const cleaned = cleanSvg(original, rootAttrs);
+    const cleaned = cleanSvg(original, rootAttrs, `${variant}/${file}`);
 
     if (cleaned !== original) {
       writeFileSync(path, cleaned);
