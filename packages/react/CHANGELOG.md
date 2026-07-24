@@ -1,5 +1,15 @@
 # @jedd-icons/react
 
+## 0.1.0
+
+### Minor Changes
+
+- [#116](https://github.com/jedd-labs/jedd-icons/pull/116) [`a739648`](https://github.com/jedd-labs/jedd-icons/commit/a7396480d2a7c02324df6e30ba07138699bf0fed) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add clock, clock-1, clock-3, clock-6, clock-8, clock-9, clock-10, clock-minus, clock-plus
+
+- [#114](https://github.com/jedd-labs/jedd-icons/pull/114) [`a8a5297`](https://github.com/jedd-labs/jedd-icons/commit/a8a5297b4deda9edffe4a2e0eb62b8472f6e18c1) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add file-arrow-down, file-arrow-down-corner, file-arrow-up, file-arrow-up-corner, file-box, file-cog, file-cog-corner, file-heart, file-lock, file-minus, file-minus-corner, file-plus, file-plus-corner, file-search, file-shield, file-star, file-text
+
+- [#113](https://github.com/jedd-labs/jedd-icons/pull/113) [`f8b7160`](https://github.com/jedd-labs/jedd-icons/commit/f8b716063736f149f691b97335fbe98b8b5c458b) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add ellipsis-horizontal, ellipsis-vertical, grip, grip-vertical, grip-horizontal
+
 ## 0.0.17
 
 ### Patch Changes
