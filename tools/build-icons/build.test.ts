@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   indexExportLine,
+  isStripped,
   parseSvg,
   renderReactIconFile,
   renderVanillaIconFile,
@@ -67,6 +68,35 @@ describe("stripInheritedAttrs", () => {
     expect(stripInheritedAttrs(nodes as never)).toEqual([
       ["g", { id: "a" }, [["circle", { cx: "12", cy: "12", r: "3" }]]],
     ]);
+  });
+
+  it("drops a redundant default stroke-linejoin but keeps an override", () => {
+    const nodes = [
+      ["path", { d: "M1 1", "stroke-linejoin": "miter" }],
+      ["path", { d: "M2 2", "stroke-linejoin": "bevel" }],
+    ] as const;
+    expect(stripInheritedAttrs(nodes as never)).toEqual([
+      ["path", { d: "M1 1" }],
+      ["path", { d: "M2 2", "stroke-linejoin": "bevel" }],
+    ]);
+  });
+});
+
+describe("isStripped", () => {
+  it("strips inherited presentation attrs", () => {
+    expect(isStripped("stroke", "red")).toBe(true);
+    expect(isStripped("stroke-width", "2")).toBe(true);
+  });
+
+  it("keeps geometry attrs", () => {
+    expect(isStripped("d", "M1 1")).toBe(false);
+    expect(isStripped("cx", "12")).toBe(false);
+  });
+
+  it("strips a redundant default stroke-linejoin but keeps an override", () => {
+    expect(isStripped("stroke-linejoin", "miter")).toBe(true);
+    expect(isStripped("stroke-linejoin", "bevel")).toBe(false);
+    expect(isStripped("stroke-linejoin", "round")).toBe(false);
   });
 });
 

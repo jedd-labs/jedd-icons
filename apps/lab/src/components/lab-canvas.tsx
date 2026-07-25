@@ -37,12 +37,23 @@ function PieceShape({
     ? PIECE_COLORS[piece.index % PIECE_COLORS.length]
     : undefined;
   const { attrs } = piece;
+  const linejoin = attrs["stroke-linejoin"] ?? attrs.strokeLinejoin;
+  const linecap = attrs["stroke-linecap"] ?? attrs.strokeLinecap;
   const common = {
     opacity: dimmed ? 0.12 : 1,
     // Forward any element transform (e.g. rotate()) so primitives render in
     // place — the source SVG relies on it (see rows-2's rotated rect).
     ...(typeof attrs.transform === "string"
       ? { transform: attrs.transform }
+      : {}),
+    // Forward per-element stroke join/cap overrides so they win over the
+    // group's defaults — matching how the shipped component renders (e.g.
+    // clock-9's bevel path over the miter root).
+    ...(typeof linejoin === "string"
+      ? { strokeLinejoin: linejoin as "miter" | "round" | "bevel" }
+      : {}),
+    ...(typeof linecap === "string"
+      ? { strokeLinecap: linecap as "butt" | "round" | "square" }
       : {}),
     ...(color
       ? { stroke: fill ? "none" : color, fill: fill ? color : "none" }

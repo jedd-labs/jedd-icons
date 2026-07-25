@@ -1,0 +1,20 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "file",
+    "box",
+    "package",
+    "storage",
+    "container",
+    "3d",
+    "model",
+    "asset",
+    "object",
+    "geometry",
+    "cad",
+    "blueprint",
+    "scene"
+  ],
+  "categories": ["files", "design", "development"]
+}

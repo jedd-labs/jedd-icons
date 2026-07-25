@@ -48,7 +48,7 @@ for (const variant of variants) {
   for (const file of files) {
     const path = join(variantDir, file);
     const original = readFileSync(path, "utf8");
-    const cleaned = cleanSvg(original, rootAttrs);
+    const cleaned = cleanSvg(original, rootAttrs, `${variant}/${file}`);
 
     if (cleaned !== original) {
       writeFileSync(path, cleaned);

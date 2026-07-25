@@ -1,0 +1,16 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "grip",
+    "horizontal",
+    "handle",
+    "drag",
+    "resize",
+    "move",
+    "variant",
+    "grab",
+    "dots"
+  ],
+  "categories": ["design", "layout"]
+}

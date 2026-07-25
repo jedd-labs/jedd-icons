@@ -1,0 +1,15 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "clock",
+    "time",
+    "plus",
+    "add",
+    "increase",
+    "watch",
+    "alarm",
+    "create"
+  ],
+  "categories": ["time"]
+}

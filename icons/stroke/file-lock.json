@@ -1,0 +1,6 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": ["file", "lock", "secure", "protected", "password"],
+  "categories": ["files", "security"]
+}
