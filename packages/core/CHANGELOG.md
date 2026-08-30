@@ -1,5 +1,11 @@
 # @jedd-icons/core
 
+## 0.1.1
+
+### Patch Changes
+
+- [#121](https://github.com/jedd-labs/jedd-icons/pull/121) [`97b17bd`](https://github.com/jedd-labs/jedd-icons/commit/97b17bd6a80b1ad722dafa5c21182777ae794a29) Thanks [@mnove](https://github.com/mnove)! - Preserve non-default stroke-linecap on icon geometry. Previously any stroke-linecap override was stripped during SVG cleaning and codegen, which erased zero-length "dot" segments that depend on a square or round cap to render.
+
 ## 0.1.0
 
 ### Minor Changes
