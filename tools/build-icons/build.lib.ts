@@ -96,7 +96,6 @@ export const INHERITED_ATTRS = new Set([
   "stroke",
   "fill",
   "stroke-width",
-  "stroke-linecap",
   "stroke-dasharray",
   "stroke-dashoffset",
   "stroke-miterlimit",
@@ -105,16 +104,24 @@ export const INHERITED_ATTRS = new Set([
   "opacity",
 ]);
 
-// stroke-linejoin is kept per element only when it overrides the root default.
+// stroke-linejoin/stroke-linecap are kept per element only when they override
+// the root default. A dropped override changes rendering — notably, a zero-
+// length "dot" segment paints nothing under the default `butt` cap.
 export const DEFAULT_LINEJOIN = "miter";
+export const DEFAULT_LINECAP = "butt";
+
+const ATTR_DEFAULTS: Record<string, string> = {
+  "stroke-linejoin": DEFAULT_LINEJOIN,
+  "stroke-linecap": DEFAULT_LINECAP,
+};
 
 /** True when an attr should be dropped from a child (inherited from the root). */
 export function isStripped(key: string, value: string | number): boolean {
   if (INHERITED_ATTRS.has(key)) {
     return true;
   }
-  // Redundant default join is stripped; a real override (bevel/round) is kept.
-  return key === "stroke-linejoin" && value === DEFAULT_LINEJOIN;
+  // A redundant default is stripped; a real override is kept.
+  return key in ATTR_DEFAULTS && value === ATTR_DEFAULTS[key];
 }
 
 export function stripInheritedAttrs(nodes: IconNode): IconNode {

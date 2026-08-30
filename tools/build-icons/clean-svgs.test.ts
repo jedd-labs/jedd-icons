@@ -83,6 +83,36 @@ describe("cleanSvg", () => {
     expect(out).toContain(`<svg ${stroke}>`);
   });
 
+  it("drops a redundant default (butt) stroke-linecap from a child", () => {
+    const svg = `<svg><path d="M1 1" stroke-linecap="butt"/></svg>`;
+    const out = cleanSvg(svg, stroke, label);
+    expect(out).toBe(`<svg ${stroke}>\n<path d="M1 1"/>\n</svg>\n`);
+  });
+
+  it("keeps a non-default (square) stroke-linecap override on a child", () => {
+    // Zero-length "dot" segments only render under a square/round cap; losing
+    // the override makes them disappear entirely.
+    const svg = `<svg><path d="M3 5H3.01" stroke-linecap="square"/></svg>`;
+    const out = cleanSvg(svg, stroke, label);
+    expect(out).toContain(`stroke-linecap="square"`);
+  });
+
+  it("hoists a non-default root stroke-linecap onto children before templating", () => {
+    const svg = `<svg stroke-linecap="round"><path d="M1 1"/></svg>`;
+    const out = cleanSvg(svg, stroke, label);
+    // The canonical root is butt; the round cap survives as a child override.
+    expect(out).toContain(`stroke-linecap="round"`);
+    expect(out).toContain(`<svg ${stroke}>`);
+  });
+
+  it("does not merge paths when one carries a linecap override", () => {
+    // Merging keeps only `d`, so it must bail rather than drop the override.
+    const svg = `<svg><path d="M3 5H3.01" stroke-linecap="square"/><path d="M8 5H21"/></svg>`;
+    const out = cleanSvg(svg, stroke, label);
+    expect(out).toContain(`stroke-linecap="square"`);
+    expect(out.match(/<path/g)).toHaveLength(2);
+  });
+
   it("is idempotent", () => {
     const svg = `<svg foo="bar"><path d="M5 12h14" stroke="red"/></svg>`;
     const once = cleanSvg(svg, stroke, label);

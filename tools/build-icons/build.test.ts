@@ -98,6 +98,12 @@ describe("isStripped", () => {
     expect(isStripped("stroke-linejoin", "bevel")).toBe(false);
     expect(isStripped("stroke-linejoin", "round")).toBe(false);
   });
+
+  it("strips a redundant default stroke-linecap but keeps an override", () => {
+    expect(isStripped("stroke-linecap", "butt")).toBe(true);
+    expect(isStripped("stroke-linecap", "square")).toBe(false);
+    expect(isStripped("stroke-linecap", "round")).toBe(false);
+  });
 });
 
 describe("toCamelAttrs", () => {

@@ -25,16 +25,28 @@ export const VARIANT_ROOT_ATTRS: Record<string, string> = {
 };
 
 // Presentation attributes stripped from child elements (they're set on the root
-// and inherited). `stroke-linejoin` is intentionally NOT here — it's handled
-// separately so a non-default join (e.g. bevel) can be kept per element.
+// and inherited). `stroke-linejoin` and `stroke-linecap` are intentionally NOT
+// here — they're handled separately so a non-default join (e.g. bevel) or cap
+// (e.g. square, which is what makes zero-length "dot" segments visible) can be
+// kept per element.
 export const INHERITED_ATTRS =
-  /\s+(?:stroke|fill|stroke-width|stroke-linecap|stroke-dasharray|stroke-dashoffset|stroke-miterlimit|stroke-opacity|fill-opacity|opacity|class)="[^"]*"/g;
+  /\s+(?:stroke|fill|stroke-width|stroke-dasharray|stroke-dashoffset|stroke-miterlimit|stroke-opacity|fill-opacity|opacity|class)="[^"]*"/g;
 
 // The default stroke-linejoin every icon inherits from the root. A child join
 // equal to this is redundant and stripped; any other value is a deliberate
 // per-element override and preserved (with a warning).
 export const DEFAULT_LINEJOIN = "miter";
 export const CHILD_LINEJOIN = /\s+stroke-linejoin="([^"]*)"/g;
+
+// Same contract for stroke-linecap. `butt` is the inherited default; `square`
+// and `round` are deliberate overrides that must survive cleaning — dropping
+// them collapses zero-length segments (dots) to nothing at render time.
+export const DEFAULT_LINECAP = "butt";
+export const CHILD_LINECAP = /\s+stroke-linecap="([^"]*)"/g;
+
+// Presentation attributes that may legitimately remain on a child element after
+// cleaning. Used by `mergePaths` to detect paths it must not merge away.
+const SURVIVING_ATTRS = /\s(?:stroke-linejoin|stroke-linecap)="/;
 
 /**
  * Flattens design-tool export artifacts: removes `<defs>` blocks (which hold
@@ -64,6 +76,10 @@ export function unwrapGroups(inner: string): string {
  * identically whether in one element or many. Skips icons with non-path
  * primitives so we never lose geometry. Runs after attribute stripping so all
  * paths share the (empty) inherited presentation.
+ *
+ * Also bails when any path still carries a per-element presentation attribute
+ * (a non-default linecap/linejoin): merging keeps only `d`, so that override
+ * would be silently discarded.
  */
 export function mergePaths(inner: string): string {
   const elements = inner.match(/<[a-zA-Z][\w-]*\b[^>]*\/?>/g) ?? [];
@@ -76,6 +92,10 @@ export function mergePaths(inner: string): string {
   if (!allPaths) {
     return inner;
   }
+  // Bail if any path carries an override that merging would drop.
+  if (nonEmpty.some((el) => SURVIVING_ATTRS.test(el))) {
+    return inner;
+  }
   const ds = nonEmpty
     .map((el) => el.match(/\bd="([^"]*)"/)?.[1]?.trim())
     .filter((d): d is string => Boolean(d));
@@ -83,6 +103,56 @@ export function mergePaths(inner: string): string {
     return inner;
   }
   return `\n<path d="${ds.join(" ")}"/>\n`;
+}
+
+const CHILD_ELEMENT =
+  /<(path|circle|rect|line|polygon|polyline|ellipse)\b((?:(?!\/?>)[\s\S])*?)(\/?>)/g;
+
+/**
+ * Pushes a non-default presentation attribute from the source root onto every
+ * child element that doesn't already set it. Called before the root is replaced
+ * by the canonical template, so the override survives as a per-element value.
+ */
+function hoistRootAttr(
+  inner: string,
+  openTag: string,
+  attr: string,
+  defaultValue: string
+): string {
+  const rootValue = openTag.match(new RegExp(`${attr}="([^"]*)"`))?.[1];
+  if (!rootValue || rootValue === defaultValue) {
+    return inner;
+  }
+  return inner.replace(
+    CHILD_ELEMENT,
+    (full, tag: string, attrs: string, close: string) =>
+      attrs.includes(attr)
+        ? full
+        : `<${tag}${attrs} ${attr}="${rootValue}"${close}`
+  );
+}
+
+/**
+ * Drops a child presentation attribute when it merely repeats the inherited
+ * default; keeps any other value (a deliberate override) and warns so an
+ * accidental design-tool export is surfaced rather than silently shipped.
+ */
+function stripDefaultAttr(
+  inner: string,
+  pattern: RegExp,
+  defaultValue: string,
+  attr: string,
+  label: string
+): string {
+  return inner.replace(pattern, (full, value: string) => {
+    if (value === defaultValue) {
+      return "";
+    }
+    console.warn(
+      `[clean-svgs] ${label}: kept non-default ${attr}="${value}" — verify this is intentional`
+    );
+    return full;
+  });
 }
 
 export function cleanSvg(
@@ -104,37 +174,40 @@ export function cleanSvg(
   // Flatten export artifacts (defs/clip-path groups) before anything else.
   inner = unwrapGroups(inner);
 
-  // The root is about to be replaced by the canonical template (miter). If the
-  // source declared a non-default join on the root hoist it onto child elements first so it survives as a
-  // per-element override rather than being lost.
-  const rootJoin = openMatch[0].match(/stroke-linejoin="([^"]*)"/)?.[1];
-  if (rootJoin && rootJoin !== DEFAULT_LINEJOIN) {
-    inner = inner.replace(
-      /<(path|circle|rect|line|polygon|polyline|ellipse)\b((?:(?!\/?>)[\s\S])*?)(\/?>)/g,
-      (full, tag: string, attrs: string, close: string) =>
-        attrs.includes("stroke-linejoin")
-          ? full
-          : `<${tag}${attrs} stroke-linejoin="${rootJoin}"${close}`
-    );
-  }
+  // The root is about to be replaced by the canonical template (miter/butt). If
+  // the source declared a non-default join or cap on the root, hoist it onto
+  // child elements first so it survives as a per-element override rather than
+  // being lost.
+  inner = hoistRootAttr(
+    inner,
+    openMatch[0],
+    "stroke-linejoin",
+    DEFAULT_LINEJOIN
+  );
+  inner = hoistRootAttr(inner, openMatch[0], "stroke-linecap", DEFAULT_LINECAP);
 
   // Strip inherited presentation attributes from child elements
   inner = inner.replace(/<([a-zA-Z][\w-]*)\s+([^>]*?)\s*\/?>/g, (match) =>
     match.replace(INHERITED_ATTRS, "")
   );
 
-  // Handle stroke-linejoin on children: drop the redundant default (miter),
-  // keep any deliberate override (bevel/round) and warn so accidental exports
-  // are surfaced rather than silently shipped.
-  inner = inner.replace(CHILD_LINEJOIN, (full, value: string) => {
-    if (value === DEFAULT_LINEJOIN) {
-      return "";
-    }
-    console.warn(
-      `[clean-svgs] ${label}: kept non-default stroke-linejoin="${value}" — verify this is intentional`
-    );
-    return full;
-  });
+  // Handle stroke-linejoin/stroke-linecap on children: drop the redundant
+  // default, keep any deliberate override (bevel/round, square/round) and warn
+  // so accidental exports are surfaced rather than silently shipped.
+  inner = stripDefaultAttr(
+    inner,
+    CHILD_LINEJOIN,
+    DEFAULT_LINEJOIN,
+    "stroke-linejoin",
+    label
+  );
+  inner = stripDefaultAttr(
+    inner,
+    CHILD_LINECAP,
+    DEFAULT_LINECAP,
+    "stroke-linecap",
+    label
+  );
 
   // Merge sibling <path>s into one (only when nothing but paths remain).
   inner = mergePaths(inner);

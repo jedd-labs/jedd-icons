@@ -14,6 +14,7 @@ import {
 } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { type IconNode, parseSvg, stripInheritedAttrs } from "./build.lib";
 import { kebabToPascal } from "./naming";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -29,123 +30,9 @@ const OUTPUT_DIR =
     : join(ROOT, "apps", "lab", ".generated");
 const OUTPUT = join(OUTPUT_DIR, "icon-nodes.json");
 
-type IconAttrs = Record<string, string | number>;
-type IconNodeChild = [
-  tag: string,
-  attrs: IconAttrs,
-  children?: IconNodeChild[],
-];
-type IconNode = IconNodeChild[];
-
-// ── SVG parser (kept in lockstep with tools/build-icons/build.ts) ──────
-
-function parseAttrs(attrsStr: string): IconAttrs {
-  const attrs: IconAttrs = {};
-  const attrRe = /([a-zA-Z:][\w:-]*)\s*=\s*"([^"]*)"/g;
-  let m: RegExpExecArray | null;
-  while ((m = attrRe.exec(attrsStr)) !== null) {
-    attrs[m[1]] = m[2];
-  }
-  return attrs;
-}
-
-function parseChildren(xml: string, pos: number): [IconNode, number] {
-  const nodes: IconNode = [];
-
-  while (pos < xml.length) {
-    const nextTag = xml.indexOf("<", pos);
-    if (nextTag === -1) {
-      break;
-    }
-    pos = nextTag;
-
-    if (xml[pos + 1] === "/") {
-      return [nodes, xml.indexOf(">", pos) + 1];
-    }
-
-    const tagMatch = xml
-      .slice(pos)
-      .match(/^<([a-zA-Z][\w-]*)\s*([^>]*?)(\/)?>/);
-    if (!tagMatch) {
-      pos++;
-      continue;
-    }
-
-    const [fullMatch, tag, attrsStr, selfClose] = tagMatch;
-    const attrs = parseAttrs(attrsStr);
-    pos += fullMatch.length;
-
-    if (selfClose) {
-      nodes.push([tag, attrs]);
-    } else {
-      const [children, newPos] = parseChildren(xml, pos);
-      pos = newPos;
-      if (children.length > 0) {
-        nodes.push([tag, attrs, children]);
-      } else {
-        nodes.push([tag, attrs]);
-      }
-    }
-  }
-
-  return [nodes, pos];
-}
-
-function parseSvg(svg: string): IconNode {
-  const cleaned = svg
-    .replace(/<\?xml[^?]*\?>/g, "")
-    .replace(/<!--[\s\S]*?-->/g, "")
-    .trim();
-
-  const svgOpen = cleaned.match(/^<svg[^>]*>/);
-  if (!svgOpen) {
-    return [];
-  }
-  const svgClose = cleaned.lastIndexOf("</svg>");
-  if (svgClose === -1) {
-    return [];
-  }
-
-  const inner = cleaned.slice(svgOpen[0].length, svgClose);
-  const [nodes] = parseChildren(inner, 0);
-  return nodes;
-}
-
-const INHERITED_ATTRS = new Set([
-  "stroke",
-  "fill",
-  "stroke-width",
-  "stroke-linecap",
-  "stroke-dasharray",
-  "stroke-dashoffset",
-  "stroke-miterlimit",
-  "stroke-opacity",
-  "fill-opacity",
-  "opacity",
-]);
-
-// stroke-linejoin is kept per element only when it overrides the root default,
-// matching build.ts so the Lab reflects what actually ships.
-const DEFAULT_LINEJOIN = "miter";
-
-function isStripped(key: string, value: string | number): boolean {
-  if (INHERITED_ATTRS.has(key)) {
-    return true;
-  }
-  return key === "stroke-linejoin" && value === DEFAULT_LINEJOIN;
-}
-
-function stripInheritedAttrs(nodes: IconNode): IconNode {
-  return nodes.map(([tag, attrs, children]) => {
-    const cleaned = Object.fromEntries(
-      Object.entries(attrs).filter(([k, v]) => !isStripped(k, v))
-    );
-    if (children) {
-      return [tag, cleaned, stripInheritedAttrs(children)];
-    }
-    return [tag, cleaned];
-  });
-}
+// The SVG parser and attribute-stripping rules are imported from build.lib so
+// the Lab reflects exactly what the codegen bakes into the shipped packages.
+// They were previously duplicated here and silently drifted.
 
 // ── Main ───────────────────────────────────────────────────────────────
 
