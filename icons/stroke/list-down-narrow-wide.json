@@ -1,0 +1,16 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "sort",
+    "ascending",
+    "narrow",
+    "wide",
+    "direction",
+    "order",
+    "list",
+    "filter",
+    "increasing"
+  ],
+  "categories": ["text"]
+}

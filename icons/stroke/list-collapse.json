@@ -1,0 +1,20 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "list",
+    "collapse",
+    "expand",
+    "hide",
+    "menu",
+    "items",
+    "fold",
+    "toggle",
+    "accordion",
+    "show",
+    "unfold",
+    "details",
+    "disclosure"
+  ],
+  "categories": ["text"]
+}
