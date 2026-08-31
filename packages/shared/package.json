@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "tsdown": "catalog:",
+    "tsx": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }
