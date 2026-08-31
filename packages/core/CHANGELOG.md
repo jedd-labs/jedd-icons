@@ -1,5 +1,13 @@
 # @jedd-icons/core
 
+## 0.2.0
+
+### Minor Changes
+
+- [#119](https://github.com/jedd-labs/jedd-icons/pull/119) [`4115bae`](https://github.com/jedd-labs/jedd-icons/commit/4115bae17196da3ef98b1cc3d9018e7fcd378052) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add list-check, list-collapse, list-down-narrow-wide, list-down-wide-narrow, list-up-narrow-wide, list-up-wide-narrow
+
+- [#120](https://github.com/jedd-labs/jedd-icons/pull/120) [`478a123`](https://github.com/jedd-labs/jedd-icons/commit/478a1231db46c1c1cea61834dd386e605066fe74) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add sparkle, sparkle-2
+
 ## 0.1.1
 
 ### Patch Changes
