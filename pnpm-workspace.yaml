@@ -56,9 +56,9 @@ catalog:
   # UI libraries
   "@base-ui/react": ^1.7.0
   lucide-react: ^1.37.0
-  motion: ^12.38.0
+  motion: ^13.1.1
   shadcn: ^4.19.1
-  sugar-high: ^1.2.1
+  sugar-high: ^2.1.0
   vaul: ^1.1.2
 
   # Fonts
