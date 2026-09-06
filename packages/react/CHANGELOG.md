@@ -1,5 +1,23 @@
 # @jedd-icons/react
 
+## 0.3.0
+
+### Minor Changes
+
+- [#132](https://github.com/jedd-labs/jedd-icons/pull/132) [`a3ab451`](https://github.com/jedd-labs/jedd-icons/commit/a3ab451f38c1385623b1396adda9e88c1a6562da) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add list-bullets, list-cog, list-dashes, list-heart, list-layout, list-plus, list-search, list-star, list-user
+
+### Patch Changes
+
+- [#131](https://github.com/jedd-labs/jedd-icons/pull/131) [`e51561a`](https://github.com/jedd-labs/jedd-icons/commit/e51561afee7098155ab66292fb5d6b90699aeb5f) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Edit icon file-minus-corner, file-plus-corner, file-shield
+
+- [#128](https://github.com/jedd-labs/jedd-icons/pull/128) [`98908cf`](https://github.com/jedd-labs/jedd-icons/commit/98908cfebde93f0840afd2308b8199b94b500e6a) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Edit icons circle-alert, triangle-alert, octagon-alert, shield-alert, search-alert
+
+- [#130](https://github.com/jedd-labs/jedd-icons/pull/130) [`a5b5fd8`](https://github.com/jedd-labs/jedd-icons/commit/a5b5fd878a171c64e14a98a0080953018289afb1) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Edit icons calendar-number, calendar-range
+
+- [#125](https://github.com/jedd-labs/jedd-icons/pull/125) [`e126daf`](https://github.com/jedd-labs/jedd-icons/commit/e126daf8ea87f784dca9360ebd176afa2617b003) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - update user icons: user-check, user-plus, user-shield, user-star
+
+- [#129](https://github.com/jedd-labs/jedd-icons/pull/129) [`2d3bd62`](https://github.com/jedd-labs/jedd-icons/commit/2d3bd622986a8b8fc1e4123a851fe176ab6ee254) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Edit icons scan-qr-code, scan-face
+
 ## 0.2.0
 
 ### Minor Changes
