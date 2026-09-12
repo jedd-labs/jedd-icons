@@ -1,0 +1,6 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": ["volume", "audio", "sound", "low", "quiet", "speaker", "music"],
+  "categories": ["media"]
+}
