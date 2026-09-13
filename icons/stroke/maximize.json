@@ -1,0 +1,6 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": ["maximize", "fullscreen", "expand", "enlarge", "window", "arrows"],
+  "categories": ["layout"]
+}
