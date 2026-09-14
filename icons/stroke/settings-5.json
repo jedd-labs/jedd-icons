@@ -1,0 +1,15 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "settings",
+    "sliders",
+    "controls",
+    "adjust",
+    "configure",
+    "knobs",
+    "filter",
+    "slider"
+  ],
+  "categories": ["tools"]
+}

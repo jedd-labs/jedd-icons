@@ -1,0 +1,15 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "settings",
+    "sliders",
+    "equalizer",
+    "bars",
+    "adjust",
+    "audio",
+    "filter",
+    "slider"
+  ],
+  "categories": ["tools"]
+}
