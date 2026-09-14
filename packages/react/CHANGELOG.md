@@ -1,5 +1,23 @@
 # @jedd-icons/react
 
+## 0.4.0
+
+### Minor Changes
+
+- [#139](https://github.com/jedd-labs/jedd-icons/pull/139) [`2622f67`](https://github.com/jedd-labs/jedd-icons/commit/2622f6738e2da4d135acf2930f9f93d03c5e99e2) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add funnel-minus, funnel-plus, funnel-x, funnel
+
+- [#140](https://github.com/jedd-labs/jedd-icons/pull/140) [`7a18b0b`](https://github.com/jedd-labs/jedd-icons/commit/7a18b0ba8798b13a054aa9a377d7ef03229ea456) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add expand, maximize
+
+- [#134](https://github.com/jedd-labs/jedd-icons/pull/134) [`544e12f`](https://github.com/jedd-labs/jedd-icons/commit/544e12fcf875c82efdbd2810930bc929096656ba) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add settings-4, settings-5
+
+- [#136](https://github.com/jedd-labs/jedd-icons/pull/136) [`b8fc7f3`](https://github.com/jedd-labs/jedd-icons/commit/b8fc7f35964cafff987f40fb1123c3c24ef300a8) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add arrow-redo, arrow-u-down-left, arrow-u-down-right, arrow-u-left-down, arrow-u-left-up, arrow-u-right-down, arrow-u-right-up, arrow-u-up-left, arrow-u-up-right, arrow-undo
+
+- [#138](https://github.com/jedd-labs/jedd-icons/pull/138) [`74c5ad5`](https://github.com/jedd-labs/jedd-icons/commit/74c5ad592106fd54f67451c5a8d14bef427fe8b7) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add chevron-down-up, chevron-left-right, chevron-right-left, chevron-up-down
+
+- [#135](https://github.com/jedd-labs/jedd-icons/pull/135) [`bab4ddd`](https://github.com/jedd-labs/jedd-icons/commit/bab4ddd509f516c7a3e3096f8cb075a9d73e47eb) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add fast-forward, pause, play-off, play, rewind, skip-back, skip-forward, volume-1, volume-2, volume-off, volume-x, volume
+
+- [#137](https://github.com/jedd-labs/jedd-icons/pull/137) [`a79bfab`](https://github.com/jedd-labs/jedd-icons/commit/a79bfab1e505889b38e5e71ec130a42d85979f15) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add bookmark-check, bookmark-minus, bookmark-off, bookmark-plus, bookmark-x, bookmark, bookmarks, file-bookmark, folder-bookmark, square-bookmark
+
 ## 0.3.0
 
 ### Minor Changes
