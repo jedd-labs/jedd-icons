@@ -1,0 +1,6 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": ["funnel", "filter", "sort", "refine", "search", "hopper"],
+  "categories": ["tools"]
+}
