@@ -6,9 +6,9 @@ export const appDescription =
 // Open Graph tags, and the sitemap. No trailing slash.
 export const siteUrl = "https://jeddicons.com";
 
-// Default social-share image (1200×630). Absolute URL so crawlers on other
+// Default social-share image (1200×663). Absolute URL so crawlers on other
 // hosts (Slack, X, Discord) can resolve it. Lives in public/.
-export const ogImageUrl = `${siteUrl}/og.png`;
+export const ogImageUrl = `${siteUrl}/og.jpg`;
 // The X/Twitter handle to attribute shared cards to. Empty string = omit.
 export const twitterHandle = "";
 
@@ -44,7 +44,7 @@ export function socialMeta({
     { content: url, property: "og:url" },
     { content: image, property: "og:image" },
     { content: "1200", property: "og:image:width" },
-    { content: "630", property: "og:image:height" },
+    { content: "663", property: "og:image:height" },
     { content: title, property: "og:image:alt" },
     { content: "summary_large_image", name: "twitter:card" },
     { content: title, name: "twitter:title" },
