@@ -1,0 +1,15 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "folder",
+    "bookmark",
+    "directory",
+    "saved",
+    "collection",
+    "favorite",
+    "archive",
+    "read-later"
+  ],
+  "categories": ["actions"]
+}

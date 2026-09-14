@@ -1,0 +1,14 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "bookmark",
+    "close",
+    "remove",
+    "delete",
+    "unbookmark",
+    "cancel",
+    "clear"
+  ],
+  "categories": ["actions"]
+}
