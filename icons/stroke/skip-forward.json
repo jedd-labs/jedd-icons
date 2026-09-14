@@ -1,0 +1,6 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": ["skip", "forward", "next", "media", "player", "track", "music"],
+  "categories": ["media"]
+}
