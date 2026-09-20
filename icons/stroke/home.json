@@ -1,0 +1,15 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "home",
+    "house",
+    "dashboard",
+    "main",
+    "return",
+    "navigate",
+    "building",
+    "residence"
+  ],
+  "categories": ["navigation"]
+}
