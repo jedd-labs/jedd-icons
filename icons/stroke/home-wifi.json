@@ -1,0 +1,15 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "home",
+    "wifi",
+    "wireless",
+    "internet",
+    "network",
+    "router",
+    "building",
+    "connectivity"
+  ],
+  "categories": ["devices"]
+}
