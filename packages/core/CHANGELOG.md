@@ -1,5 +1,19 @@
 # @jedd-icons/core
 
+## 0.5.0
+
+### Minor Changes
+
+- [#145](https://github.com/jedd-labs/jedd-icons/pull/145) [`13945b7`](https://github.com/jedd-labs/jedd-icons/commit/13945b7eeda3a3ce1001bd48fc6d6af23a302bff) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add shopping-cart, shopping-cart-check, shopping-cart-check-in, shopping-cart-check-out, shopping-cart-heart, shopping-cart-plus, shopping-cart-x, shopping-cart-2, shopping-cart-2-check, shopping-cart-2-check-in, shopping-cart-2-check-out, shopping-cart-2-heart, shopping-cart-2-plus, shopping-cart-2-x
+
+- [#148](https://github.com/jedd-labs/jedd-icons/pull/148) [`cb6f876`](https://github.com/jedd-labs/jedd-icons/commit/cb6f8765433a9bcbd64661125d3d20fbfb6e68e7) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add package, package-check, package-plus, package-x, package-search, package-return, package-2, package-2-check, package-2-plus, package-2-x, package-2-search, package-2-return, package-2-heart, package-2-location, package-2-lock, package-2-fast, package-3, package-4, package-5
+
+- [#143](https://github.com/jedd-labs/jedd-icons/pull/143) [`d683e36`](https://github.com/jedd-labs/jedd-icons/commit/d683e36f3af8959546d1c12ada83ed415547ced7) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add home, home-heart, home-plus, home-star
+
+- [#146](https://github.com/jedd-labs/jedd-icons/pull/146) [`f86e367`](https://github.com/jedd-labs/jedd-icons/commit/f86e367037828caa7d2bfcc5dc836ef4909097ab) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add shopping-basket, shopping-basket-heart, shopping-basket-minus, shopping-basket-plus, shopping-basket-2, shopping-basket-2-heart, shopping-basket-2-minus, shopping-basket-2-plus, shopping-basket-3, shopping-basket-3-heart, shopping-basket-3-minus, shopping-basket-3-plus, shopping-basket-4, shopping-basket-4-heart, shopping-basket-4-minus, shopping-basket-4-plus
+
+- [#144](https://github.com/jedd-labs/jedd-icons/pull/144) [`29afefb`](https://github.com/jedd-labs/jedd-icons/commit/29afefb8df0558971ac605da3371b2e37a055a49) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add wifi, home-wifi
+
 ## 0.4.0
 
 ### Minor Changes
