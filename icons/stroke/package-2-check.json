@@ -1,0 +1,15 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "package",
+    "check",
+    "verified",
+    "delivered",
+    "confirmed",
+    "approved",
+    "done",
+    "complete"
+  ],
+  "categories": ["actions", "ecommerce"]
+}

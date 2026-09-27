@@ -1,0 +1,6 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": ["package", "lock", "secure", "protected", "locked", "safe"],
+  "categories": ["actions", "ecommerce"]
+}
