@@ -1,0 +1,28 @@
+{
+  "worktree": {
+    "setup": "pnpm install"
+  },
+  "scripts": {
+    "[www-docs]: dev": {
+      "command": "cd apps/www-docs && pnpm run dev"
+    },
+    "[lab]: dev": {
+      "command": "cd apps/lab && pnpm run dev"
+    },
+    "check": {
+      "command": "pnpm run check"
+    },
+    "fix": {
+      "command": "pnpm run fix"
+    },
+    "test": {
+      "command": "pnpm run test"
+    },
+    "typecheck": {
+      "command": "pnpm run typecheck"
+    },
+    "build": {
+      "command": "pnpm run build"
+    }
+  }
+}
