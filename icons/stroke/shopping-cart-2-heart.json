@@ -1,0 +1,6 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": ["shopping", "cart", "heart", "favorite", "wishlist", "like"],
+  "categories": ["actions", "ecommerce"]
+}
