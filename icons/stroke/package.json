@@ -1,0 +1,22 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": [
+    "agoscolantuoni"
+  ],
+  "tags": [
+    "package",
+    "box",
+    "delivery",
+    "shipping",
+    "parcel",
+    "send",
+    "container",
+    "storage",
+    "sealed",
+    "packed"
+  ],
+  "categories": [
+    "actions",
+    "ecommerce"
+  ]
+}
