@@ -44,9 +44,10 @@ export const CHILD_LINEJOIN = /\s+stroke-linejoin="([^"]*)"/g;
 export const DEFAULT_LINECAP = "butt";
 export const CHILD_LINECAP = /\s+stroke-linecap="([^"]*)"/g;
 
-// Presentation attributes that may legitimately remain on a child element after
-// cleaning. Used by `mergePaths` to detect paths it must not merge away.
-const SURVIVING_ATTRS = /\s(?:stroke-linejoin|stroke-linecap)="/;
+// Design-tool layer names (Figma's "Include 'id' attribute"). Stripped because
+// an icon rendered twice would put duplicate ids in the page; the source keeps
+// structure through separate elements, not names.
+const LAYER_IDS = /\s+id="[^"]*"/g;
 
 /**
  * Flattens design-tool export artifacts: removes `<defs>` blocks (which hold
@@ -67,42 +68,6 @@ export function unwrapGroups(inner: string): string {
     out = out.replace(/<g\b[^>]*>((?:(?!<\/?g\b)[\s\S])*?)<\/g>/g, "$1");
   } while (out !== prev);
   return out;
-}
-
-/**
- * Merges multiple sibling `<path>` elements into a single one by concatenating
- * their `d` attributes, but ONLY when every child element is a `<path>` (no
- * circle/rect/line/etc). Safe for stroke icons: separate subpaths render
- * identically whether in one element or many. Skips icons with non-path
- * primitives so we never lose geometry. Runs after attribute stripping so all
- * paths share the (empty) inherited presentation.
- *
- * Also bails when any path still carries a per-element presentation attribute
- * (a non-default linecap/linejoin): merging keeps only `d`, so that override
- * would be silently discarded.
- */
-export function mergePaths(inner: string): string {
-  const elements = inner.match(/<[a-zA-Z][\w-]*\b[^>]*\/?>/g) ?? [];
-  const nonEmpty = elements.filter((el) => !el.startsWith("<?"));
-  if (nonEmpty.length < 2) {
-    return inner;
-  }
-  // Bail unless EVERY element is a self-contained <path …/>.
-  const allPaths = nonEmpty.every((el) => /^<path\b/.test(el));
-  if (!allPaths) {
-    return inner;
-  }
-  // Bail if any path carries an override that merging would drop.
-  if (nonEmpty.some((el) => SURVIVING_ATTRS.test(el))) {
-    return inner;
-  }
-  const ds = nonEmpty
-    .map((el) => el.match(/\bd="([^"]*)"/)?.[1]?.trim())
-    .filter((d): d is string => Boolean(d));
-  if (ds.length < 2) {
-    return inner;
-  }
-  return `\n<path d="${ds.join(" ")}"/>\n`;
 }
 
 const CHILD_ELEMENT =
@@ -186,9 +151,9 @@ export function cleanSvg(
   );
   inner = hoistRootAttr(inner, openMatch[0], "stroke-linecap", DEFAULT_LINECAP);
 
-  // Strip inherited presentation attributes from child elements
+  // Strip inherited presentation attributes and layer ids from child elements
   inner = inner.replace(/<([a-zA-Z][\w-]*)\s+([^>]*?)\s*\/?>/g, (match) =>
-    match.replace(INHERITED_ATTRS, "")
+    match.replace(INHERITED_ATTRS, "").replace(LAYER_IDS, "")
   );
 
   // Handle stroke-linejoin/stroke-linecap on children: drop the redundant
@@ -209,8 +174,8 @@ export function cleanSvg(
     label
   );
 
-  // Merge sibling <path>s into one (only when nothing but paths remain).
-  inner = mergePaths(inner);
+  // Separate elements are kept as authored: they carry the designer's part
+  // structure. The static packages merge them at build time (`mergePathNodes`).
 
   // Clean up any double spaces left behind
   inner = inner
@@ -220,7 +185,10 @@ export function cleanSvg(
 
   // Collapse blank lines left by unwrapping so each element sits on its own
   // line with a single leading/trailing newline.
-  inner = `\n${inner.replace(/[ \t]*\n\s*\n/g, "\n").trim()}\n`;
+  inner = `\n${inner
+    .replace(/>\s*</g, ">\n<")
+    .replace(/[ \t]*\n\s*\n/g, "\n")
+    .trim()}\n`;
 
   return `<svg ${rootAttrs}>${inner}</svg>\n`;
 }

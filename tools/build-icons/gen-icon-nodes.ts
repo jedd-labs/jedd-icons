@@ -31,8 +31,9 @@ const OUTPUT_DIR =
 const OUTPUT = join(OUTPUT_DIR, "icon-nodes.json");
 
 // The SVG parser and attribute-stripping rules are imported from build.lib so
-// the Lab reflects exactly what the codegen bakes into the shipped packages.
-// They were previously duplicated here and silently drifted.
+// the Lab reflects exactly what the codegen parses. They were previously
+// duplicated here and silently drifted. Paths are deliberately NOT merged
+// (unlike the stroke packages): the Lab shows the source's element structure.
 
 // ── Main ───────────────────────────────────────────────────────────────
 

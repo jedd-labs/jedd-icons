@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   indexExportLine,
   isStripped,
+  mergePathNodes,
   parseSvg,
   renderReactIconFile,
   renderVanillaIconFile,
@@ -79,6 +80,60 @@ describe("stripInheritedAttrs", () => {
       ["path", { d: "M1 1" }],
       ["path", { d: "M2 2", "stroke-linejoin": "bevel" }],
     ]);
+  });
+});
+
+describe("mergePathNodes", () => {
+  it("joins sibling paths without a separator", () => {
+    expect(
+      mergePathNodes([
+        ["path", { d: "M1 1H5Z" }],
+        ["path", { d: " M2 2V8 " }],
+      ])
+    ).toEqual([["path", { d: "M1 1H5ZM2 2V8" }]]);
+  });
+
+  it("merges only paths that share the same presentation", () => {
+    expect(
+      mergePathNodes([
+        ["path", { d: "M3 5H3.01", "stroke-linecap": "square" }],
+        ["path", { d: "M8 5H21" }],
+        ["path", { d: "M3 9H3.01", "stroke-linecap": "square" }],
+        ["path", { d: "M8 9H21" }],
+      ])
+    ).toEqual([
+      ["path", { d: "M3 5H3.01M3 9H3.01", "stroke-linecap": "square" }],
+      ["path", { d: "M8 5H21M8 9H21" }],
+    ]);
+  });
+
+  it("keeps non-path elements in place", () => {
+    const circle = ["circle", { cx: "12", cy: "12", r: "3" }] as const;
+    expect(
+      mergePathNodes([
+        ["path", { d: "M1 1H5" }],
+        [...circle] as never,
+        ["path", { d: "M2 2V8" }],
+      ])
+    ).toEqual([["path", { d: "M1 1H5M2 2V8" }], [...circle]]);
+  });
+
+  it("leaves a path starting with a relative moveto unmerged", () => {
+    const nodes = [
+      ["path", { d: "M1 1H5" }],
+      ["path", { d: "m2 2v6" }],
+    ] as never;
+    expect(mergePathNodes(nodes)).toEqual(nodes);
+  });
+
+  it("does not mutate its input", () => {
+    const nodes = [
+      ["path", { d: "M1 1" }],
+      ["path", { d: "M2 2" }],
+    ] as never;
+    const copy = structuredClone(nodes);
+    mergePathNodes(nodes);
+    expect(nodes).toEqual(copy);
   });
 });
 

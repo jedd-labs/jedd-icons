@@ -8,6 +8,7 @@ A pnpm + Turbo monorepo that builds and distributes a set of SVG icons as publis
 
 ## Commands
 
+- `pnpm icons:compare [--ref <git-ref>]` — for every icon SVG changed since the ref (default `HEAD`), reports whether the packages still ship the same geometry (`identical` / `same geometry` / `CHANGED`). Use it when re-exporting icons.
 - `pnpm icons` — full pipeline: normalize source SVGs (`clean-svgs`) then build every package via Turbo. **Run this after adding/changing any icon.**
 - `pnpm build` — build all packages (Turbo, respects `^build` dependency order).
 - `pnpm dev` — Turbo dev across the workspace.
@@ -28,9 +29,9 @@ The whole system exists to turn `icons/**/*.svg` into typed, tree-shakeable comp
 
 1. **`icons/<variant>/<name>.svg` + `<name>.json`** — source of truth. Note the layout is `icons/stroke/` and `icons/fill/` (variant subdirectories), **not** flat `icons/<name>.svg` as the README's "Adding icons" section implies. Each variant directory is discovered dynamically. `stroke` is the `DEFAULT_VARIANT`; `fill` is a secondary variant exported under the `/fill` subpath. `<name>.json` metadata is validated against `icon.schema.json` (required: `contributors`, `tags`, `categories` where `categories` is a closed enum).
 
-2. **`tools/build-icons/clean-svgs.ts`** — normalizes source SVGs in place: sets canonical root attributes and strips inline presentation attributes (`stroke`, `fill`, etc.) from child elements so they inherit from the root at render time. Icons must be 24×24 viewBox, stroke-only, flat geometry (no `<g>`/`<defs>`/`<mask>` — the parser is intentionally simple and regex-based, not a real XML parser).
+2. **`tools/build-icons/clean-svgs.ts`** — normalizes source SVGs in place: sets canonical root attributes and strips inline presentation attributes (`stroke`, `fill`, etc.) from child elements so they inherit from the root at render time. Icons must be 24×24 viewBox, stroke-only, flat geometry (no `<g>`/`<defs>`/`<mask>` — the parser is intentionally simple and regex-based, not a real XML parser). It also strips layer `id`s and keeps separate elements as authored: sources are **unmerged**, one element per part of the icon.
 
-3. **`tools/build-icons/build.ts`** — the codegen. Invoked as `pnpm gen` from each package. `--target react` (default) or `--target vanilla` selects the output package (`packages/react/src` vs `packages/core/src`). For each SVG it: parses to an `IconNode` tuple tree (`[tag, attrs, children?]`), strips inherited attrs again, camelCases attrs (React target only), and writes one `<name>.ts` per icon plus an `index.ts` barrel with `export { default as PascalName }` lines (plus alias re-exports from each icon's JSON `aliases`). Non-default variants also get a `<variant>.ts` entry file (e.g. `fill.ts`) that re-exports `./icons-<variant>`.
+3. **`tools/build-icons/build.ts`** — the codegen. Invoked as `pnpm gen` from each package. `--target react` (default) or `--target vanilla` selects the output package (`packages/react/src` vs `packages/core/src`). For each SVG it: parses to an `IconNode` tuple tree (`[tag, attrs, children?]`), strips inherited attrs again, merges same-presentation `<path>`s into one (stroke variant only, `mergePathNodes`), camelCases attrs (React target only), and writes one `<name>.ts` per icon plus an `index.ts` barrel with `export { default as PascalName }` lines (plus alias re-exports from each icon's JSON `aliases`). Non-default variants also get a `<variant>.ts` entry file (e.g. `fill.ts`) that re-exports `./icons-<variant>`.
 
 4. **tsdown** (`--config-loader tsx`) bundles the generated `src/` into `dist/` with the CJS/ESM/`.d.ts` matrix declared in each package's `exports`.
 

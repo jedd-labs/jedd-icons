@@ -151,6 +151,46 @@ export function toCamelAttrs(nodes: IconNode): IconNode {
   });
 }
 
+/**
+ * Merges top-level `<path>`s that share the same presentation (e.g. all plain,
+ * or all `stroke-linecap="square"`) into one compound path, placed where the
+ * first of them sat. Sources keep separate elements for their part structure;
+ * the static packages ship the compact merged form, which also paints
+ * overlapping strokes once (no darker joints with semi-transparent colors).
+ * Stroke-only: for filled shapes, merging can turn overlaps into holes.
+ *
+ * `d`s are joined without a separator, so an icon re-exported unmerged from
+ * the same geometry reproduces the design tool's merged path exactly. Paths
+ * whose `d` doesn't start with an absolute `M` are left alone, since a
+ * relative `m` would be offset by the path it's appended to.
+ */
+export function mergePathNodes(nodes: IconNode): IconNode {
+  const merged: IconNode = [];
+  const bySignature = new Map<string, IconNodeChild>();
+  for (const node of nodes) {
+    const [tag, { d, ...rest }, children] = node;
+    const mergeable =
+      tag === "path" &&
+      !children &&
+      typeof d === "string" &&
+      d.trimStart().startsWith("M");
+    if (!mergeable) {
+      merged.push(node);
+      continue;
+    }
+    const signature = JSON.stringify(Object.entries(rest).sort());
+    const first = bySignature.get(signature);
+    if (first) {
+      first[1].d = `${first[1].d}${d.trim()}`;
+    } else {
+      const copy: IconNodeChild = [tag, { ...node[1], d: d.trim() }];
+      bySignature.set(signature, copy);
+      merged.push(copy);
+    }
+  }
+  return merged;
+}
+
 // ── File renderers ───────────────────────────────────────────────────
 
 export function renderReactIconFile(

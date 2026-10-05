@@ -15,6 +15,7 @@
   "name": "jedd-icons",
   "scripts": {
     "clean-svgs": "tsx tools/build-icons/clean-svgs.ts",
+    "icons:compare": "tsx tools/build-icons/compare-icons.ts",
     "gen-releases": "tsx tools/build-icons/gen-releases.ts",
     "gen-contributors": "tsx tools/build-icons/gen-contributors.ts",
     "icons": "pnpm clean-svgs && pnpm build",

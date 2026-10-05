@@ -47,11 +47,6 @@ const FILTER_ACCENTS = {
     active: "border-rose-500 bg-rose-500/10 text-rose-600 dark:text-rose-400",
     dot: "bg-rose-500",
   },
-  amber: {
-    active:
-      "border-amber-500 bg-amber-500/10 text-amber-600 dark:text-amber-400",
-    dot: "bg-amber-500",
-  },
   violet: {
     active:
       "border-violet-500 bg-violet-500/10 text-violet-600 dark:text-violet-400",

@@ -4,7 +4,6 @@ import type { Variant } from "@/lib/icons";
 
 const ACCENT_TEXT: Record<string, string> = {
   rose: "text-rose-600 dark:text-rose-400",
-  amber: "text-amber-600 dark:text-amber-400",
   violet: "text-violet-600 dark:text-violet-400",
   sky: "text-sky-600 dark:text-sky-400",
   orange: "text-orange-600 dark:text-orange-400",
@@ -106,11 +105,6 @@ function CheckReason({
       <span className={cls}>
         Contains: {detail.forbiddenTags.map((t) => `<${t}>`).join(", ")}
       </span>
-    );
-  }
-  if (id === "multiElement") {
-    return (
-      <span className={cls}>{detail.elementCount} top-level elements</span>
     );
   }
   if (id === "margin") {

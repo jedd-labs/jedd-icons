@@ -13,6 +13,7 @@ import {
   DEFAULT_VARIANT,
   type IconNode,
   indexExportLine,
+  mergePathNodes,
   parseSvg,
   renderReactIconFile,
   renderVanillaIconFile,
@@ -86,7 +87,9 @@ function buildIcon(
   const name = basename(file, ".svg");
   const componentName = kebabToPascal(name);
   const svg = readFileSync(join(variantIconsDir, file), "utf8");
-  const iconNode: IconNode = stripInheritedAttrs(parseSvg(svg));
+  const parsed = stripInheritedAttrs(parseSvg(svg));
+  const iconNode: IconNode =
+    variant === DEFAULT_VARIANT ? mergePathNodes(parsed) : parsed;
 
   if (iconNode.length === 0) {
     console.warn(`[build-icons] ${variant}/${file}: no child elements parsed`);

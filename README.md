@@ -50,6 +50,7 @@ Design rules:
 - Stay inside the 24x24 viewBox with ~1px padding on each side (room for stroke).
 - Stroke-only — no `fill` on child elements.
 - Keep the geometry flat: no `<g>` groups, no `<defs>`, no `<mask>`. The parser is intentionally simple.
+- Keep the parts separate: export each part of the icon (e.g. a bookmark and the check inside it) as its own `<path>`, and don't merge them into one. Keep each continuous stroke in one path, though; splitting it would break its corners. The build merges paths when it generates the packages, so this only affects the source files. Export without layer names (Figma's "Include 'id' attribute" off); `pnpm clean-svgs` strips any `id`s anyway.
 
 ### 2. Add metadata
 
