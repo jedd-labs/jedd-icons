@@ -2,6 +2,7 @@
 // separate from `clean-svgs.ts` (the CLI entry) so these transforms can be
 // imported and unit-tested without walking the filesystem.
 import { mergePathNodes, parseSvg, stripInheritedAttrs } from "./build.lib";
+import { findDots } from "./geometry";
 
 export const VARIANT_ROOT_ATTRS: Record<string, string> = {
   stroke: [
@@ -175,6 +176,31 @@ function warnUnmergeable(svg: string, label: string): void {
   );
 }
 
+// Dots shorter than this are flagged. Tested in desktop Safari, merged into
+// one path with other strokes: 0.0001 is dropped, 0.001 and longer render
+// (the icons' 0.01–0.0156 dots included). 0.005 leaves a 5× margin.
+const MIN_DOT_LENGTH = 0.005;
+
+// Dot length to aim for in the design tool, as in search-alert (0.0805).
+const RECOMMENDED_DOT_LENGTH = 0.08;
+
+/**
+ * Warns about dots (tiny square/round-capped strokes) too short to render
+ * reliably. Safari drops them once they're merged into one path with the rest
+ * of the icon, which the static build does; Chrome draws them. Fixed in the
+ * design tool by making the dot longer, which still looks square.
+ */
+function warnShortDots(svg: string, label: string): void {
+  const f = (v: number) => String(Number(v.toFixed(4)));
+  for (const [tag, attrs] of stripInheritedAttrs(parseSvg(svg))) {
+    for (const { at, length } of findDots(tag, attrs, MIN_DOT_LENGTH)) {
+      console.warn(
+        `[clean-svgs] ${label}: dot at (${f(at[0])}, ${f(at[1])}) is only ${f(length)} long — Safari drops dots this short once merged; make it about ${RECOMMENDED_DOT_LENGTH} long in the design tool`
+      );
+    }
+  }
+}
+
 export function cleanSvg(
   svg: string,
   rootAttrs: string,
@@ -242,6 +268,7 @@ export function cleanSvg(
   const cleaned = `<svg ${rootAttrs}>${inner}</svg>\n`;
   if (rootAttrs === VARIANT_ROOT_ATTRS.stroke) {
     warnUnmergeable(cleaned, label);
+    warnShortDots(cleaned, label);
   }
   return cleaned;
 }

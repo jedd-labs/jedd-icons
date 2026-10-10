@@ -147,6 +147,20 @@ describe("cleanSvg", () => {
     warn.mockRestore();
   });
 
+  it("warns about dots too short to render in Safari", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    cleanSvg(
+      `<svg><path d="M12 8V12M12 16V16.0001M11 20V20.01M10 21V21.08" stroke-linecap="square"/></svg>`,
+      stroke,
+      label
+    );
+    expect(warn).toHaveBeenCalledOnce();
+    expect(String(warn.mock.calls[0][0])).toContain(
+      "dot at (12, 16) is only 0.0001 long"
+    );
+    warn.mockRestore();
+  });
+
   it("doesn't warn about the clip-path frame Figma wraps exports in", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
     cleanSvg(

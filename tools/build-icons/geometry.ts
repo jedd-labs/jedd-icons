@@ -505,6 +505,21 @@ function strokeLength(segs: Segment[]): number {
   }, 0);
 }
 
+/**
+ * The "dots" an element draws: open strokes shorter than `maxLength`, made
+ * visible by a square or round cap.
+ */
+export function findDots(
+  tag: string,
+  attrs: Record<string, string | number>,
+  maxLength: number
+): { at: Point; length: number }[] {
+  return (elementSubpaths(tag, attrs) ?? [])
+    .filter((s) => !s.closed && s.segments.length > 0)
+    .map((s) => ({ at: s.segments[0][0], length: strokeLength(s.segments) }))
+    .filter((dot) => dot.length < maxLength);
+}
+
 /** Dots are keyed coarsely by their position and cap. */
 function dotKey(subpath: Subpath, style: StrokeStyle): string | null {
   const at = subpath.segments[0]?.[0];
