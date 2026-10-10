@@ -3,15 +3,18 @@
   "compilerOptions": {
     "types": ["node"],
     "noEmit": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "resolveJsonModule": true
   },
   "include": [
     "./build.ts",
     "./build.lib.ts",
     "./check-icons.ts",
     "./check-icons.lib.ts",
+    "./check-rules.ts",
     "./clean-icons.ts",
     "./clean-icons.lib.ts",
+    "./gen-icon-nodes.ts",
     "./naming.ts",
     "./*.test.ts"
   ]

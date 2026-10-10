@@ -96,9 +96,13 @@ function lineTo(cur: PathCursor, p: Point) {
   cur.point = p;
 }
 
-/** Parse path data (M L H V C Z, absolute or relative) into subpaths. */
+/**
+ * Parse path data (M L H V C Z, absolute or relative) into subpaths. Throws on
+ * any other command (arcs, quadratics), which design tools don't export.
+ */
 export function parsePathData(d: string): Subpath[] {
-  const tokens = d.match(/[MLHVCZmlhvcz]|-?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?/g);
+  // Numbers first, so an exponent's `e` isn't read as a command.
+  const tokens = d.match(/-?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?|[a-zA-Z]/g);
   const cur: PathCursor = {
     current: null,
     point: [0, 0],
@@ -314,6 +318,76 @@ export function elementSubpaths(
     closed: s.closed,
     segments: s.segments.map((seg) => seg.map((p) => applyMatrix(m, p))),
   }));
+}
+
+// ── Bounds ───────────────────────────────────────────────────────────
+
+export interface BBox {
+  maxX: number;
+  maxY: number;
+  minX: number;
+  minY: number;
+}
+
+/** Parameters in (0, 1) where one axis of a cubic Bézier turns around. */
+function cubicExtrema(p0: number, p1: number, p2: number, p3: number) {
+  // Roots of the derivative, a quadratic a·t² + b·t + c.
+  const a = 3 * (-p0 + 3 * p1 - 3 * p2 + p3);
+  const b = 6 * (p0 - 2 * p1 + p2);
+  const c = 3 * (p1 - p0);
+  let roots: number[];
+  if (Math.abs(a) < 1e-12) {
+    roots = Math.abs(b) < 1e-12 ? [] : [-c / b];
+  } else {
+    const disc = b * b - 4 * a * c;
+    roots =
+      disc < 0
+        ? []
+        : [(-b + Math.sqrt(disc)) / (2 * a), (-b - Math.sqrt(disc)) / (2 * a)];
+  }
+  return roots.filter((t) => t > 0 && t < 1);
+}
+
+const cubicAt = (p0: number, p1: number, p2: number, p3: number, t: number) =>
+  (1 - t) ** 3 * p0 +
+  3 * (1 - t) ** 2 * t * p1 +
+  3 * (1 - t) * t ** 2 * p2 +
+  t ** 3 * p3;
+
+/**
+ * Tight bounding box of subpaths, measured on the stroke's centerline (the
+ * stroke width isn't added). Curves count where they bulge past their
+ * endpoints, not just at them. Null when nothing is drawn.
+ */
+export function boundingBox(subpaths: Subpath[]): BBox | null {
+  const xs: number[] = [];
+  const ys: number[] = [];
+  for (const seg of subpaths.flatMap((s) => s.segments)) {
+    for (const [x, y] of [seg[0], seg.at(-1) as Point]) {
+      xs.push(x);
+      ys.push(y);
+    }
+    if (seg.length === 4) {
+      for (const [axis, out] of [
+        [0, xs],
+        [1, ys],
+      ] as const) {
+        const [p0, p1, p2, p3] = seg.map((p) => p[axis]);
+        for (const t of cubicExtrema(p0, p1, p2, p3)) {
+          out.push(cubicAt(p0, p1, p2, p3, t));
+        }
+      }
+    }
+  }
+  if (xs.length === 0) {
+    return null;
+  }
+  return {
+    minX: Math.min(...xs),
+    minY: Math.min(...ys),
+    maxX: Math.max(...xs),
+    maxY: Math.max(...ys),
+  };
 }
 
 // ── Serialization ────────────────────────────────────────────────────

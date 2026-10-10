@@ -83,8 +83,10 @@ This single command runs the full pipeline:
 
 1. **`icons:clean`** — normalizes root `<svg>` attributes and strips inline
    presentation attributes from child elements.
-2. **`icons:check`** — checks the normalized SVGs without changing them, and
-   stops on export problems such as transforms or dots too short for Safari.
+2. **`icons:check`** — checks the normalized SVGs and their metadata without
+   changing them, and stops on problems such as transforms, dots too short for
+   Safari, geometry outside the 1px margin, or metadata that doesn't match
+   `icon.schema.json`.
 3. **`build`** — builds `@jedd-icons/shared`, generates the per-icon TS files,
    then builds `@jedd-icons/core` and `@jedd-icons/react`.
 

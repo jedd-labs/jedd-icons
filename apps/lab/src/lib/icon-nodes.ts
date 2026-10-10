@@ -1,17 +1,18 @@
 import rawIconNodes from "generated/icon-nodes.json";
 import type { Variant } from "@/lib/icons";
 import type { IconNodeChild } from "@/lib/svg-path";
-
-export interface IconMeta {
-  categories?: unknown;
-  contributors?: unknown;
-  deprecated?: boolean;
-  tags?: unknown;
-}
+import type {
+  Issue,
+  MarginReport,
+} from "../../../../tools/build-icons/check-rules";
 
 interface IconNodeEntry {
-  /** Raw sidecar metadata, or null when the `.json` is missing. */
-  meta: IconMeta | null;
+  /** What `icons:check` reports for this icon, sidecar `.json` included. */
+  issues: Issue[];
+  /** How far the geometry crosses the 1px margin; null if it can't be read. */
+  margin: MarginReport | null;
+  /** Parsed sidecar `.json`, or null when it's missing or isn't valid JSON. */
+  meta: unknown;
   /** Source geometry: one element per part, as authored. */
   node: IconNodeChild[];
   pascalName: string;
@@ -60,9 +61,22 @@ export function getShippedIconNode(
   return iconNodes[name]?.[variant]?.shipped ?? null;
 }
 
-/** Raw sidecar metadata for an icon+variant, or null when absent. */
-export function getIconMeta(name: string, variant: Variant): IconMeta | null {
+/** Parsed sidecar metadata for an icon+variant, or null when absent. */
+export function getIconMeta(name: string, variant: Variant): unknown {
   return iconNodes[name]?.[variant]?.meta ?? null;
+}
+
+/** What `icons:check` reports for an icon+variant. */
+export function getIconIssues(name: string, variant: Variant): Issue[] {
+  return iconNodes[name]?.[variant]?.issues ?? [];
+}
+
+/** The icon+variant's margin measurement, or null when absent. */
+export function getIconMargin(
+  name: string,
+  variant: Variant
+): MarginReport | null {
+  return iconNodes[name]?.[variant]?.margin ?? null;
 }
 
 /** PascalCase component name for a kebab icon name + variant, or null. */

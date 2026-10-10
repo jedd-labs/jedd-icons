@@ -86,7 +86,7 @@ pnpm icons
 
 This single command runs the full pipeline:
 1. **`icons:clean`** — normalizes root `<svg>` attributes and strips inline presentation attributes from child elements
-2. **`icons:check`** — checks the normalized SVGs without changing them (export problems such as transforms, `<use>` or dots too short for Safari); stops on errors
+2. **`icons:check`** — checks the normalized SVGs and their `.json` metadata without changing them (export problems such as transforms, `<use>` or dots too short for Safari, geometry outside the 1px margin, metadata not matching `icon.schema.json`); stops on errors
 3. **`build`** — builds `@jedd-icons/shared`, generates icon TS files, builds `@jedd-icons/core` and `@jedd-icons/react`
 
 ### 4. Import it

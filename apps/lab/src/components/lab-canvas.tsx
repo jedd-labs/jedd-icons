@@ -1,9 +1,9 @@
 // biome-ignore-all lint/suspicious/noArrayIndexKey: grid lines and per-vertex overlays are positional, fixed-length, and never reorder — the index is the stable identity.
 
 import { useMemo, useRef, useState } from "react";
-import { marginReport } from "@/lib/margin";
 import type { IconNodeChild, IconPiece } from "@/lib/svg-path";
 import { flattenPieces } from "@/lib/svg-path";
+import type { MarginReport } from "../../../../tools/build-icons/check-rules";
 
 /** The icon's native user-space size — Jedd icons are authored to 24×24. */
 const VIEW = 24;
@@ -102,6 +102,8 @@ export interface LabCanvasProps {
   fill: boolean;
   /** Index of the piece to isolate, or null to show all. */
   isolatedPiece: number | null;
+  /** The icon's margin measurement from `icons:check`, for the bounds overlay. */
+  margin: MarginReport | null;
   node: IconNodeChild[];
   perPiece: boolean;
   /** Rendered pixel size of the whole grid (square). */
@@ -127,9 +129,9 @@ export function LabCanvas({
   perPiece,
   isolatedPiece,
   fill,
+  margin,
 }: LabCanvasProps) {
   const pieces = useMemo(() => flattenPieces(node), [node]);
-  const report = useMemo(() => marginReport(pieces), [pieces]);
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [hover, setHover] = useState<{ x: number; y: number } | null>(null);
 
@@ -303,19 +305,19 @@ export function LabCanvas({
         )}
 
         {/* ── Geometry bounds + margin violations ────────────────── */}
-        {showBounds && report.bbox && (
+        {showBounds && margin?.bbox && (
           <g fill="none" pointerEvents="none">
             <rect
               className={
-                report.violates ? "text-rose-500" : "text-emerald-500/70"
+                margin.violates ? "text-rose-500" : "text-emerald-500/70"
               }
-              height={report.bbox.maxY - report.bbox.minY}
+              height={margin.bbox.maxY - margin.bbox.minY}
               stroke="currentColor"
               strokeDasharray={`${hairline * 3} ${hairline * 2}`}
               strokeWidth={hairline}
-              width={report.bbox.maxX - report.bbox.minX}
-              x={report.bbox.minX}
-              y={report.bbox.minY}
+              width={margin.bbox.maxX - margin.bbox.minX}
+              x={margin.bbox.minX}
+              y={margin.bbox.minY}
             />
             {/* Solid red mark on each side that breaks the margin. */}
             <g
@@ -323,36 +325,36 @@ export function LabCanvas({
               stroke="currentColor"
               strokeWidth={hairline * 2}
             >
-              {report.sides.left > 0 && (
+              {margin.sides.left > 0 && (
                 <line
-                  x1={report.bbox.minX}
-                  x2={report.bbox.minX}
-                  y1={report.bbox.minY}
-                  y2={report.bbox.maxY}
+                  x1={margin.bbox.minX}
+                  x2={margin.bbox.minX}
+                  y1={margin.bbox.minY}
+                  y2={margin.bbox.maxY}
                 />
               )}
-              {report.sides.right > 0 && (
+              {margin.sides.right > 0 && (
                 <line
-                  x1={report.bbox.maxX}
-                  x2={report.bbox.maxX}
-                  y1={report.bbox.minY}
-                  y2={report.bbox.maxY}
+                  x1={margin.bbox.maxX}
+                  x2={margin.bbox.maxX}
+                  y1={margin.bbox.minY}
+                  y2={margin.bbox.maxY}
                 />
               )}
-              {report.sides.top > 0 && (
+              {margin.sides.top > 0 && (
                 <line
-                  x1={report.bbox.minX}
-                  x2={report.bbox.maxX}
-                  y1={report.bbox.minY}
-                  y2={report.bbox.minY}
+                  x1={margin.bbox.minX}
+                  x2={margin.bbox.maxX}
+                  y1={margin.bbox.minY}
+                  y2={margin.bbox.minY}
                 />
               )}
-              {report.sides.bottom > 0 && (
+              {margin.sides.bottom > 0 && (
                 <line
-                  x1={report.bbox.minX}
-                  x2={report.bbox.maxX}
-                  y1={report.bbox.maxY}
-                  y2={report.bbox.maxY}
+                  x1={margin.bbox.minX}
+                  x2={margin.bbox.maxX}
+                  y1={margin.bbox.maxY}
+                  y2={margin.bbox.maxY}
                 />
               )}
             </g>

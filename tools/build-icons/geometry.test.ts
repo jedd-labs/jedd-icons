@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { elementSubpaths, parsePathData, strokeKey } from "./geometry";
+import {
+  boundingBox,
+  elementSubpaths,
+  parsePathData,
+  strokeKey,
+} from "./geometry";
 
 describe("parsePathData", () => {
   it("parses absolute and relative commands into absolute segments", () => {
@@ -26,6 +31,13 @@ describe("parsePathData", () => {
 
   it("starts a new subpath at each M", () => {
     expect(parsePathData("M1 1H5M2 2V8")).toHaveLength(2);
+  });
+
+  it("reads exponents and throws on commands it doesn't support", () => {
+    expect(parsePathData("M1e-1 1H5")[0].segments[0][0]).toEqual([0.1, 1]);
+    expect(() => parsePathData("M2 2A4 4 0 0 1 6 6")).toThrow(
+      'unsupported path command "A"'
+    );
   });
 });
 
@@ -66,5 +78,20 @@ describe("strokeKey", () => {
 
   it("distinguishes a closed shape from an open one", () => {
     expect(key("M3 3H21V21H3Z")).not.toBe(key("M3 3H21V21H3V3"));
+  });
+});
+
+describe("boundingBox", () => {
+  it("includes where a curve bulges past its endpoints", () => {
+    expect(boundingBox(parsePathData("M4 4C4 0 20 0 20 4"))).toEqual({
+      minX: 4,
+      minY: 1,
+      maxX: 20,
+      maxY: 4,
+    });
+  });
+
+  it("is null when nothing is drawn", () => {
+    expect(boundingBox([])).toBeNull();
   });
 });

@@ -1,17 +1,20 @@
-import { CHECKS, getIconCheckDetail, getIconFlags } from "@/lib/checks";
-import { getIconMeta } from "@/lib/icon-nodes";
+import { type Accent, CHECKS } from "@/lib/checks";
+import { getIconIssues, getIconMeta } from "@/lib/icon-nodes";
 import type { Variant } from "@/lib/icons";
 
-const ACCENT_TEXT: Record<string, string> = {
-  rose: "text-rose-600 dark:text-rose-400",
-  violet: "text-violet-600 dark:text-violet-400",
+const ACCENT_TEXT: Record<Accent, string> = {
   sky: "text-sky-600 dark:text-sky-400",
+  violet: "text-violet-600 dark:text-violet-400",
+  indigo: "text-indigo-600 dark:text-indigo-400",
+  rose: "text-rose-600 dark:text-rose-400",
+  amber: "text-amber-600 dark:text-amber-400",
+  teal: "text-teal-600 dark:text-teal-400",
   orange: "text-orange-600 dark:text-orange-400",
 };
 
 /**
  * Shows the current icon's sidecar metadata plus a pass/fail breakdown of every
- * spec check, with the specific reasons a check failed.
+ * check, with the messages `icons:check` reports for the ones that fail.
  */
 export function IconInspector({
   name,
@@ -20,8 +23,7 @@ export function IconInspector({
   name: string;
   variant: Variant;
 }) {
-  const flags = getIconFlags(name);
-  const detail = getIconCheckDetail(name, variant);
+  const issues = getIconIssues(name, variant);
   const meta = getIconMeta(name, variant);
 
   return (
@@ -33,13 +35,15 @@ export function IconInspector({
       {/* Per-check pass/fail rows */}
       <ul className="flex flex-col gap-1">
         {CHECKS.map((check) => {
-          const failed = flags.has(check.id);
+          const found = issues.filter((issue) => issue.rule === check.id);
+          const failed = found.length > 0;
+          const onlyWarnings = found.every((i) => i.severity === "warning");
           return (
             <li className="flex items-start gap-2" key={check.id}>
               <span
                 className={`mt-0.5 shrink-0 ${failed ? ACCENT_TEXT[check.accent] : "text-muted-foreground/50"}`}
               >
-                {failed ? "✕" : "✓"}
+                {failed ? (onlyWarnings ? "!" : "✕") : "✓"}
               </span>
               <div className="flex flex-col">
                 <span
@@ -48,13 +52,16 @@ export function IconInspector({
                   }
                 >
                   {check.label}
+                  {failed && onlyWarnings && (
+                    <span className="text-muted-foreground"> (warning)</span>
+                  )}
                 </span>
                 {failed && (
-                  <CheckReason
-                    accent={check.accent}
-                    detail={detail}
-                    id={check.id}
-                  />
+                  <ul className={`text-[10px] ${ACCENT_TEXT[check.accent]}`}>
+                    {found.map((issue) => (
+                      <li key={issue.message}>{issue.message}</li>
+                    ))}
+                  </ul>
                 )}
               </div>
             </li>
@@ -72,50 +79,11 @@ export function IconInspector({
             {JSON.stringify(meta, null, 2)}
           </pre>
         ) : (
-          <p className="text-muted-foreground text-xs">No sidecar found.</p>
+          <p className="text-muted-foreground text-xs">
+            No sidecar found, or it isn&apos;t valid JSON.
+          </p>
         )}
       </div>
     </div>
   );
-}
-
-/** The specific reason a given check failed, drawn under the check label. */
-function CheckReason({
-  id,
-  detail,
-  accent,
-}: {
-  id: string;
-  detail: ReturnType<typeof getIconCheckDetail>;
-  accent: string;
-}) {
-  const cls = `text-[10px] ${ACCENT_TEXT[accent] ?? "text-muted-foreground"}`;
-
-  if (id === "metadata") {
-    return (
-      <ul className={cls}>
-        {detail.metadataIssues.map((issue) => (
-          <li key={issue}>{issue}</li>
-        ))}
-      </ul>
-    );
-  }
-  if (id === "forbiddenElements") {
-    return (
-      <span className={cls}>
-        Contains: {detail.forbiddenTags.map((t) => `<${t}>`).join(", ")}
-      </span>
-    );
-  }
-  if (id === "margin") {
-    return (
-      <span className={cls}>
-        Overflows margin by {detail.marginOverflow.toFixed(2)}px
-      </span>
-    );
-  }
-  if (id === "offGrid") {
-    return <span className={cls}>Coordinates fall outside 0–24</span>;
-  }
-  return null;
 }

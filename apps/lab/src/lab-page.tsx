@@ -12,12 +12,14 @@ import { IconGlyph, PackageRender } from "@/components/package-render";
 import { SvgCodeView } from "@/components/svg-code-view";
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
+  type Accent,
   CHECKS,
   type CheckId,
   getCheckCounts,
   getIconFlags,
 } from "@/lib/checks";
 import {
+  getIconMargin,
   getIconNode,
   getVariantsWithGeometry,
   ICON_NODE_NAMES,
@@ -42,26 +44,40 @@ const PIECE_COLORS = [
 ];
 
 // Accent styling per check color. Full class strings so Tailwind keeps them.
-const FILTER_ACCENTS = {
-  rose: {
-    active: "border-rose-500 bg-rose-500/10 text-rose-600 dark:text-rose-400",
-    dot: "bg-rose-500",
+const FILTER_ACCENTS: Record<Accent, { active: string; dot: string }> = {
+  sky: {
+    active: "border-sky-500 bg-sky-500/10 text-sky-600 dark:text-sky-400",
+    dot: "bg-sky-500",
   },
   violet: {
     active:
       "border-violet-500 bg-violet-500/10 text-violet-600 dark:text-violet-400",
     dot: "bg-violet-500",
   },
-  sky: {
-    active: "border-sky-500 bg-sky-500/10 text-sky-600 dark:text-sky-400",
-    dot: "bg-sky-500",
+  indigo: {
+    active:
+      "border-indigo-500 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400",
+    dot: "bg-indigo-500",
+  },
+  rose: {
+    active: "border-rose-500 bg-rose-500/10 text-rose-600 dark:text-rose-400",
+    dot: "bg-rose-500",
+  },
+  amber: {
+    active:
+      "border-amber-500 bg-amber-500/10 text-amber-600 dark:text-amber-400",
+    dot: "bg-amber-500",
+  },
+  teal: {
+    active: "border-teal-500 bg-teal-500/10 text-teal-600 dark:text-teal-400",
+    dot: "bg-teal-500",
   },
   orange: {
     active:
       "border-orange-500 bg-orange-500/10 text-orange-600 dark:text-orange-400",
     dot: "bg-orange-500",
   },
-} as const;
+};
 
 /** A pill that filters the icon list to a flagged subset. Disabled at count 0. */
 function FilterToggle({
@@ -75,7 +91,7 @@ function FilterToggle({
   label: string;
   count: number;
   active: boolean;
-  accent: keyof typeof FILTER_ACCENTS;
+  accent: Accent;
   hint?: string;
   onToggle: () => void;
 }) {
@@ -323,6 +339,7 @@ export function LabPage() {
               <LabCanvas
                 fill={variant === "fill"}
                 isolatedPiece={isolatedPiece}
+                margin={getIconMargin(iconName, variant)}
                 node={node}
                 perPiece={perPiece}
                 pixelSize={pixelSize}

@@ -4,6 +4,8 @@
 // docs app's "Jedd Lab" x-ray route can inspect path data at runtime. This is
 // the same tuple shape the codegen bakes into each package file, but kept as an
 // app-local artifact (nothing new is added to the published package surface).
+// Each icon also carries the issues `icons:check` reports for it, so the Lab
+// shows the same checks rather than re-implementing them.
 
 import {
   existsSync,
@@ -21,6 +23,9 @@ import {
   parseSvg,
   stripInheritedAttrs,
 } from "./build.lib";
+import { checkIcon, checkMetadata, marginReport } from "./check-icons.lib";
+import type { Issue, MarginReport } from "./check-rules";
+import { VARIANT_ROOT_ATTRS } from "./clean-icons.lib";
 import { kebabToPascal } from "./naming";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -44,17 +49,13 @@ const OUTPUT = join(OUTPUT_DIR, "icon-nodes.json");
 
 // ── Main ───────────────────────────────────────────────────────────────
 
-/** The sidecar `.json` fields the Lab's metadata checks care about. */
-interface IconMeta {
-  categories?: unknown;
-  contributors?: unknown;
-  deprecated?: boolean;
-  tags?: unknown;
-}
-
 interface IconNodeEntry {
-  /** Raw sidecar metadata (present: true) or absence marker for the checks. */
-  meta: IconMeta | null;
+  /** What `icons:check` reports for this icon, sidecar `.json` included. */
+  issues: Issue[];
+  /** How far the geometry crosses the 1px margin; null if it can't be read. */
+  margin: MarginReport | null;
+  /** Parsed sidecar `.json`, or null when it's missing or isn't valid JSON. */
+  meta: unknown;
   /** Parsed IconNode tuples (kebab-cased attrs, as in the source SVG). */
   node: IconNode;
   /** PascalCase component name, e.g. "AlertCircle". */
@@ -65,23 +66,22 @@ interface IconNodeEntry {
   variant: string;
 }
 
-function readMeta(dir: string, name: string): IconMeta | null {
-  const path = join(dir, `${name}.json`);
-  if (!existsSync(path)) {
+// A malformed sidecar shows as a metadata issue in the Lab rather than
+// crashing the whole generation.
+function parseMeta(json: string | undefined): unknown {
+  try {
+    return json === undefined ? null : JSON.parse(json);
+  } catch {
     return null;
   }
+}
+
+function measureMargin(node: IconNode): MarginReport | null {
   try {
-    const raw = JSON.parse(readFileSync(path, "utf8")) as IconMeta;
-    return {
-      contributors: raw.contributors,
-      tags: raw.tags,
-      categories: raw.categories,
-      deprecated: raw.deprecated,
-    };
+    return marginReport(node);
   } catch {
-    // A malformed sidecar surfaces as "invalid metadata" in the Lab rather
-    // than crashing the whole generation.
-    return {};
+    // Geometry the build can't read; `checkIcon` reports why.
+    return null;
   }
 }
 
@@ -97,6 +97,10 @@ function collectVariant(
   for (const file of files) {
     const name = basename(file, ".svg");
     const svg = readFileSync(join(dir, file), "utf8");
+    const metaPath = join(dir, `${name}.json`);
+    const json = existsSync(metaPath)
+      ? readFileSync(metaPath, "utf8")
+      : undefined;
     const node = stripInheritedAttrs(parseSvg(svg));
     if (node.length === 0) {
       console.warn(`[gen-icon-nodes] ${variant}/${file}: no geometry parsed`);
@@ -106,7 +110,12 @@ function collectVariant(
       variant,
       node,
       shipped: variant === DEFAULT_VARIANT ? mergePathNodes(node) : node,
-      meta: readMeta(dir, name),
+      meta: parseMeta(json),
+      issues: [
+        ...(VARIANT_ROOT_ATTRS[variant] ? checkIcon(svg, variant) : []),
+        ...checkMetadata(json),
+      ],
+      margin: measureMargin(node),
     };
   }
 

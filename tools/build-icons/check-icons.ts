@@ -1,17 +1,19 @@
 #!/usr/bin/env node
 /**
  * Checks the source SVGs without changing them: each must already be
- * normalized (`pnpm icons:clean`) and free of export problems that change what
- * the packages ship. Exits 1 on any error; warnings flag what may be intended.
+ * normalized (`pnpm icons:clean`), free of export problems that change what
+ * the packages ship, and have a sidecar `.json` matching `icon.schema.json`.
+ * Exits 1 on any error; warnings flag what may be intended.
  *
  * Auto-discovers variant subdirectories under icons/ (e.g. stroke/, fill/).
  *
  * Usage: tsx tools/build-icons/check-icons.ts
  */
-import { readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { checkIcon } from "./check-icons.lib";
+import { checkIcon, checkMetadata } from "./check-icons.lib";
+import type { Issue } from "./check-rules";
 import { VARIANT_ROOT_ATTRS } from "./clean-icons.lib";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -28,6 +30,16 @@ let checked = 0;
 let errors = 0;
 let warnings = 0;
 
+function report(file: string, { severity, message }: Issue) {
+  if (severity === "error") {
+    errors++;
+    console.error(`[check-icons] ${file}: error: ${message}`);
+  } else {
+    warnings++;
+    console.warn(`[check-icons] ${file}: warning: ${message}`);
+  }
+}
+
 for (const variant of variants) {
   if (!VARIANT_ROOT_ATTRS[variant]) {
     console.warn(`[check-icons] unknown variant "${variant}", skipping`);
@@ -35,20 +47,26 @@ for (const variant of variants) {
   }
 
   const variantDir = join(ICONS_DIR, variant);
-  const files = readdirSync(variantDir)
-    .filter((f) => f.endsWith(".svg"))
-    .sort();
+  const entries = readdirSync(variantDir);
+  const files = entries.filter((f) => f.endsWith(".svg")).sort();
 
   for (const file of files) {
     const svg = readFileSync(join(variantDir, file), "utf8");
-    for (const { severity, message } of checkIcon(svg, variant)) {
-      if (severity === "error") {
-        errors++;
-        console.error(`[check-icons] ${variant}/${file}: error: ${message}`);
-      } else {
-        warnings++;
-        console.warn(`[check-icons] ${variant}/${file}: warning: ${message}`);
-      }
+    const metaPath = join(variantDir, file.replace(/\.svg$/, ".json"));
+    const meta = existsSync(metaPath)
+      ? readFileSync(metaPath, "utf8")
+      : undefined;
+    for (const issue of [...checkIcon(svg, variant), ...checkMetadata(meta)]) {
+      report(`${variant}/${file}`, issue);
+    }
+  }
+  for (const file of entries.filter((f) => f.endsWith(".json")).sort()) {
+    if (!entries.includes(file.replace(/\.json$/, ".svg"))) {
+      report(`${variant}/${file}`, {
+        rule: "metadata",
+        severity: "error",
+        message: "sidecar .json has no matching .svg — rename or delete it",
+      });
     }
   }
   checked += files.length;

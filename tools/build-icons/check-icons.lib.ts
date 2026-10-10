@@ -1,13 +1,18 @@
 // Read-only checks for the source icons: everything that can be verified on a
-// committed SVG and affects what the packages ship. Kept separate from
-// `check-icons.ts` (the CLI entry) so the rules can be unit-tested without
-// walking the filesystem.
+// committed SVG and its sidecar `.json`. Kept separate from `check-icons.ts`
+// (the CLI entry) so the rules can be unit-tested without walking the
+// filesystem. The Lab shows the same issues: `gen-icon-nodes` runs these
+// checks and writes the results into its data.
+import Ajv, { type ErrorObject } from "ajv";
+import iconSchema from "../../icon.schema.json";
 import {
   DEFAULT_VARIANT,
+  type IconNode,
   mergePathNodes,
   parseSvg,
   stripInheritedAttrs,
 } from "./build.lib";
+import type { Issue, MarginReport } from "./check-rules";
 import {
   cleanSvg,
   DEFAULT_LINECAP,
@@ -15,13 +20,7 @@ import {
   droppedFeatures,
   VARIANT_ROOT_ATTRS,
 } from "./clean-icons.lib";
-import { findDots } from "./geometry";
-
-export interface Issue {
-  message: string;
-  /** Errors fail `icons:check`; warnings flag something that may be intended. */
-  severity: "error" | "warning";
-}
+import { boundingBox, elementSubpaths, findDots } from "./geometry";
 
 // The only elements a source icon may contain once cleaned.
 const GEOMETRY_TAGS = new Set([
@@ -47,12 +46,14 @@ function unsupportedFeatures(svg: string): Issue[] {
   const issues: Issue[] = [];
   if (unsupported.length > 0) {
     issues.push({
+      rule: "unsupported",
       severity: "error",
       message: `unsupported <${unsupported.join(">, <")}> — flatten it in the design tool (e.g. a Repeat exports as <use>); it won't render as designed`,
     });
   }
   if (/\stransform="/.test(svg)) {
     issues.push({
+      rule: "transform",
       severity: "error",
       message:
         'transform="…" found — reset the rotation/position in the design tool (or flatten the shape) so the exported coordinates are final',
@@ -76,6 +77,7 @@ function unmergeable(svg: string): Issue[] {
     `${attrs["stroke-linecap"] ?? DEFAULT_LINECAP} cap + ${attrs["stroke-linejoin"] ?? DEFAULT_LINEJOIN} join`;
   return [
     {
+      rule: "unmergeable",
       severity: "warning",
       message: `ships as ${paths.length} paths, not one — layers need different line styles where they show (${paths.map(describe).join(" / ")}); make them match in the design tool if that's not intended`,
     },
@@ -100,10 +102,65 @@ function shortDots(svg: string): Issue[] {
   const f = (v: number) => String(Number(v.toFixed(4)));
   return stripInheritedAttrs(parseSvg(svg)).flatMap(([tag, attrs]) =>
     findDots(tag, attrs, MIN_DOT_LENGTH).map(({ at, length }) => ({
+      rule: "short-dot" as const,
       severity: "error" as const,
       message: `dot at (${f(at[0])}, ${f(at[1])}) is only ${f(length)} long — Safari drops dots this short once merged; make it about ${RECOMMENDED_DOT_LENGTH} long in the design tool`,
     }))
   );
+}
+
+// The icon canvas is 24×24 and artwork keeps a 1px margin on every side.
+const VIEW = 24;
+const MARGIN = 1;
+// Geometry within this of a boundary counts as touching it, not crossing it.
+const EPS = 0.01;
+
+/**
+ * Measures how far an icon's geometry crosses the 1px safe margin, on the
+ * stroke's centerline. Transforms are applied, so it measures what renders.
+ */
+export function marginReport(nodes: IconNode): MarginReport {
+  const bbox = boundingBox(
+    nodes.flatMap(([tag, attrs]) => elementSubpaths(tag, attrs) ?? [])
+  );
+  if (!bbox) {
+    return {
+      bbox,
+      sides: { left: 0, top: 0, right: 0, bottom: 0 },
+      violates: false,
+      worst: 0,
+    };
+  }
+  const sides = {
+    left: Math.max(0, MARGIN - bbox.minX),
+    top: Math.max(0, MARGIN - bbox.minY),
+    right: Math.max(0, bbox.maxX - (VIEW - MARGIN)),
+    bottom: Math.max(0, bbox.maxY - (VIEW - MARGIN)),
+  };
+  const worst = Math.max(...Object.values(sides));
+  return { bbox, sides, violates: worst > EPS, worst };
+}
+
+const round = (v: number) => String(Number(v.toFixed(2)));
+
+/** Flags geometry that crosses the 1px margin, or leaves the viewBox. */
+function marginIssues(nodes: IconNode): Issue[] {
+  const { sides, violates, worst } = marginReport(nodes);
+  if (!violates) {
+    return [];
+  }
+  const crossed = Object.entries(sides)
+    .filter(([, v]) => v > EPS)
+    .map(([side, v]) => `${side} ${round(v)}`)
+    .join(", ");
+  const outside = worst > MARGIN + EPS ? " and leaves the 24×24 viewBox" : "";
+  return [
+    {
+      rule: "margin",
+      severity: "error",
+      message: `geometry crosses the 1px margin (${crossed})${outside} — keep it within 1–23 in the design tool`,
+    },
+  ];
 }
 
 /**
@@ -120,16 +177,92 @@ export function checkIcon(svg: string, variant: string): Issue[] {
   const cleaned = cleanSvg(svg, rootAttrs);
   if (cleaned !== svg) {
     issues.push(
-      { severity: "error", message: "not normalized — run `pnpm icons:clean`" },
+      {
+        rule: "not-normalized",
+        severity: "error",
+        message: "not normalized — run `pnpm icons:clean`",
+      },
       ...droppedFeatures(svg).map((message) => ({
+        rule: "not-normalized" as const,
         severity: "error" as const,
         message,
       }))
     );
   }
   issues.push(...unsupportedFeatures(cleaned));
-  if (variant === DEFAULT_VARIANT) {
-    issues.push(...unmergeable(cleaned), ...shortDots(cleaned));
+  try {
+    issues.push(...marginIssues(stripInheritedAttrs(parseSvg(cleaned))));
+    if (variant === DEFAULT_VARIANT) {
+      issues.push(...unmergeable(cleaned), ...shortDots(cleaned));
+    }
+  } catch (error) {
+    // e.g. path data using arcs, which the build's geometry doesn't read.
+    issues.push({
+      rule: "unsupported",
+      severity: "error",
+      message: `can't read the geometry: ${(error as Error).message}`,
+    });
   }
   return issues;
+}
+
+const validateMeta = new Ajv({ allErrors: true, verbose: true }).compile(
+  iconSchema
+);
+
+/** `/aliases/0/name` → `aliases[0].name` */
+const fieldName = (instancePath: string) =>
+  instancePath
+    .replace(/\/(\d+)/g, "[$1]")
+    .replaceAll("/", ".")
+    .replace(/^\./, "");
+
+function describeSchemaError({
+  instancePath,
+  keyword,
+  params,
+  message,
+  data,
+}: ErrorObject): string {
+  const field = fieldName(instancePath);
+  const at = field ? `${field}: ` : "";
+  switch (keyword) {
+    case "required":
+      return `${at}missing required field "${params.missingProperty}"`;
+    case "additionalProperties":
+      return `${at}unknown field "${params.additionalProperty}"`;
+    case "enum":
+      return `${at}${JSON.stringify(data)} isn't one of the allowed values`;
+    case "minItems":
+      return params.limit === 1 ? `${field} is empty` : `${field} ${message}`;
+    default:
+      return `${field || "metadata"} ${message}`;
+  }
+}
+
+/**
+ * Checks an icon's sidecar `.json` (its text, or undefined when the file is
+ * missing) against `icon.schema.json`.
+ */
+export function checkMetadata(json: string | undefined): Issue[] {
+  const issue = (message: string): Issue => ({
+    rule: "metadata",
+    severity: "error",
+    message,
+  });
+  if (json === undefined) {
+    return [issue("sidecar .json is missing")];
+  }
+  let meta: unknown;
+  try {
+    meta = JSON.parse(json);
+  } catch (error) {
+    return [
+      issue(`sidecar .json isn't valid JSON: ${(error as Error).message}`),
+    ];
+  }
+  if (validateMeta(meta)) {
+    return [];
+  }
+  return (validateMeta.errors ?? []).map((e) => issue(describeSchemaError(e)));
 }

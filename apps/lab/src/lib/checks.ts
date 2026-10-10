@@ -1,23 +1,33 @@
-// Spec checks for the icon set, mirroring the "Adding icons" guidelines. Each
-// check turns one documented rule into an automated per-icon flag so the Lab can
-// filter and badge non-conformant icons.
+// The icon checks, as the Lab shows them. The rules themselves live in
+// tools/build-icons (`pnpm icons:check`): `gen-icon-nodes` runs them and writes
+// each icon's issues into the Lab's data, so the Lab only groups and badges
+// them and can't drift from what CI enforces.
 
 import {
-  getIconMeta,
-  getIconNode,
+  getIconIssues,
   getVariantsWithGeometry,
   ICON_NODE_NAMES,
 } from "@/lib/icon-nodes";
-import type { Variant } from "@/lib/icons";
-import { marginReportFor } from "@/lib/margin";
-import { flattenPieces, type IconNodeChild } from "@/lib/svg-path";
-import iconSchema from "../../../../icon.schema.json";
+import {
+  type Issue,
+  RULES,
+  type Rule,
+} from "../../../../tools/build-icons/check-rules";
 
-export type CheckId = "margin" | "forbiddenElements" | "offGrid" | "metadata";
+export type CheckId = Rule;
+
+export type Accent =
+  | "sky"
+  | "violet"
+  | "indigo"
+  | "rose"
+  | "amber"
+  | "teal"
+  | "orange";
 
 export interface CheckDef {
   /** Tailwind accent used for the pill + badge dot. */
-  accent: "rose" | "violet" | "sky" | "orange";
+  accent: Accent;
   /** One-line explanation of the rule for tooltips/legend. */
   hint: string;
   id: CheckId;
@@ -25,179 +35,35 @@ export interface CheckDef {
   label: string;
 }
 
-export const CHECKS: CheckDef[] = [
-  {
-    id: "margin",
-    label: "Margin issues",
-    hint: "Geometry crosses the 1px safe margin",
-    accent: "rose",
-  },
-  {
-    id: "forbiddenElements",
-    label: "Non-flat (g/defs/mask)",
-    hint: "Contains groups, defs, masks, or other non-flat elements",
-    accent: "violet",
-  },
-  {
-    id: "offGrid",
-    label: "Off-grid / out of bounds",
-    hint: "Coordinates fall outside the 0–24 viewBox",
-    accent: "sky",
-  },
-  {
-    id: "metadata",
-    label: "Metadata issues",
-    hint: "Missing required fields or invalid category",
-    accent: "orange",
-  },
-];
+// Typed by rule, so adding a rule to `icons:check` fails the Lab's typecheck
+// until it gets an accent here.
+const ACCENTS: Record<Rule, Accent> = {
+  "not-normalized": "sky",
+  unsupported: "violet",
+  transform: "indigo",
+  margin: "rose",
+  "short-dot": "amber",
+  unmergeable: "teal",
+  metadata: "orange",
+};
 
-// Elements the "keep geometry flat" rule forbids (no grouping/masking/refs).
-const FORBIDDEN_TAGS = new Set([
-  "g",
-  "defs",
-  "mask",
-  "clippath",
-  "use",
-  "symbol",
-  "image",
-  "text",
-  "filter",
-]);
+export const CHECKS: CheckDef[] = (Object.keys(RULES) as Rule[]).map((id) => ({
+  id,
+  ...RULES[id],
+  accent: ACCENTS[id],
+}));
 
-// The closed category enum, read from the schema the sidecars are validated
-// against, so the Lab can't drift from it (a hand-kept copy once missed
-// "ecommerce").
-const VALID_CATEGORIES = new Set<string>(
-  iconSchema.properties.categories.items.enum
-);
-
-const VIEW = 24;
-const EPS = 0.01;
-
-function hasForbiddenElement(node: IconNodeChild[]): boolean {
-  return node.some(
-    ([tag, , children]) =>
-      FORBIDDEN_TAGS.has(tag.toLowerCase()) ||
-      (children ? hasForbiddenElement(children) : false)
+/** Every rule an icon fails, across its variants. */
+function failedRules(name: string): Set<CheckId> {
+  return new Set(
+    getVariantsWithGeometry(name).flatMap((variant) =>
+      getIconIssues(name, variant).map((issue: Issue) => issue.rule)
+    )
   );
 }
 
-/** True when any geometry coordinate falls outside the 0–24 viewBox. */
-function isOffGrid(node: IconNodeChild[]): boolean {
-  const pieces = flattenPieces(node);
-  for (const piece of pieces) {
-    for (const p of [...piece.parsed.anchors, ...piece.parsed.controls]) {
-      if (p.x < -EPS || p.x > VIEW + EPS || p.y < -EPS || p.y > VIEW + EPS) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
-/** Specific, human-readable metadata problems for one icon variant. */
-function metadataIssues(name: string, variant: Variant): string[] {
-  const meta = getIconMeta(name, variant);
-  if (!meta) {
-    return ["Sidecar .json is missing"];
-  }
-  const issues: string[] = [];
-  const { contributors, tags, categories } = meta;
-
-  if (!(Array.isArray(contributors) && contributors.length > 0)) {
-    issues.push("Missing required field: contributors");
-  }
-  if (!(Array.isArray(tags) && tags.length > 0)) {
-    issues.push("Missing required field: tags");
-  }
-  if (Array.isArray(categories) && categories.length > 0) {
-    const invalid = categories.filter(
-      (c) => typeof c !== "string" || !VALID_CATEGORIES.has(c)
-    );
-    if (invalid.length > 0) {
-      issues.push(
-        `Invalid categor${invalid.length > 1 ? "ies" : "y"}: ${invalid.join(", ")}`
-      );
-    }
-  } else {
-    issues.push("Missing required field: categories");
-  }
-  return issues;
-}
-
-function hasMetadataIssue(name: string, variant: Variant): boolean {
-  return metadataIssues(name, variant).length > 0;
-}
-
-/** The forbidden element tags present in an icon's tree, de-duplicated. */
-function forbiddenTags(
-  node: IconNodeChild[],
-  acc = new Set<string>()
-): Set<string> {
-  for (const [tag, , children] of node) {
-    if (FORBIDDEN_TAGS.has(tag.toLowerCase())) {
-      acc.add(tag);
-    }
-    if (children) {
-      forbiddenTags(children, acc);
-    }
-  }
-  return acc;
-}
-
-export interface IconCheckDetail {
-  forbiddenTags: string[];
-  marginOverflow: number;
-  meta: ReturnType<typeof getIconMeta>;
-  metadataIssues: string[];
-  offGrid: boolean;
-}
-
-/** Full check breakdown for one icon (default/first variant) for the panel. */
-export function getIconCheckDetail(
-  name: string,
-  variant: Variant
-): IconCheckDetail {
-  const node = getIconNode(name, variant) ?? [];
-  return {
-    meta: getIconMeta(name, variant),
-    metadataIssues: metadataIssues(name, variant),
-    forbiddenTags: [...forbiddenTags(node)],
-    offGrid: isOffGrid(node),
-    marginOverflow: marginReportFor(name, variant).worst,
-  };
-}
-
-/** Run all checks for one icon across its variants; returns the set that fail. */
-function checkIcon(name: string): Set<CheckId> {
-  const failed = new Set<CheckId>();
-  const variants = getVariantsWithGeometry(name);
-
-  for (const variant of variants) {
-    const node = getIconNode(name, variant);
-    if (!node) {
-      continue;
-    }
-    if (marginReportFor(name, variant).violates) {
-      failed.add("margin");
-    }
-    if (hasForbiddenElement(node)) {
-      failed.add("forbiddenElements");
-    }
-    if (isOffGrid(node)) {
-      failed.add("offGrid");
-    }
-    if (hasMetadataIssue(name, variant)) {
-      failed.add("metadata");
-    }
-  }
-
-  return failed;
-}
-
 // Memoized flag map: icon name → set of failing check ids. Built once per
-// session so filtering/badging never recomputes geometry.
+// session so filtering/badging never re-walks the issues.
 let flagCache: Map<string, Set<CheckId>> | null = null;
 
 function buildFlags(): Map<string, Set<CheckId>> {
@@ -206,7 +72,7 @@ function buildFlags(): Map<string, Set<CheckId>> {
   }
   flagCache = new Map();
   for (const name of ICON_NODE_NAMES) {
-    const failed = checkIcon(name);
+    const failed = failedRules(name);
     if (failed.size > 0) {
       flagCache.set(name, failed);
     }
@@ -221,12 +87,10 @@ export function getIconFlags(name: string): Set<CheckId> {
 
 /** Count of icons failing each check, for filter pills and the health panel. */
 export function getCheckCounts(): Record<CheckId, number> {
-  const counts = {
-    margin: 0,
-    forbiddenElements: 0,
-    offGrid: 0,
-    metadata: 0,
-  } as Record<CheckId, number>;
+  const counts = Object.fromEntries(CHECKS.map((c) => [c.id, 0])) as Record<
+    CheckId,
+    number
+  >;
   for (const failed of buildFlags().values()) {
     for (const id of failed) {
       counts[id] += 1;
