@@ -9,21 +9,44 @@ import {
   stripInheritedAttrs,
 } from "./build.lib";
 import { cleanSvg, VARIANT_ROOT_ATTRS } from "./clean-svgs.lib";
+import {
+  elementSubpaths,
+  segmentDistance,
+  segmentFromKey,
+  segmentKeys,
+  strokeKey,
+} from "./geometry";
 
 export type Verdict =
   /** The packages ship byte-identical geometry. */
   | "identical"
-  /** Same strokes, but reordered or with different number formatting. */
+  /**
+   * Every stroke is the same, but written differently: reordered, drawn in the
+   * other direction, starting at another corner, a `<circle>` instead of its
+   * path form, or different number formatting. Renders the same.
+   */
   | "same-geometry"
-  /** At least one stroke was added, removed or redrawn. */
+  /**
+   * The same segments, but split into strokes differently (e.g. two lines that
+   * meet now drawn as one stroke with a corner). Can change how that meeting
+   * point renders; usually invisible.
+   */
+  | "restructured"
+  /** At least one segment was added, removed or moved. */
   | "changed";
 
 export interface Comparison {
-  /** Subpaths (or non-path elements) only present in the new version. */
+  /** Segments only present in the new version. */
   added: string[];
   /** Top-level element count before → after cleaning (source structure). */
   elements: [before: number, after: number];
-  /** Subpaths (or non-path elements) only present in the old version. */
+  /**
+   * For "changed": how far (px) the furthest-moved segment shifted, when every
+   * removed segment has a moved counterpart of the same kind. Null when
+   * segments were added, removed, or changed between line and curve.
+   */
+  maxShift: number | null;
+  /** Segments only present in the old version. */
   removed: string[];
   verdict: Verdict;
 }
@@ -45,36 +68,40 @@ function shipped(
   return { node, source };
 }
 
-const TOKEN = /[A-Za-z]|-?(?:\d+\.?\d*|\.\d+)(?:e-?\d+)?/g;
-
-/** Re-serialize path data with rounded numbers so formatting can't differ. */
-function normalizePathData(d: string): string {
-  return (d.match(TOKEN) ?? [])
-    .map((t) => (/[A-Za-z]/.test(t) ? t : String(Number(Number(t).toFixed(3)))))
-    .join(" ")
-    .replace(/ ?([A-Za-z]) ?/g, "$1");
+interface Keys {
+  segments: string[];
+  strokes: string[];
 }
 
-/**
- * One key per stroke: each absolute-`M` subpath of every path, prefixed with
- * the element's other attributes (a square-capped dot differs from a butt one).
- * Non-path elements are keyed whole.
- */
-function strokeKeys(node: IconNode): string[] {
-  return node.flatMap(([tag, { d, ...rest }]) => {
-    const attrs = Object.entries(rest)
-      .sort()
-      .map(([k, v]) => `${k}=${v}`)
-      .join(" ");
-    const prefix = attrs ? `[${attrs}] ` : "";
-    if (tag !== "path" || typeof d !== "string") {
-      return [`${prefix}<${tag}>`];
+/** Stroke- and segment-level keys for every element of an icon. */
+function geometryKeys(node: IconNode): Keys {
+  const strokes: string[] = [];
+  const unreadable: string[] = [];
+  const items: Parameters<typeof segmentKeys>[0] = [];
+  for (const [tag, attrs] of node) {
+    const subpaths = elementSubpaths(tag, attrs);
+    if (!subpaths) {
+      // Not geometry the comparison understands (e.g. a leftover <use>):
+      // keep it visible as its own "stroke" so it can't pass silently.
+      unreadable.push(`<${tag} ${JSON.stringify(attrs)}>`);
+      continue;
     }
-    return normalizePathData(d)
-      .split(/(?=M)/)
-      .map((sub) => `${prefix}${sub}`);
-  });
+    const style = {
+      cap: attrs["stroke-linecap"] as string | undefined,
+      join: attrs["stroke-linejoin"] as string | undefined,
+    };
+    for (const subpath of subpaths) {
+      strokes.push(strokeKey(subpath, style));
+      items.push({ subpath, style });
+    }
+  }
+  return {
+    strokes: [...strokes, ...unreadable],
+    segments: [...segmentKeys(items), ...unreadable],
+  };
 }
+
+const SHIFT_TOLERANCE = 0.02;
 
 /** Multiset difference: items of `a` not matched one-for-one in `b`. */
 function minus(a: string[], b: string[]): string[] {
@@ -89,6 +116,32 @@ function minus(a: string[], b: string[]): string[] {
   });
 }
 
+const sameMultiset = (a: string[], b: string[]) =>
+  a.length === b.length && minus(a, b).length === 0;
+
+/** Largest distance from a removed segment to its nearest added one. */
+function maxShift(removed: string[], added: string[]): number | null {
+  const unreadable = [...removed, ...added].some((k) => k.startsWith("<"));
+  if (removed.length === 0 || removed.length !== added.length || unreadable) {
+    return null;
+  }
+  // Only segments with the same style (cap) can count as "moved".
+  const styleOf = (key: string) => key.match(/^\[[^\]]*\] /)?.[0] ?? "";
+  const shift = Math.max(
+    ...removed.map((key) => {
+      const seg = segmentFromKey(key);
+      return Math.min(
+        ...added.map((a) =>
+          styleOf(a) === styleOf(key)
+            ? segmentDistance(seg, segmentFromKey(a))
+            : Number.POSITIVE_INFINITY
+        )
+      );
+    })
+  );
+  return Number.isFinite(shift) ? shift : null;
+}
+
 /**
  * Compares a committed (already cleaned) source SVG with a new version, which
  * may be a raw export: it's cleaned in memory first.
@@ -100,22 +153,30 @@ export function compareIcon(
 ): Comparison {
   const before = shipped(oldSvg, variant, false);
   const after = shipped(newSvg, variant, true);
-  const oldKeys = strokeKeys(before.node);
-  const newKeys = strokeKeys(after.node);
-  const added = minus(newKeys, oldKeys);
-  const removed = minus(oldKeys, newKeys);
+  const elements: Comparison["elements"] = [
+    before.source.length,
+    after.source.length,
+  ];
+  const none = { added: [], removed: [], maxShift: null, elements };
 
-  let verdict: Verdict = "changed";
   if (JSON.stringify(before.node) === JSON.stringify(after.node)) {
-    verdict = "identical";
-  } else if (added.length === 0 && removed.length === 0) {
-    verdict = "same-geometry";
+    return { verdict: "identical", ...none };
   }
-
-  return {
-    verdict,
-    added,
-    removed,
-    elements: [before.source.length, after.source.length],
-  };
+  const oldKeys = geometryKeys(before.node);
+  const newKeys = geometryKeys(after.node);
+  if (sameMultiset(oldKeys.strokes, newKeys.strokes)) {
+    return { verdict: "same-geometry", ...none };
+  }
+  const added = minus(newKeys.segments, oldKeys.segments);
+  const removed = minus(oldKeys.segments, newKeys.segments);
+  if (added.length === 0 && removed.length === 0) {
+    return { verdict: "restructured", ...none };
+  }
+  const shift = maxShift(removed, added);
+  // Differences below this are rounding in the export (e.g. a curve's control
+  // point at 9.97 vs 9.98), not a design change.
+  if (shift !== null && shift < SHIFT_TOLERANCE) {
+    return { verdict: "same-geometry", ...none };
+  }
+  return { verdict: "changed", added, removed, maxShift: shift, elements };
 }

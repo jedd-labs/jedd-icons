@@ -1,6 +1,7 @@
 // Pure, side-effect-free SVG normalization for the source-of-truth icons. Kept
 // separate from `clean-svgs.ts` (the CLI entry) so these transforms can be
 // imported and unit-tested without walking the filesystem.
+import { mergePathNodes, parseSvg, stripInheritedAttrs } from "./build.lib";
 
 export const VARIANT_ROOT_ATTRS: Record<string, string> = {
   stroke: [
@@ -34,7 +35,7 @@ export const INHERITED_ATTRS =
 
 // The default stroke-linejoin every icon inherits from the root. A child join
 // equal to this is redundant and stripped; any other value is a deliberate
-// per-element override and preserved (with a warning).
+// per-element override and preserved.
 export const DEFAULT_LINEJOIN = "miter";
 export const CHILD_LINEJOIN = /\s+stroke-linejoin="([^"]*)"/g;
 
@@ -48,6 +49,20 @@ export const CHILD_LINECAP = /\s+stroke-linecap="([^"]*)"/g;
 // an icon rendered twice would put duplicate ids in the page; the source keeps
 // structure through separate elements, not names.
 const LAYER_IDS = /\s+id="[^"]*"/g;
+
+// Design-tool bookkeeping such as Figma's `data-figma-trr`. Never rendered.
+const DATA_ATTRS = /\s+data-[\w-]+="[^"]*"/g;
+
+// The only elements a source icon may contain once cleaned.
+const GEOMETRY_TAGS = new Set([
+  "path",
+  "circle",
+  "rect",
+  "line",
+  "polygon",
+  "polyline",
+  "ellipse",
+]);
 
 /**
  * Flattens design-tool export artifacts: removes `<defs>` blocks (which hold
@@ -72,6 +87,36 @@ export function unwrapGroups(inner: string): string {
 
 const CHILD_ELEMENT =
   /<(path|circle|rect|line|polygon|polyline|ellipse)\b((?:(?!\/?>)[\s\S])*?)(\/?>)/g;
+
+/**
+ * Warns about export features the pipeline can't keep, so they're fixed in the
+ * design tool instead of silently shipping a different icon.
+ */
+function warnUnsupported(raw: string, label: string): void {
+  // <defs> (clip paths) and <g> wrappers are export artifacts that get removed.
+  const inner = raw.replace(/<defs\b[^>]*>[\s\S]*?<\/defs>/g, "");
+  const tags = new Set(
+    [...inner.matchAll(/<([a-zA-Z][\w:-]*)\b/g)].map((m) => m[1])
+  );
+  const unsupported = [...tags].filter(
+    (t) => t !== "g" && !GEOMETRY_TAGS.has(t)
+  );
+  if (unsupported.length > 0) {
+    console.warn(
+      `[clean-svgs] ${label}: unsupported <${unsupported.join(">, <")}> — flatten it in the design tool (e.g. a Repeat exports as <use>); it won't render as designed`
+    );
+  }
+  if (/\stransform="/.test(inner)) {
+    console.warn(
+      `[clean-svgs] ${label}: transform="…" found — reset the rotation/position in the design tool (or flatten the shape) so the exported coordinates are final`
+    );
+  }
+  if (/\sstroke-dasharray="/.test(inner)) {
+    console.warn(
+      `[clean-svgs] ${label}: stroke-dasharray is stripped, so dashes will render as a solid line — draw the dashes as separate strokes`
+    );
+  }
+}
 
 /**
  * Pushes a non-default presentation attribute from the source root onto every
@@ -99,25 +144,35 @@ function hoistRootAttr(
 
 /**
  * Drops a child presentation attribute when it merely repeats the inherited
- * default; keeps any other value (a deliberate override) and warns so an
- * accidental design-tool export is surfaced rather than silently shipped.
+ * default; keeps any other value (a deliberate override, e.g. the square cap
+ * that makes a dot visible).
  */
 function stripDefaultAttr(
   inner: string,
   pattern: RegExp,
-  defaultValue: string,
-  attr: string,
-  label: string
+  defaultValue: string
 ): string {
-  return inner.replace(pattern, (full, value: string) => {
-    if (value === defaultValue) {
-      return "";
-    }
-    console.warn(
-      `[clean-svgs] ${label}: kept non-default ${attr}="${value}" — verify this is intentional`
-    );
-    return full;
-  });
+  return inner.replace(pattern, (full, value: string) =>
+    value === defaultValue ? "" : full
+  );
+}
+
+/**
+ * Warns when the static build couldn't merge an icon into one path: some
+ * layers need a different line cap or join where it shows (e.g. two cornered
+ * strokes, one bevelled and one not). Uses the build's own merge, so the
+ * warning matches what ships.
+ */
+function warnUnmergeable(svg: string, label: string): void {
+  const paths = mergePathNodes(stripInheritedAttrs(parseSvg(svg)));
+  if (paths.length < 2) {
+    return;
+  }
+  const describe = ([, attrs]: (typeof paths)[number]) =>
+    `${attrs["stroke-linecap"] ?? DEFAULT_LINECAP} cap + ${attrs["stroke-linejoin"] ?? DEFAULT_LINEJOIN} join`;
+  console.warn(
+    `[clean-svgs] ${label}: ships as ${paths.length} paths, not one — layers need different line styles where they show (${paths.map(describe).join(" / ")}); make them match in the design tool if that's not intended`
+  );
 }
 
 export function cleanSvg(
@@ -136,7 +191,10 @@ export function cleanSvg(
 
   let inner = svg.slice(openMatch[0].length, closeIdx);
 
-  // Flatten export artifacts (defs/clip-path groups) before anything else.
+  // Flag export features the pipeline can't keep (checked before unwrapping,
+  // which would silently drop a group's transform), then flatten export
+  // artifacts (defs/clip-path groups).
+  warnUnsupported(inner, label);
   inner = unwrapGroups(inner);
 
   // The root is about to be replaced by the canonical template (miter/butt). If
@@ -151,28 +209,19 @@ export function cleanSvg(
   );
   inner = hoistRootAttr(inner, openMatch[0], "stroke-linecap", DEFAULT_LINECAP);
 
-  // Strip inherited presentation attributes and layer ids from child elements
+  // Strip inherited presentation attributes, layer ids and design-tool data
+  // attributes from child elements
   inner = inner.replace(/<([a-zA-Z][\w-]*)\s+([^>]*?)\s*\/?>/g, (match) =>
-    match.replace(INHERITED_ATTRS, "").replace(LAYER_IDS, "")
+    match
+      .replace(INHERITED_ATTRS, "")
+      .replace(LAYER_IDS, "")
+      .replace(DATA_ATTRS, "")
   );
 
   // Handle stroke-linejoin/stroke-linecap on children: drop the redundant
-  // default, keep any deliberate override (bevel/round, square/round) and warn
-  // so accidental exports are surfaced rather than silently shipped.
-  inner = stripDefaultAttr(
-    inner,
-    CHILD_LINEJOIN,
-    DEFAULT_LINEJOIN,
-    "stroke-linejoin",
-    label
-  );
-  inner = stripDefaultAttr(
-    inner,
-    CHILD_LINECAP,
-    DEFAULT_LINECAP,
-    "stroke-linecap",
-    label
-  );
+  // default and keep any deliberate override (bevel/round, square/round).
+  inner = stripDefaultAttr(inner, CHILD_LINEJOIN, DEFAULT_LINEJOIN);
+  inner = stripDefaultAttr(inner, CHILD_LINECAP, DEFAULT_LINECAP);
 
   // Separate elements are kept as authored: they carry the designer's part
   // structure. The static packages merge them at build time (`mergePathNodes`).
@@ -190,5 +239,9 @@ export function cleanSvg(
     .replace(/[ \t]*\n\s*\n/g, "\n")
     .trim()}\n`;
 
-  return `<svg ${rootAttrs}>${inner}</svg>\n`;
+  const cleaned = `<svg ${rootAttrs}>${inner}</svg>\n`;
+  if (rootAttrs === VARIANT_ROOT_ATTRS.stroke) {
+    warnUnmergeable(cleaned, label);
+  }
+  return cleaned;
 }

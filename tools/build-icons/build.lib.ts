@@ -1,6 +1,7 @@
 // Pure, side-effect-free transforms for the icon codegen. Kept separate from
 // `build.ts` (the CLI entry) so they can be imported and unit-tested without
 // triggering a filesystem run.
+import { lineStyleRelevance, shapeToPathData } from "./geometry";
 import { kebabToPascal } from "./naming";
 
 export const DEFAULT_VARIANT = "stroke";
@@ -151,13 +152,90 @@ export function toCamelAttrs(nodes: IconNode): IconNode {
   });
 }
 
+// Attributes that only describe a basic shape's geometry; once the shape is
+// converted to path data they're replaced by `d`.
+const SHAPE_ATTRS = new Set([
+  "cx",
+  "cy",
+  "r",
+  "rx",
+  "ry",
+  "x",
+  "y",
+  "width",
+  "height",
+  "x1",
+  "y1",
+  "x2",
+  "y2",
+  "points",
+  "transform",
+]);
+
+/** A `<circle>`, `<rect>`, etc. as an equivalent `<path>`; others unchanged. */
+function asPath(node: IconNodeChild): IconNodeChild {
+  const [tag, attrs, children] = node;
+  const d = children ? null : shapeToPathData(tag, attrs);
+  if (d === null) {
+    return node;
+  }
+  const rest = Object.entries(attrs).filter(([k]) => !SHAPE_ATTRS.has(k));
+  return ["path", { d, ...Object.fromEntries(rest) }];
+}
+
+const LINE_STYLES = ["stroke-linecap", "stroke-linejoin"] as const;
+type LineStyle = (typeof LINE_STYLES)[number];
+
+/** A merged path being built, and the line styles its strokes require. */
+interface MergeGroup {
+  /** Every cap/join value the group's elements declare (defaults included). */
+  declared: Record<LineStyle, Set<string>>;
+  node: IconNodeChild;
+  /** Attributes other than `d` and line styles; must match to merge. */
+  other: string;
+  /** Line style values that show on at least one stroke in the group. */
+  requires: Partial<Record<LineStyle, string>>;
+}
+
+/** The cap/join values a path needs where they're visible (see relevance). */
+function requiredLineStyles(
+  d: string,
+  attrs: IconAttrs
+): MergeGroup["requires"] {
+  const relevance = lineStyleRelevance(d);
+  const requires: MergeGroup["requires"] = {};
+  for (const key of LINE_STYLES) {
+    if (relevance[key === "stroke-linecap" ? "cap" : "join"]) {
+      requires[key] = String(attrs[key] ?? ATTR_DEFAULTS[key]);
+    }
+  }
+  return requires;
+}
+
+const compatible = (a: MergeGroup["requires"], b: MergeGroup["requires"]) =>
+  LINE_STYLES.every(
+    (k) => a[k] === undefined || b[k] === undefined || a[k] === b[k]
+  );
+
+const isMergeablePath = ([tag, attrs, children]: IconNodeChild) =>
+  tag === "path" &&
+  !children &&
+  typeof attrs.d === "string" &&
+  attrs.d.trimStart().startsWith("M");
+
 /**
- * Merges top-level `<path>`s that share the same presentation (e.g. all plain,
- * or all `stroke-linecap="square"`) into one compound path, placed where the
- * first of them sat. Sources keep separate elements for their part structure;
- * the static packages ship the compact merged form, which also paints
- * overlapping strokes once (no darker joints with semi-transparent colors).
- * Stroke-only: for filled shapes, merging can turn overlaps into holes.
+ * Merges top-level elements into as few compound paths as possible, each
+ * placed where its first element sat. Circles, rects and other basic shapes
+ * are converted to path data first. Sources keep separate elements for their
+ * part structure; the static packages ship the compact merged form, which also
+ * paints overlapping strokes once (no darker joints with semi-transparent
+ * colors). Stroke-only: for filled shapes, merging can turn overlaps into holes.
+ *
+ * Elements with different line caps/joins still merge when the difference
+ * can't show: a join only matters at corners and a cap only on open ends, so a
+ * circle without `stroke-linejoin="bevel"` merges with bevelled clock hands and
+ * the merged path is bevelled. Where a value would show on both sides (two
+ * cornered strokes, one bevel and one miter), they stay separate paths.
  *
  * `d`s are joined without a separator, so an icon re-exported unmerged from
  * the same geometry reproduces the design tool's merged path exactly. Paths
@@ -166,26 +244,60 @@ export function toCamelAttrs(nodes: IconNode): IconNode {
  */
 export function mergePathNodes(nodes: IconNode): IconNode {
   const merged: IconNode = [];
-  const bySignature = new Map<string, IconNodeChild>();
-  for (const node of nodes) {
-    const [tag, { d, ...rest }, children] = node;
-    const mergeable =
-      tag === "path" &&
-      !children &&
-      typeof d === "string" &&
-      d.trimStart().startsWith("M");
-    if (!mergeable) {
+  const groups: MergeGroup[] = [];
+  for (const node of nodes.map(asPath)) {
+    if (!isMergeablePath(node)) {
       merged.push(node);
       continue;
     }
-    const signature = JSON.stringify(Object.entries(rest).sort());
-    const first = bySignature.get(signature);
-    if (first) {
-      first[1].d = `${first[1].d}${d.trim()}`;
-    } else {
-      const copy: IconNodeChild = [tag, { ...node[1], d: d.trim() }];
-      bySignature.set(signature, copy);
-      merged.push(copy);
+    const attrs = node[1];
+    const d = String(attrs.d).trim();
+    const other = JSON.stringify(
+      Object.entries(attrs)
+        .filter(
+          ([k]) => k !== "d" && !(LINE_STYLES as readonly string[]).includes(k)
+        )
+        .sort()
+    );
+    const requires = requiredLineStyles(d, attrs);
+    const group = groups.find(
+      (g) => g.other === other && compatible(g.requires, requires)
+    );
+    const declare = (g: MergeGroup) => {
+      for (const key of LINE_STYLES) {
+        g.declared[key].add(String(attrs[key] ?? ATTR_DEFAULTS[key]));
+      }
+    };
+    if (group) {
+      group.node[1].d = `${group.node[1].d}${d}`;
+      Object.assign(group.requires, requires);
+      declare(group);
+      continue;
+    }
+    const copy: IconNodeChild = ["path", { ...attrs, d }];
+    const created: MergeGroup = {
+      node: copy,
+      other,
+      requires: { ...requires },
+      declared: { "stroke-linecap": new Set(), "stroke-linejoin": new Set() },
+    };
+    declare(created);
+    groups.push(created);
+    merged.push(copy);
+  }
+  // Set each merged path's cap/join to what its strokes require. A value that
+  // shows nowhere is kept when its layers agree on it (so an unchanged icon
+  // ships unchanged) and dropped otherwise.
+  for (const { node, requires, declared } of groups) {
+    for (const key of LINE_STYLES) {
+      const value =
+        requires[key] ??
+        (declared[key].size === 1 ? [...declared[key]][0] : undefined);
+      if (value === undefined || value === ATTR_DEFAULTS[key]) {
+        delete node[1][key];
+      } else {
+        node[1][key] = value;
+      }
     }
   }
   return merged;

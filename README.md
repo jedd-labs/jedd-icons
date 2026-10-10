@@ -51,6 +51,7 @@ Design rules:
 - Stroke-only — no `fill` on child elements.
 - Keep the geometry flat: no `<g>` groups, no `<defs>`, no `<mask>`. The parser is intentionally simple.
 - Keep the parts separate: export each part of the icon (e.g. a bookmark and the check inside it) as its own `<path>`, and don't merge them into one. Keep each continuous stroke in one path, though; splitting it would break its corners. The build merges paths when it generates the packages, so this only affects the source files. Export without layer names (Figma's "Include 'id' attribute" off); `pnpm clean-svgs` strips any `id`s anyway.
+- Export final coordinates: no rotated shapes (reset the rotation or flatten with ⌘E), no Repeat groups (they export as `<use>`), and no dash patterns (draw dashes as separate strokes). `pnpm clean-svgs` warns about each of these.
 
 ### 2. Add metadata
 

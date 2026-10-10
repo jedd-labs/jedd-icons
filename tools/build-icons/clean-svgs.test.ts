@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { cleanSvg, unwrapGroups, VARIANT_ROOT_ATTRS } from "./clean-svgs.lib";
 
 describe("unwrapGroups", () => {
@@ -102,6 +102,60 @@ describe("cleanSvg", () => {
     expect(out).toBe(
       `<svg ${stroke}>\n<path d="M14 2H4V22"/>\n<path d="M16 15H14"/>\n</svg>\n`
     );
+  });
+
+  it("strips design-tool data attributes", () => {
+    const svg = `<svg><path d="M1 1" data-figma-trr="r6u6-0f"/></svg>`;
+    expect(cleanSvg(svg, stroke, label)).toBe(
+      `<svg ${stroke}>\n<path d="M1 1"/>\n</svg>\n`
+    );
+  });
+
+  it("warns about <use>, transforms and dashes, which can't be kept", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    cleanSvg(
+      `<svg><g transform="rotate(90)"><path d="M1 1" stroke-dasharray="4 2"/></g><use href="#a"/></svg>`,
+      stroke,
+      label
+    );
+    const messages = warn.mock.calls.map(([m]) => String(m)).join("\n");
+    expect(messages).toContain("unsupported <use>");
+    expect(messages).toContain("transform");
+    expect(messages).toContain("stroke-dasharray");
+    warn.mockRestore();
+  });
+
+  it("warns only when layers can't merge into one path", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    // A bevelled circle merges with plain hands: the circle has no corners.
+    cleanSvg(
+      `<svg><circle cx="12" cy="12" r="9"/><path d="M12 7V12H16" stroke-linejoin="bevel"/></svg>`,
+      stroke,
+      label
+    );
+    expect(warn).not.toHaveBeenCalled();
+    // Two cornered strokes, one round and one miter, can't.
+    cleanSvg(
+      `<svg><path d="M3 3H21V21" stroke-linejoin="round"/><path d="M12 7V12H16"/></svg>`,
+      stroke,
+      label
+    );
+    expect(warn).toHaveBeenCalledOnce();
+    expect(String(warn.mock.calls[0][0])).toContain(
+      "ships as 2 paths, not one"
+    );
+    warn.mockRestore();
+  });
+
+  it("doesn't warn about the clip-path frame Figma wraps exports in", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    cleanSvg(
+      `<svg><g clip-path="url(#c)"><path d="M1 1"/></g><defs><clipPath id="c"><rect width="24" height="24"/></clipPath></defs></svg>`,
+      stroke,
+      label
+    );
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
   });
 
   it("is idempotent", () => {

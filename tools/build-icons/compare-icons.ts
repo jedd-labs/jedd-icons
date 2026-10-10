@@ -1,14 +1,19 @@
 #!/usr/bin/env node
 /**
- * Checks re-exported source SVGs against a committed version: for every icon
- * changed or added under icons/ since `--ref` (default HEAD), reports whether
- * the packages would still ship the same geometry. Works on raw exports too;
- * they're cleaned in memory the same way `clean-svgs` would.
+ * Checks re-exported source SVGs against the committed icons and reports
+ * whether the packages would still ship the same shapes. Works on raw design
+ * tool exports too; they're cleaned in memory the same way `clean-svgs` would.
  *
- * Usage: tsx tools/build-icons/compare-icons.ts [--ref <git-ref>]
+ * Usage:
+ *   tsx tools/build-icons/compare-icons.ts [--ref <git-ref>]
+ *     Every icon changed or added under icons/ since the ref (default HEAD).
+ *   tsx tools/build-icons/compare-icons.ts --from <dir> [--variant stroke]
+ *     Every SVG in <dir>, against the committed icon of the same name. Also
+ *     lists committed icons missing from <dir>.
+ *   Add --verbose to list the icons in every group, not just the changed ones.
  */
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { type Comparison, compareIcon } from "./compare-icons.lib";
@@ -16,92 +21,167 @@ import { type Comparison, compareIcon } from "./compare-icons.lib";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..", "..");
 
-const refIdx = process.argv.indexOf("--ref");
-const ref = refIdx === -1 ? "HEAD" : process.argv[refIdx + 1];
+const arg = (name: string) => {
+  const i = process.argv.indexOf(name);
+  return i === -1 ? undefined : process.argv[i + 1];
+};
+const ref = arg("--ref") ?? "HEAD";
+const from = arg("--from");
+const verbose = process.argv.includes("--verbose");
+
+interface Pair {
+  after: string | null;
+  before: string | null;
+  label: string;
+  variant: string;
+}
 
 const git = (...args: string[]) =>
   execFileSync("git", args, { cwd: ROOT, encoding: "utf8" });
-
 const lines = (out: string) => out.split("\n").filter(Boolean);
+const readOrNull = (path: string) =>
+  existsSync(path) ? readFileSync(path, "utf8") : null;
 
-const changed = lines(git("diff", "--name-only", ref, "--", "icons/*.svg"));
-const untracked = lines(
-  git("ls-files", "--others", "--exclude-standard", "--", "icons/*.svg")
-);
-const files = [...new Set([...changed, ...untracked])].sort();
-
-if (files.length === 0) {
-  console.log(`[compare-icons] no icon changes since ${ref}`);
-  process.exit(0);
+function gitPairs(): Pair[] {
+  const changed = lines(git("diff", "--name-only", ref, "--", "icons/*.svg"));
+  const untracked = lines(
+    git("ls-files", "--others", "--exclude-standard", "--", "icons/*.svg")
+  );
+  return [...new Set([...changed, ...untracked])].sort().map((file) => {
+    let before: string | null = null;
+    try {
+      before = git("show", `${ref}:${file}`);
+    } catch {
+      // Not in the ref: a new (or misnamed) icon.
+    }
+    return {
+      label: file.replace(/^icons\//, ""),
+      variant: basename(dirname(file)),
+      before,
+      after: readOrNull(join(ROOT, file)),
+    };
+  });
 }
 
-const LABELS: Record<Comparison["verdict"], string> = {
-  identical: "identical",
-  "same-geometry": "same geometry (reordered/reformatted)",
+/** Pairs for a folder of exports, plus committed icons the folder lacks. */
+function folderPairs(dir: string): { missing: string[]; pairs: Pair[] } {
+  const variant = arg("--variant") ?? "stroke";
+  const committedDir = join(ROOT, "icons", variant);
+  const svgs = (d: string) => readdirSync(d).filter((f) => f.endsWith(".svg"));
+  const exported = svgs(dir).sort();
+  const pairs = exported.map((file) => ({
+    label: `${variant}/${file}`,
+    variant,
+    before: readOrNull(join(committedDir, file)),
+    after: readFileSync(join(dir, file), "utf8"),
+  }));
+  const missing = svgs(committedDir)
+    .filter((f) => !exported.includes(f))
+    .map((f) => `${variant}/${f}`);
+  return { pairs, missing };
+}
+
+const fmtPoint = (p: string) => `(${p.replace(",", ", ")})`;
+
+/** "dot (12, 16)", "(3, 3.71) → (21, 3.71)" or a curve's end points. */
+function describeSegment(key: string): string {
+  const style = key.match(/^\[([^\]]*)\] /)?.[1];
+  const body = key.replace(/^\[[^\]]*\] /, "");
+  const suffix = style ? ` [${style}]` : "";
+  if (body.startsWith("<")) {
+    return body;
+  }
+  if (body.startsWith("dot ")) {
+    return `dot ${fmtPoint(body.slice(4))}${suffix}`;
+  }
+  const pts = body.split(" ");
+  const kind = pts.length === 4 ? " (curve)" : "";
+  return `${fmtPoint(pts[0])} → ${fmtPoint(pts.at(-1) ?? "")}${kind}${suffix}`;
+}
+
+type Group = Comparison["verdict"] | "new" | "deleted" | "missing" | "error";
+const LABELS: Record<Group, string> = {
+  identical: "identical (packages ship the same bytes)",
+  "same-geometry": "same geometry (reordered, reversed, or other element type)",
+  restructured: "restructured (same segments, split into strokes differently)",
   changed: "CHANGED",
+  new: "NEW (no committed icon with this name)",
+  deleted: "DELETED",
+  missing: "MISSING from the export folder",
+  error: "ERROR (could not compare)",
 };
+const groups = new Map<Group, string[]>();
+const add = (group: Group, line: string) =>
+  groups.set(group, [...(groups.get(group) ?? []), line]);
 
-const counts: Record<string, number> = {};
-const count = (key: string) => {
-  counts[key] = (counts[key] ?? 0) + 1;
-};
-
-function readAt(file: string): string | null {
-  try {
-    return git("show", `${ref}:${file}`);
-  } catch {
-    return null;
-  }
-}
-
-function report(file: string): void {
-  const icon = file.replace(/^icons\//, "");
-  const variant = basename(dirname(file));
-  const before = readAt(file);
-  let after: string | null = null;
-  try {
-    after = readFileSync(join(ROOT, file), "utf8");
-  } catch {
-    // Deleted in the working tree.
-  }
-
+function compare({ label, variant, before, after }: Pair): void {
   if (before === null) {
-    count("new");
-    console.log(`  NEW        ${icon} (no version at ${ref}; misnamed?)`);
+    add("new", label);
     return;
   }
   if (after === null) {
-    count("deleted");
-    console.log(`  DELETED    ${icon}`);
+    add("deleted", label);
     return;
   }
-
-  const result = compareIcon(before, after, variant);
-  count(result.verdict);
-  const [was, now] = result.elements;
-  console.log(
-    `  ${LABELS[result.verdict].padEnd(10)} ${icon}  (elements ${was} → ${now})`
-  );
-  for (const sub of result.removed) {
-    console.log(`      - ${sub}`);
+  let result: Comparison;
+  try {
+    result = compareIcon(before, after, variant);
+  } catch (error) {
+    add("error", `${label}: ${(error as Error).message}`);
+    return;
   }
-  for (const sub of result.added) {
-    console.log(`      + ${sub}`);
+  if (result.verdict !== "changed") {
+    add(result.verdict, label);
+    return;
+  }
+  const shift =
+    result.maxShift === null
+      ? "segments added, removed or reshaped"
+      : `moved up to ${result.maxShift.toFixed(2)}px`;
+  add(
+    "changed",
+    [
+      `${label}  (${shift})`,
+      ...result.removed.map((k) => `      - ${describeSegment(k)}`),
+      ...result.added.map((k) => `      + ${describeSegment(k)}`),
+    ].join("\n")
+  );
+}
+
+// clean-svgs warns about deliberate per-element overrides on every run; that's
+// noise here, where only the comparison matters.
+console.warn = () => undefined;
+
+let pairs: Pair[];
+let missing: string[] = [];
+if (from) {
+  ({ pairs, missing } = folderPairs(resolve(process.cwd(), from)));
+  console.log(`[compare-icons] ${pairs.length} SVG(s) in ${from}:`);
+} else {
+  pairs = gitPairs();
+  console.log(`[compare-icons] ${pairs.length} icon(s) changed since ${ref}:`);
+}
+for (const pair of pairs) {
+  compare(pair);
+}
+for (const label of missing) {
+  add("missing", label);
+}
+
+const DETAILED: Group[] = ["changed", "new", "deleted", "missing", "error"];
+for (const group of Object.keys(LABELS) as Group[]) {
+  const items = groups.get(group);
+  if (!items) {
+    continue;
+  }
+  console.log(`\n${items.length} ${LABELS[group]}`);
+  if (verbose || DETAILED.includes(group) || group === "restructured") {
+    for (const item of items) {
+      console.log(`  ${item}`);
+    }
   }
 }
 
-console.log(`[compare-icons] ${files.length} icon(s) changed since ${ref}:`);
-for (const file of files) {
-  report(file);
-}
-console.log(
-  `[compare-icons] ${Object.entries(counts)
-    .map(([k, n]) => `${n} ${k}`)
-    .join(", ")}`
-);
-if (counts.changed || counts.new) {
-  console.log(
-    "[compare-icons] CHANGED can still render the same (a closed shape starting at another corner, or drawn in reverse); check those visually."
-  );
+if (DETAILED.some((g) => groups.has(g))) {
   process.exitCode = 1;
 }
