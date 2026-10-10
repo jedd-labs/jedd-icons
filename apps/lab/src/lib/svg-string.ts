@@ -1,5 +1,5 @@
 import { variantDefaults } from "@jedd-icons/shared";
-import { getIconNode } from "@/lib/icon-nodes";
+import { getShippedIconNode } from "@/lib/icon-nodes";
 import type { Variant } from "@/lib/icons";
 import type { IconNodeChild } from "@/lib/svg-path";
 
@@ -52,7 +52,7 @@ function serializeNode(node: IconNodeChild[], indent: string): string {
  * children from the shipped tuples.
  */
 export function buildShippedSvg(name: string, variant: Variant): string | null {
-  const node = getIconNode(name, variant);
+  const node = getShippedIconNode(name, variant);
   if (!node) {
     return null;
   }

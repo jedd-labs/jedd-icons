@@ -1,3 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="butt" stroke-linejoin="miter">
-<path d="M3 17V21H7M3 7V3H7M21 7V3H17M21 17V21H17M16 13C16 13 15 15 12 15C9 15 8 13 8 13M10.0156 9H10M14.0205 9H14" stroke-linecap="square"/>
+<path d="M3 17V21H7" stroke-linecap="square"/>
+<path d="M3 7V3H7" stroke-linecap="square"/>
+<path d="M21 7V3H17" stroke-linecap="square"/>
+<path d="M21 17V21H17" stroke-linecap="square"/>
+<path d="M15.9999 13C15.9999 13 14.9999 15 11.9999 15C8.99995 15 8 13 8 13" stroke-linecap="square"/>
+<path d="M10 9H10.01" stroke-linecap="square" stroke-linejoin="round"/>
+<path d="M14 9H14.01" stroke-linecap="square" stroke-linejoin="round"/>
 </svg>

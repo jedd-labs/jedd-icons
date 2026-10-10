@@ -1,3 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="butt" stroke-linejoin="miter">
-<path d="M3 9H21M21 13V9L18 3H6L3 9V21H11M12 9V3M13 17.9998L15.9999 20.9998L21.9998 14.9999"/>
+<path d="M3 9H21M21 13V9L18 3H6L3 9V21H11"/>
+<path d="M12 9V3"/>
+<path d="M13 17.9999L15.9999 20.9999L21.9998 15"/>
 </svg>

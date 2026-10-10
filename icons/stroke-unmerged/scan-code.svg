@@ -1,8 +1,0 @@
-<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M3 16V21H8" stroke="black" stroke-width="2"/>
-<path d="M3 8V3H8" stroke="black" stroke-width="2"/>
-<path d="M21 8V3H16" stroke="black" stroke-width="2"/>
-<path d="M21 16V21H16" stroke="black" stroke-width="2"/>
-<path d="M14 16L18 12L14 8" stroke="black" stroke-width="2"/>
-<path d="M10 16L6 12L10 8" stroke="black" stroke-width="2"/>
-</svg>

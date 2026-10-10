@@ -11,6 +11,7 @@ import {
 import type { Variant } from "@/lib/icons";
 import { marginReportFor } from "@/lib/margin";
 import { flattenPieces, type IconNodeChild } from "@/lib/svg-path";
+import iconSchema from "../../../../icon.schema.json";
 
 export type CheckId = "margin" | "forbiddenElements" | "offGrid" | "metadata";
 
@@ -64,27 +65,12 @@ const FORBIDDEN_TAGS = new Set([
   "filter",
 ]);
 
-const VALID_CATEGORIES = new Set([
-  "account",
-  "actions",
-  "arrows",
-  "development",
-  "charts",
-  "communication",
-  "design",
-  "devices",
-  "files",
-  "layout",
-  "media",
-  "navigation",
-  "security",
-  "shapes",
-  "social",
-  "text",
-  "time",
-  "tools",
-  "weather",
-]);
+// The closed category enum, read from the schema the sidecars are validated
+// against, so the Lab can't drift from it (a hand-kept copy once missed
+// "ecommerce").
+const VALID_CATEGORIES = new Set<string>(
+  iconSchema.properties.categories.items.enum
+);
 
 const VIEW = 24;
 const EPS = 0.01;

@@ -12,8 +12,11 @@ export interface IconMeta {
 interface IconNodeEntry {
   /** Raw sidecar metadata, or null when the `.json` is missing. */
   meta: IconMeta | null;
+  /** Source geometry: one element per part, as authored. */
   node: IconNodeChild[];
   pascalName: string;
+  /** What the packages ship: stroke icons merged into as few paths as possible. */
+  shipped: IconNodeChild[];
   variant: string;
 }
 
@@ -47,6 +50,14 @@ export function getIconNode(
   variant: Variant
 ): IconNodeChild[] | null {
   return iconNodes[name]?.[variant]?.node ?? null;
+}
+
+/** The geometry the packages ship for an icon+variant, or null when absent. */
+export function getShippedIconNode(
+  name: string,
+  variant: Variant
+): IconNodeChild[] | null {
+  return iconNodes[name]?.[variant]?.shipped ?? null;
 }
 
 /** Raw sidecar metadata for an icon+variant, or null when absent. */

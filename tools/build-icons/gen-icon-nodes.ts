@@ -14,7 +14,13 @@ import {
 } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { type IconNode, parseSvg, stripInheritedAttrs } from "./build.lib";
+import {
+  DEFAULT_VARIANT,
+  type IconNode,
+  mergePathNodes,
+  parseSvg,
+  stripInheritedAttrs,
+} from "./build.lib";
 import { kebabToPascal } from "./naming";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -32,8 +38,9 @@ const OUTPUT = join(OUTPUT_DIR, "icon-nodes.json");
 
 // The SVG parser and attribute-stripping rules are imported from build.lib so
 // the Lab reflects exactly what the codegen parses. They were previously
-// duplicated here and silently drifted. Paths are deliberately NOT merged
-// (unlike the stroke packages): the Lab shows the source's element structure.
+// duplicated here and silently drifted. `node` is deliberately NOT merged: the
+// Lab inspects the source's element structure. `shipped` is the merged form the
+// stroke packages ship, for the Lab's "shipped SVG" view.
 
 // ── Main ───────────────────────────────────────────────────────────────
 
@@ -52,6 +59,8 @@ interface IconNodeEntry {
   node: IconNode;
   /** PascalCase component name, e.g. "AlertCircle". */
   pascalName: string;
+  /** The geometry the packages ship: `node` merged as the codegen does. */
+  shipped: IconNode;
   /** Variant this geometry belongs to. */
   variant: string;
 }
@@ -96,6 +105,7 @@ function collectVariant(
       pascalName: kebabToPascal(name),
       variant,
       node,
+      shipped: variant === DEFAULT_VARIANT ? mergePathNodes(node) : node,
       meta: readMeta(dir, name),
     };
   }
