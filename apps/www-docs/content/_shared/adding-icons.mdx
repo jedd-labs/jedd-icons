@@ -27,7 +27,7 @@ set on the root `<svg>` and inherited at render time so the `color` and
 
 <Callout type="info">
   If your SVGs have inline presentation attributes on child elements (common
-  with design-tool exports), `pnpm clean-svgs` strips them automatically and
+  with design-tool exports), `pnpm icons:clean` strips them automatically and
   normalizes the root attributes.
 </Callout>
 
@@ -81,9 +81,11 @@ pnpm icons
 
 This single command runs the full pipeline:
 
-1. **`clean-svgs`** — normalizes root `<svg>` attributes and strips inline
+1. **`icons:clean`** — normalizes root `<svg>` attributes and strips inline
    presentation attributes from child elements.
-2. **`build`** — builds `@jedd-icons/shared`, generates the per-icon TS files,
+2. **`icons:check`** — checks the normalized SVGs without changing them, and
+   stops on export problems such as transforms or dots too short for Safari.
+3. **`build`** — builds `@jedd-icons/shared`, generates the per-icon TS files,
    then builds `@jedd-icons/core` and `@jedd-icons/react`.
 
 </Step>
@@ -103,8 +105,9 @@ the `size` / `strokeWidth` / `color` / `absoluteStrokeWidth` props behave.
 
 | Command | What it does |
 | --- | --- |
-| `pnpm icons` | Full pipeline: clean SVGs + build all packages |
-| `pnpm clean-svgs` | Normalize source SVGs (strip inline attrs, set root defaults) |
+| `pnpm icons` | Full pipeline: clean + check SVGs, then build all packages |
+| `pnpm icons:clean` | Normalize source SVGs (strip inline attrs, set root defaults) |
+| `pnpm icons:check` | Check source SVGs without changing them; exits 1 on errors |
 | `pnpm build` | Build all packages via Turbo |
 | `pnpm --filter @jedd-icons/react gen` | Regenerate icon TS files only |
 | `pnpm --filter @jedd-icons/react build` | Build the React package |

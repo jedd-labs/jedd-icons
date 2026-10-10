@@ -8,8 +8,10 @@
   "include": [
     "./build.ts",
     "./build.lib.ts",
-    "./clean-svgs.ts",
-    "./clean-svgs.lib.ts",
+    "./check-icons.ts",
+    "./check-icons.lib.ts",
+    "./clean-icons.ts",
+    "./clean-icons.lib.ts",
     "./naming.ts",
     "./*.test.ts"
   ]

@@ -8,7 +8,7 @@ import {
   parseSvg,
   stripInheritedAttrs,
 } from "./build.lib";
-import { cleanSvg, VARIANT_ROOT_ATTRS } from "./clean-svgs.lib";
+import { cleanSvg, VARIANT_ROOT_ATTRS } from "./clean-icons.lib";
 import {
   elementSubpaths,
   segmentDistance,
@@ -53,7 +53,7 @@ export interface Comparison {
 
 /**
  * The icon node exactly as the static packages ship it. `clean` runs the
- * `clean-svgs` normalization first, for raw design-tool exports.
+ * `icons:clean` normalization first, for raw design-tool exports.
  */
 function shipped(
   svg: string,
@@ -61,7 +61,7 @@ function shipped(
   clean: boolean
 ): { node: IconNode; source: IconNode } {
   const cleaned = clean
-    ? cleanSvg(svg, VARIANT_ROOT_ATTRS[variant] ?? "", variant)
+    ? cleanSvg(svg, VARIANT_ROOT_ATTRS[variant] ?? "")
     : svg;
   const source = stripInheritedAttrs(parseSvg(cleaned));
   const node = variant === DEFAULT_VARIANT ? mergePathNodes(source) : source;

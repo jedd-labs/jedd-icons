@@ -221,7 +221,7 @@ export function LabCanvas({
         {/* ── Icon geometry ──────────────────────────────────────── */}
         {/* Cap/join match the canonical stroke defaults (butt/miter) so the
             x-ray renders identically to the published icons — Jedd icons are
-            sharp/squared, not rounded. See tools/build-icons/clean-svgs.ts. */}
+            sharp/squared, not rounded. See tools/build-icons/clean-icons.lib.ts. */}
         <g
           fill={fill ? "currentColor" : "none"}
           stroke={fill ? "none" : "currentColor"}

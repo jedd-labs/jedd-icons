@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { VARIANT_ROOT_ATTRS } from "./clean-svgs.lib";
+import { VARIANT_ROOT_ATTRS } from "./clean-icons.lib";
 import { compareIcon } from "./compare-icons.lib";
 
 const committed = (inner: string) =>

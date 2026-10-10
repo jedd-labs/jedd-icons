@@ -44,14 +44,14 @@ Save your file at `icons/<name>.svg` using **kebab-case**. Icons must fit inside
 
 Child elements should only contain geometry attributes (`d`, `cx`, `r`, `points`, etc.) — not presentation attributes like `stroke` or `fill`. These are set on the root `<svg>` and inherited at render time so that `color`, `strokeWidth`, and other props work correctly.
 
-> If your SVGs have inline presentation attributes on child elements (common with design tool exports), `pnpm clean-svgs` will strip them automatically and normalize the root attributes.
+> If your SVGs have inline presentation attributes on child elements (common with design tool exports), `pnpm icons:clean` will strip them automatically and normalize the root attributes.
 
 Design rules:
 - Stay inside the 24x24 viewBox with ~1px padding on each side (room for stroke).
 - Stroke-only — no `fill` on child elements.
 - Keep the geometry flat: no `<g>` groups, no `<defs>`, no `<mask>`. The parser is intentionally simple.
-- Keep the parts separate: export each part of the icon (e.g. a bookmark and the check inside it) as its own `<path>`, and don't merge them into one. Keep each continuous stroke in one path, though; splitting it would break its corners. The build merges paths when it generates the packages, so this only affects the source files. Export without layer names (Figma's "Include 'id' attribute" off); `pnpm clean-svgs` strips any `id`s anyway.
-- Export final coordinates: no rotated shapes (reset the rotation or flatten with ⌘E), no Repeat groups (they export as `<use>`), and no dash patterns (draw dashes as separate strokes). `pnpm clean-svgs` warns about each of these.
+- Keep the parts separate: export each part of the icon (e.g. a bookmark and the check inside it) as its own `<path>`, and don't merge them into one. Keep each continuous stroke in one path, though; splitting it would break its corners. The build merges paths when it generates the packages, so this only affects the source files. Export without layer names (Figma's "Include 'id' attribute" off); `pnpm icons:clean` strips any `id`s anyway.
+- Export final coordinates: no rotated shapes (reset the rotation or flatten with ⌘E), no Repeat groups (they export as `<use>`), and no dash patterns (draw dashes as separate strokes). `pnpm icons:check` flags each of these (and `pnpm icons:clean` warns when cleaning drops a group's rotation or a dash pattern).
 
 ### 2. Add metadata
 
@@ -85,8 +85,9 @@ pnpm icons
 ```
 
 This single command runs the full pipeline:
-1. **`clean-svgs`** — normalizes root `<svg>` attributes and strips inline presentation attributes from child elements
-2. **`build`** — builds `@jedd-icons/shared`, generates icon TS files, builds `@jedd-icons/core` and `@jedd-icons/react`
+1. **`icons:clean`** — normalizes root `<svg>` attributes and strips inline presentation attributes from child elements
+2. **`icons:check`** — checks the normalized SVGs without changing them (export problems such as transforms, `<use>` or dots too short for Safari); stops on errors
+3. **`build`** — builds `@jedd-icons/shared`, generates icon TS files, builds `@jedd-icons/core` and `@jedd-icons/react`
 
 ### 4. Import it
 
@@ -113,8 +114,9 @@ Open `http://localhost:3000`. Your icon shows up in the grid; the search box fil
 
 | Command | What it does |
 |---|---|
-| `pnpm icons` | Full pipeline: clean SVGs + build all packages |
-| `pnpm clean-svgs` | Normalize source SVGs (strip inline attrs, set root defaults) |
+| `pnpm icons` | Full pipeline: clean + check SVGs, then build all packages |
+| `pnpm icons:clean` | Normalize source SVGs (strip inline attrs, set root defaults) |
+| `pnpm icons:check` | Check source SVGs without changing them; exits 1 on errors |
 | `pnpm build` | Build all packages via Turbo |
 | `pnpm --filter @jedd-icons/react gen` | Regenerate icon TS files only |
 | `pnpm --filter @jedd-icons/react build` | Build the React package |

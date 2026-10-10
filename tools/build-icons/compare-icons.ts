@@ -2,7 +2,7 @@
 /**
  * Checks re-exported source SVGs against the committed icons and reports
  * whether the packages would still ship the same shapes. Works on raw design
- * tool exports too; they're cleaned in memory the same way `clean-svgs` would.
+ * tool exports too; they're cleaned in memory the same way `icons:clean` would.
  *
  * Usage:
  *   tsx tools/build-icons/compare-icons.ts [--ref <git-ref>]
@@ -147,10 +147,6 @@ function compare({ label, variant, before, after }: Pair): void {
     ].join("\n")
   );
 }
-
-// clean-svgs warns about deliberate per-element overrides on every run; that's
-// noise here, where only the comparison matters.
-console.warn = () => undefined;
 
 let pairs: Pair[];
 let missing: string[] = [];

@@ -1,9 +1,6 @@
 // Pure, side-effect-free SVG normalization for the source-of-truth icons. Kept
-// separate from `clean-svgs.ts` (the CLI entry) so these transforms can be
+// separate from `clean-icons.ts` (the CLI entry) so these transforms can be
 // imported and unit-tested without walking the filesystem.
-import { mergePathNodes, parseSvg, stripInheritedAttrs } from "./build.lib";
-import { findDots } from "./geometry";
-
 export const VARIANT_ROOT_ATTRS: Record<string, string> = {
   stroke: [
     'xmlns="http://www.w3.org/2000/svg"',
@@ -54,17 +51,6 @@ const LAYER_IDS = /\s+id="[^"]*"/g;
 // Design-tool bookkeeping such as Figma's `data-figma-trr`. Never rendered.
 const DATA_ATTRS = /\s+data-[\w-]+="[^"]*"/g;
 
-// The only elements a source icon may contain once cleaned.
-const GEOMETRY_TAGS = new Set([
-  "path",
-  "circle",
-  "rect",
-  "line",
-  "polygon",
-  "polyline",
-  "ellipse",
-]);
-
 /**
  * Flattens design-tool export artifacts: removes `<defs>` blocks (which hold
  * clip/mask/gradient definitions the flat icons never use) and unwraps
@@ -88,36 +74,6 @@ export function unwrapGroups(inner: string): string {
 
 const CHILD_ELEMENT =
   /<(path|circle|rect|line|polygon|polyline|ellipse)\b((?:(?!\/?>)[\s\S])*?)(\/?>)/g;
-
-/**
- * Warns about export features the pipeline can't keep, so they're fixed in the
- * design tool instead of silently shipping a different icon.
- */
-function warnUnsupported(raw: string, label: string): void {
-  // <defs> (clip paths) and <g> wrappers are export artifacts that get removed.
-  const inner = raw.replace(/<defs\b[^>]*>[\s\S]*?<\/defs>/g, "");
-  const tags = new Set(
-    [...inner.matchAll(/<([a-zA-Z][\w:-]*)\b/g)].map((m) => m[1])
-  );
-  const unsupported = [...tags].filter(
-    (t) => t !== "g" && !GEOMETRY_TAGS.has(t)
-  );
-  if (unsupported.length > 0) {
-    console.warn(
-      `[clean-svgs] ${label}: unsupported <${unsupported.join(">, <")}> — flatten it in the design tool (e.g. a Repeat exports as <use>); it won't render as designed`
-    );
-  }
-  if (/\stransform="/.test(inner)) {
-    console.warn(
-      `[clean-svgs] ${label}: transform="…" found — reset the rotation/position in the design tool (or flatten the shape) so the exported coordinates are final`
-    );
-  }
-  if (/\sstroke-dasharray="/.test(inner)) {
-    console.warn(
-      `[clean-svgs] ${label}: stroke-dasharray is stripped, so dashes will render as a solid line — draw the dashes as separate strokes`
-    );
-  }
-}
 
 /**
  * Pushes a non-default presentation attribute from the source root onto every
@@ -159,53 +115,28 @@ function stripDefaultAttr(
 }
 
 /**
- * Warns when the static build couldn't merge an icon into one path: some
- * layers need a different line cap or join where it shows (e.g. two cornered
- * strokes, one bevelled and one not). Uses the build's own merge, so the
- * warning matches what ships.
+ * Describes what cleaning discards that changes how the icon renders, so it's
+ * fixed in the design tool rather than silently shipping a different icon.
+ * These can't be checked afterwards: the cleaned file no longer has them.
  */
-function warnUnmergeable(svg: string, label: string): void {
-  const paths = mergePathNodes(stripInheritedAttrs(parseSvg(svg)));
-  if (paths.length < 2) {
-    return;
+export function droppedFeatures(svg: string): string[] {
+  // <defs> (clip paths) are export artifacts whose contents never render.
+  const source = svg.replace(/<defs\b[^>]*>[\s\S]*?<\/defs>/g, "");
+  const dropped: string[] = [];
+  if (/<g\b[^>]*\stransform="/.test(source)) {
+    dropped.push(
+      'transform="…" on a group is dropped when the group is unwrapped — reset the rotation/position in the design tool (or flatten the shape) so the exported coordinates are final'
+    );
   }
-  const describe = ([, attrs]: (typeof paths)[number]) =>
-    `${attrs["stroke-linecap"] ?? DEFAULT_LINECAP} cap + ${attrs["stroke-linejoin"] ?? DEFAULT_LINEJOIN} join`;
-  console.warn(
-    `[clean-svgs] ${label}: ships as ${paths.length} paths, not one — layers need different line styles where they show (${paths.map(describe).join(" / ")}); make them match in the design tool if that's not intended`
-  );
+  if (/\sstroke-dasharray="/.test(source)) {
+    dropped.push(
+      "stroke-dasharray is stripped, so dashes will render as a solid line — draw the dashes as separate strokes"
+    );
+  }
+  return dropped;
 }
 
-// Dots shorter than this are flagged. Tested in desktop Safari, merged into
-// one path with other strokes: 0.0001 is dropped, 0.001 and longer render
-// (the icons' 0.01–0.0156 dots included). 0.005 leaves a 5× margin.
-const MIN_DOT_LENGTH = 0.005;
-
-// Dot length to aim for in the design tool, as in search-alert (0.0805).
-const RECOMMENDED_DOT_LENGTH = 0.08;
-
-/**
- * Warns about dots (tiny square/round-capped strokes) too short to render
- * reliably. Safari drops them once they're merged into one path with the rest
- * of the icon, which the static build does; Chrome draws them. Fixed in the
- * design tool by making the dot longer, which still looks square.
- */
-function warnShortDots(svg: string, label: string): void {
-  const f = (v: number) => String(Number(v.toFixed(4)));
-  for (const [tag, attrs] of stripInheritedAttrs(parseSvg(svg))) {
-    for (const { at, length } of findDots(tag, attrs, MIN_DOT_LENGTH)) {
-      console.warn(
-        `[clean-svgs] ${label}: dot at (${f(at[0])}, ${f(at[1])}) is only ${f(length)} long — Safari drops dots this short once merged; make it about ${RECOMMENDED_DOT_LENGTH} long in the design tool`
-      );
-    }
-  }
-}
-
-export function cleanSvg(
-  svg: string,
-  rootAttrs: string,
-  label: string
-): string {
+export function cleanSvg(svg: string, rootAttrs: string): string {
   const openMatch = svg.match(/^<svg[^>]*>/);
   if (!openMatch) {
     return svg;
@@ -217,10 +148,7 @@ export function cleanSvg(
 
   let inner = svg.slice(openMatch[0].length, closeIdx);
 
-  // Flag export features the pipeline can't keep (checked before unwrapping,
-  // which would silently drop a group's transform), then flatten export
-  // artifacts (defs/clip-path groups).
-  warnUnsupported(inner, label);
+  // Flatten export artifacts (defs/clip-path groups).
   inner = unwrapGroups(inner);
 
   // The root is about to be replaced by the canonical template (miter/butt). If
@@ -265,10 +193,5 @@ export function cleanSvg(
     .replace(/[ \t]*\n\s*\n/g, "\n")
     .trim()}\n`;
 
-  const cleaned = `<svg ${rootAttrs}>${inner}</svg>\n`;
-  if (rootAttrs === VARIANT_ROOT_ATTRS.stroke) {
-    warnUnmergeable(cleaned, label);
-    warnShortDots(cleaned, label);
-  }
-  return cleaned;
+  return `<svg ${rootAttrs}>${inner}</svg>\n`;
 }
