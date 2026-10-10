@@ -1,5 +1,11 @@
 # @jedd-icons/react
 
+## 0.5.1
+
+### Patch Changes
+
+- [#151](https://github.com/jedd-labs/jedd-icons/pull/151) [`e7784cc`](https://github.com/jedd-labs/jedd-icons/commit/e7784ccff24cd47cd94c8bc8de744908fb2439a8) Thanks [@mnove](https://github.com/mnove)! - Refine calendar-number (frame aligned with the other calendar icons) and cog (spoke positions). The square icon's node is now a `path` instead of a `rect`; it renders the same. Icon sources now keep each part as a separate path; the packages still ship one merged path per icon, so there's no visual change.
+
 ## 0.5.0
 
 ### Minor Changes
