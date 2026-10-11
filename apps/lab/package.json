@@ -11,7 +11,7 @@
     "prebuild": "pnpm gen-data",
     "build": "vite build",
     "preview": "vite preview",
-    "types:check": "pnpm gen-data && tsc --noEmit"
+    "typecheck": "pnpm gen-data && tsc --noEmit"
   },
   "dependencies": {
     "@jedd-icons/react": "workspace:*",

@@ -13,7 +13,8 @@
       "outputs": ["src/icons/**", "src/icons-*/**", "src/fill.ts"]
     },
     "typecheck": {
-      "dependsOn": ["^build", "gen"]
+      "dependsOn": ["^build", "gen"],
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/tools/build-icons/**"]
     },
     "test": {},
     "dev": {

@@ -18,7 +18,7 @@
     "deploy": "npm run build && wrangler deploy",
     "deploy:dry": "npm run build && wrangler deploy --dry-run",
     "cf-typegen": "wrangler types",
-    "types:check": "fumadocs-mdx && pnpm gen-data && tsc --noEmit",
+    "typecheck": "fumadocs-mdx && pnpm gen-data && tsc --noEmit",
     "postinstall": "fumadocs-mdx && pnpm gen-data"
   },
   "dependencies": {
