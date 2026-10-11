@@ -53,7 +53,16 @@ export interface AnimatedIconProps<N extends string = string>
     AnimationTriggers<N>,
     AnimationOptions {}
 
-export type AnimationName<N extends string> = N | "default" | PresetName;
+/**
+ * An icon's animation names, suggested by the editor. Any other string is
+ * accepted too (it plays `default`), so every icon fits `AnimatedJeddIcon` —
+ * e.g. in an array of icons or an `icon` prop.
+ */
+export type AnimationName<N extends string> =
+  | N
+  | "default"
+  | PresetName
+  | (string & Record<never, never>);
 
 export type AnimatedJeddIcon<N extends string = string> =
   ForwardRefExoticComponent<

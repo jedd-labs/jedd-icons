@@ -1,0 +1,36 @@
+---
+title: Animations
+description: The presets every icon has, and each icon's own animations.
+icon: Film
+---
+
+import { getMDXComponents } from "@/components/mdx";
+import { OwnAnimationsTable, PresetDemo } from "@/components/animated-demos";
+import Status from "../../_shared/animated-status.mdx";
+
+<Status components={getMDXComponents()} />
+
+An icon plays `default` unless you pick another with `animation` or a named
+trigger (`animateOnHover="pointing"`).
+
+## Presets
+
+Every icon can play these, whatever it depicts:
+
+<PresetDemo />
+
+| Name | What it does |
+| --- | --- |
+| `draw` | Draws each stroke in. The `default` of icons without one of their own. |
+| `draw-loop` | Undraws each stroke and draws it back — made for `loop`. |
+| `pulse` | Shrinks and springs back. |
+| `wiggle` | Rocks side to side. |
+
+## Icons with their own animations
+
+These icons have animations designed for them. Hover a name to play it:
+
+<OwnAnimationsTable />
+
+More icons get their own animations over time; until then they play `draw` by
+default. Want to add one? See [Adding animations](/docs/animated/adding-animations).

@@ -228,6 +228,9 @@ importers:
       '@jedd-icons/react':
         specifier: workspace:*
         version: link:../../packages/react
+      '@jedd-icons/react-animated':
+        specifier: workspace:*
+        version: link:../../packages/react-animated
       '@tanstack/react-router':
         specifier: 'catalog:'
         version: 1.170.32(react-dom@19.2.8(react@19.2.8))(react@19.2.8)

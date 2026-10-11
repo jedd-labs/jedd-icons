@@ -1,0 +1,103 @@
+---
+title: Usage
+description: Play Jedd Icons animations on hover, click, scroll or state.
+icon: Atom
+---
+
+import { getMDXComponents } from "@/components/mdx";
+import { AnimateIconDemo } from "@/components/animated-demos";
+import Status from "../../_shared/animated-status.mdx";
+
+<Status components={getMDXComponents()} />
+
+## Importing icons
+
+Icons have the same names as in `@jedd-icons/react`, so switching is a change
+of import path:
+
+```tsx
+import { ArrowRight } from "@jedd-icons/react"; // [!code --]
+import { ArrowRight } from "@jedd-icons/react-animated"; // [!code ++]
+```
+
+They take the same props (`size`, `color`, `strokeWidth`,
+`absoluteStrokeWidth`, any SVG attribute) and render the same. Without an
+animation prop, an icon never moves.
+
+## Triggers
+
+Add a trigger to make an icon play:
+
+```tsx
+<ArrowRight animateOnHover />         {/* while hovered, back on leave */}
+<Heart animateOnTap />                {/* once per click, to the end */}
+<Check animateOnView />               {/* the first time it scrolls into view */}
+<Loader animate={isLoading} loop />   {/* while `isLoading` is true */}
+```
+
+`animate` is controlled: it plays while true and returns to rest when it turns
+false. With `loop`, the animation repeats for as long as the trigger is active.
+
+## Picking an animation
+
+Each icon plays `default` unless you pick another, by giving the trigger a
+name or with `animation`:
+
+```tsx
+<ArrowRight animateOnHover="pointing" />
+<ArrowRight animateOnHover animation="out" />
+```
+
+Every icon has the presets (`draw`, `draw-loop`, `pulse`, `wiggle`); many have
+their own too — see [Animations](/docs/animated/animations). Your editor
+suggests each icon's names; a name the icon doesn't have plays `default`.
+`ArrowRight.animations` lists them at runtime.
+
+## Animating from a larger element
+
+Usually the icon should react to its button, link or row, not just to the
+icon itself. Wrap that element in `<AnimateIcon>`:
+
+```tsx
+import { AnimateIcon, Trash } from "@jedd-icons/react-animated";
+
+<AnimateIcon animateOnHover asChild>
+  <button type="button">
+    <Trash /> Delete
+  </button>
+</AnimateIcon>
+```
+
+<AnimateIconDemo />
+
+With `asChild` the triggers attach to the button itself; without it,
+`<AnimateIcon>` wraps its children in a `<span>`. Every icon inside follows it,
+and an icon can still set its own `animation` or options — or a trigger of its
+own, which takes over from the wrapper.
+
+## Timing and endings
+
+```tsx
+<ArrowRight animateOnHover delay={150} />          {/* wait 150ms first */}
+<Loader animate loop loopDelay={800} />           {/* pause between runs */}
+<RefreshCw animateOnHover completeOnStop />       {/* finish the spin on a quick hover */}
+<Lock animateOnHover persistOnAnimateEnd />       {/* stay unlocked after leaving */}
+<Heart animate loop initialOnAnimateEnd />        {/* snap back after each run */}
+```
+
+See [Props](/docs/animated/props) for all of them.
+
+## Reduced motion
+
+When the visitor's system asks for reduced motion
+(`prefers-reduced-motion: reduce`), icons don't animate — they stay at rest.
+
+## Using it with the static package
+
+There's no need to: an animated icon without a trigger is the static icon.
+If a file uses both, rename one import:
+
+```tsx
+import { ArrowRight } from "@jedd-icons/react";
+import { ArrowRight as AnimatedArrowRight } from "@jedd-icons/react-animated";
+```
