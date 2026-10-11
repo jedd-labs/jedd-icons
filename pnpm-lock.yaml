@@ -173,12 +173,18 @@ importers:
       '@jedd-icons/react':
         specifier: workspace:*
         version: link:../../packages/react
+      '@jedd-icons/react-animated':
+        specifier: workspace:*
+        version: link:../../packages/react-animated
       '@jedd-icons/shared':
         specifier: workspace:*
         version: link:../../packages/shared
       '@workspace/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      motion:
+        specifier: 'catalog:'
+        version: 13.1.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       react:
         specifier: 'catalog:'
         version: 19.2.8
@@ -319,6 +325,31 @@ importers:
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.18
+      react:
+        specifier: 'catalog:'
+        version: 19.2.8
+      tsdown:
+        specifier: 'catalog:'
+        version: 0.22.14(oxc-resolver@11.24.2)(tsx@4.21.0)(typescript@6.0.3)
+      tsx:
+        specifier: 'catalog:'
+        version: 4.21.0
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+
+  packages/react-animated:
+    dependencies:
+      '@jedd-icons/react':
+        specifier: workspace:^
+        version: link:../react
+    devDependencies:
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.2.18
+      motion:
+        specifier: 'catalog:'
+        version: 13.1.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       react:
         specifier: 'catalog:'
         version: 19.2.8

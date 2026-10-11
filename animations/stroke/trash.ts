@@ -1,0 +1,15 @@
+import type { IconAnimations } from "../types";
+
+// 0: lid, 1: bin, 2: handle.
+export default {
+  groups: { lid: [0, 2] },
+  animations: {
+    default: {
+      lid: {
+        animate: { y: -1.5, rotate: -10 },
+        origin: "0% 100%",
+        transition: { duration: 0.25, ease: "easeOut" },
+      },
+    },
+  },
+} satisfies IconAnimations;

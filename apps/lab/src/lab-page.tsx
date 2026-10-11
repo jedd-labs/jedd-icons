@@ -6,6 +6,7 @@ import { Label } from "@workspace/ui/components/label";
 import { Separator } from "@workspace/ui/components/separator";
 import { Slider } from "@workspace/ui/components/slider";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { AnimatedRender } from "@/components/animated-render";
 import { IconInspector } from "@/components/icon-inspector";
 import { LabCanvas } from "@/components/lab-canvas";
 import { LabLegend } from "@/components/lab-legend";
@@ -569,6 +570,13 @@ export function LabPage() {
                   variant={variant}
                 />
               </div>
+            </div>
+          )}
+
+          {/* Animated package (stroke only for now). */}
+          {node && variant === "stroke" && (
+            <div className="flex w-full max-w-4xl justify-center rounded-none border border-border bg-background p-4">
+              <AnimatedRender name={iconName} strokeWidth={view.strokeWidth} />
             </div>
           )}
         </main>

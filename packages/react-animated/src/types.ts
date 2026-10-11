@@ -1,0 +1,64 @@
+import type { IconProps } from "@jedd-icons/react";
+import type { ForwardRefExoticComponent, RefAttributes } from "react";
+import type { PresetName } from "./presets";
+
+export type { IconNode, IconProps } from "@jedd-icons/react";
+export type {
+  AnimatableValues,
+  Animation,
+  Animations,
+  Easing,
+  Keyframes,
+  PartAnimation,
+  Transition,
+} from "./animation-types";
+export type { PresetName } from "./presets";
+
+/** What starts an animation. A string trigger also picks which animation plays. */
+export interface AnimationTriggers<N extends string = string> {
+  /** Plays while true (controlled). */
+  animate?: boolean | N;
+  /** Plays while hovered. */
+  animateOnHover?: boolean | N;
+  /** Plays once per press, to the end. */
+  animateOnTap?: boolean | N;
+  /** Plays while in the viewport. */
+  animateOnView?: boolean | N;
+  /** IntersectionObserver root margin, e.g. "0px 0px -20% 0px". */
+  animateOnViewMargin?: string;
+  /** Plays the first time it's in view only. Default true. */
+  animateOnViewOnce?: boolean;
+  /** Which animation plays. Default "default". */
+  animation?: N;
+}
+
+/** How an animation plays over time. */
+export interface AnimationOptions {
+  /** Finish the current run before returning to rest when stopped. */
+  completeOnStop?: boolean;
+  /** Milliseconds before it starts. */
+  delay?: number;
+  /** Snap back to rest, without a transition, when a run ends. */
+  initialOnAnimateEnd?: boolean;
+  /** Repeat while active. */
+  loop?: boolean;
+  /** Milliseconds between loops. */
+  loopDelay?: number;
+  /** Stay where the animation ended instead of returning to rest when stopped. */
+  persistOnAnimateEnd?: boolean;
+}
+
+export interface AnimatedIconProps<N extends string = string>
+  extends IconProps,
+    AnimationTriggers<N>,
+    AnimationOptions {}
+
+export type AnimationName<N extends string> = N | "default" | PresetName;
+
+export type AnimatedJeddIcon<N extends string = string> =
+  ForwardRefExoticComponent<
+    AnimatedIconProps<AnimationName<N>> & RefAttributes<SVGSVGElement>
+  > & {
+    /** Every animation this icon can play: its own, then the presets. */
+    readonly animations: readonly AnimationName<N>[];
+  };
