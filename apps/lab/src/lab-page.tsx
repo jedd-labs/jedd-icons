@@ -523,28 +523,41 @@ export function LabPage() {
             )}
           </div>
 
-          {node ? (
-            <div className="flex items-center justify-center overflow-auto rounded-none border border-border bg-muted/10">
-              <LabCanvas
-                fill={variant === "fill"}
-                isolatedPiece={isolatedPiece}
-                margin={getIconMargin(iconName, variant)}
-                node={node}
-                perPiece={view.perPiece}
-                pixelSize={view.zoom}
-                showAnchors={view.anchors}
-                showBounds={view.bounds}
-                showControls={view.controls}
-                showGrid={view.grid}
-                showKeylines={view.keylines}
-                strokeWidth={view.strokeWidth}
-              />
-            </div>
-          ) : (
-            <p className="py-12 text-muted-foreground text-sm">
-              No geometry available for this icon.
-            </p>
-          )}
+          {/* Canvas + animated render, side by side; they wrap when narrow. */}
+          <div className="flex w-full flex-wrap items-stretch justify-center gap-6">
+            {node ? (
+              <div className="flex max-w-full shrink-0 items-center justify-center overflow-auto rounded-none border border-border bg-muted/10">
+                <LabCanvas
+                  fill={variant === "fill"}
+                  isolatedPiece={isolatedPiece}
+                  margin={getIconMargin(iconName, variant)}
+                  node={node}
+                  perPiece={view.perPiece}
+                  pixelSize={view.zoom}
+                  showAnchors={view.anchors}
+                  showBounds={view.bounds}
+                  showControls={view.controls}
+                  showGrid={view.grid}
+                  showKeylines={view.keylines}
+                  strokeWidth={view.strokeWidth}
+                />
+              </div>
+            ) : (
+              <p className="py-12 text-muted-foreground text-sm">
+                No geometry available for this icon.
+              </p>
+            )}
+
+            {/* Animated package (stroke only for now). */}
+            {node && variant === "stroke" && (
+              <div className="flex min-w-72 max-w-xl flex-1 basis-72 items-center justify-center rounded-none border border-border bg-background p-4">
+                <AnimatedRender
+                  name={iconName}
+                  strokeWidth={view.strokeWidth}
+                />
+              </div>
+            )}
+          </div>
 
           {/* Stats */}
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-muted-foreground text-xs tabular-nums">
@@ -570,13 +583,6 @@ export function LabPage() {
                   variant={variant}
                 />
               </div>
-            </div>
-          )}
-
-          {/* Animated package (stroke only for now). */}
-          {node && variant === "stroke" && (
-            <div className="flex w-full max-w-4xl justify-center rounded-none border border-border bg-background p-4">
-              <AnimatedRender name={iconName} strokeWidth={view.strokeWidth} />
             </div>
           )}
         </main>
