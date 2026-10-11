@@ -10,7 +10,6 @@
     "@base-ui/react": "catalog:",
     "@fontsource-variable/figtree": "catalog:",
     "@fontsource-variable/hubot-sans": "catalog:",
-    "@fontsource/iosevka": "catalog:",
     "class-variance-authority": "catalog:",
     "clsx": "catalog:",
     "lucide-react": "catalog:",
