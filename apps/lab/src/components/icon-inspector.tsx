@@ -15,13 +15,17 @@ const ACCENT_TEXT: Record<Accent, string> = {
 /**
  * Shows the current icon's sidecar metadata plus a pass/fail breakdown of every
  * check, with the messages `icons:check` reports for the ones that fail.
+ * `onShowBounds`, when given, adds a link on a failing margin check to turn on
+ * the bounding-box overlay that draws it.
  */
 export function IconInspector({
   name,
   variant,
+  onShowBounds,
 }: {
   name: string;
   variant: Variant;
+  onShowBounds?: () => void;
 }) {
   const issues = getIconIssues(name, variant);
   const meta = getIconMeta(name, variant);
@@ -62,6 +66,15 @@ export function IconInspector({
                       <li key={issue.message}>{issue.message}</li>
                     ))}
                   </ul>
+                )}
+                {failed && check.id === "margin" && onShowBounds && (
+                  <button
+                    className="w-fit text-[10px] text-muted-foreground underline underline-offset-2 hover:text-foreground"
+                    onClick={onShowBounds}
+                    type="button"
+                  >
+                    Show on canvas
+                  </button>
                 )}
               </div>
             </li>

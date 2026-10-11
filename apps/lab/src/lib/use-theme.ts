@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { isTyping } from "@/lib/use-shortcuts";
 
 export type Theme = "light" | "dark";
 
@@ -43,9 +44,7 @@ export function useTheme() {
       if (e.key.toLowerCase() !== "d" || e.metaKey || e.ctrlKey || e.altKey) {
         return;
       }
-      const target = e.target as HTMLElement | null;
-      const tag = target?.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA" || target?.isContentEditable) {
+      if (isTyping(e.target)) {
         return;
       }
       e.preventDefault();

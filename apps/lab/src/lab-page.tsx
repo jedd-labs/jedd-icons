@@ -1,10 +1,11 @@
 import { Button } from "@workspace/ui/components/button";
 import { Checkbox } from "@workspace/ui/components/checkbox";
 import { Input } from "@workspace/ui/components/input";
+import { Kbd } from "@workspace/ui/components/kbd";
 import { Label } from "@workspace/ui/components/label";
 import { Separator } from "@workspace/ui/components/separator";
 import { Slider } from "@workspace/ui/components/slider";
-import { useId, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { IconInspector } from "@/components/icon-inspector";
 import { LabCanvas } from "@/components/lab-canvas";
 import { LabLegend } from "@/components/lab-legend";
@@ -19,14 +20,18 @@ import {
   getIconFlags,
 } from "@/lib/checks";
 import {
+  getIconIssues,
   getIconMargin,
   getIconNode,
   getVariantsWithGeometry,
   ICON_NODE_NAMES,
 } from "@/lib/icon-nodes";
 import { humanizeIconName, type Variant } from "@/lib/icons";
+import { readSelection, writeSelection } from "@/lib/selection-url";
 import { flattenPieces } from "@/lib/svg-path";
+import { useShortcuts } from "@/lib/use-shortcuts";
 import { useTheme } from "@/lib/use-theme";
+import { type Overlay, useViewPrefs } from "@/lib/use-view-prefs";
 
 const DEFAULT_ICON = ICON_NODE_NAMES.includes("alert-circle")
   ? "alert-circle"
@@ -41,6 +46,16 @@ const PIECE_COLORS = [
   "#14b8a6",
   "#ef4444",
   "#eab308",
+];
+
+// Overlay toggles, each with a single-key shortcut.
+const OVERLAYS: { key: Overlay; label: string; shortcut: string }[] = [
+  { key: "grid", label: "Pixel grid", shortcut: "G" },
+  { key: "keylines", label: "Keylines", shortcut: "K" },
+  { key: "anchors", label: "Anchor points", shortcut: "A" },
+  { key: "controls", label: "Control handles", shortcut: "C" },
+  { key: "bounds", label: "Bounding box", shortcut: "B" },
+  { key: "perPiece", label: "Color per piece", shortcut: "P" },
 ];
 
 // Accent styling per check color. Full class strings so Tailwind keeps them.
@@ -79,7 +94,22 @@ const FILTER_ACCENTS: Record<Accent, { active: string; dot: string }> = {
   },
 };
 
-/** A pill that filters the icon list to a flagged subset. Disabled at count 0. */
+/** The variant to show for an icon: the preferred one if it has it. */
+function resolveVariant(name: string, preferred: Variant): Variant {
+  const available = getVariantsWithGeometry(name);
+  return available.includes(preferred) ? preferred : (available[0] ?? "stroke");
+}
+
+function failsMargin(name: string, variant: Variant): boolean {
+  return getIconIssues(name, variant).some((i) => i.rule === "margin");
+}
+
+// Ref callback for the selected list row, so keyboard browsing keeps it in view.
+function scrollIntoView(el: HTMLElement | null) {
+  el?.scrollIntoView({ block: "nearest" });
+}
+
+/** A chip that filters the icon list to a flagged subset. */
 function FilterToggle({
   label,
   count,
@@ -98,50 +128,97 @@ function FilterToggle({
   const a = FILTER_ACCENTS[accent];
   return (
     <button
-      className={`flex w-full items-center gap-2 border px-2 py-1.5 text-left text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+      aria-pressed={active}
+      className={`flex items-center gap-1.5 border px-1.5 py-0.5 text-[11px] transition-colors ${
         active
           ? a.active
           : "border-border text-muted-foreground hover:bg-muted/40 hover:text-foreground"
       }`}
-      disabled={count === 0}
       onClick={onToggle}
       title={hint}
       type="button"
     >
-      <span aria-hidden className={`size-2 shrink-0 rounded-full ${a.dot}`} />
-      <span className="flex-1">{label}</span>
-      <span className="tabular-nums">{count}</span>
+      <span aria-hidden className={`size-1.5 shrink-0 rounded-full ${a.dot}`} />
+      <span>{label}</span>
+      <span className="tabular-nums opacity-70">{count}</span>
+    </button>
+  );
+}
+
+/** Pass/fail summary of the current icon's checks, shown by its title. */
+function CheckStatus({
+  name,
+  variant,
+  onClick,
+}: {
+  name: string;
+  variant: Variant;
+  onClick: () => void;
+}) {
+  const issues = getIconIssues(name, variant);
+  const errors = issues.filter((i) => i.severity === "error").length;
+  const warnings = issues.length - errors;
+  const parts = [
+    errors > 0 && `${errors} error${errors === 1 ? "" : "s"}`,
+    warnings > 0 && `${warnings} warning${warnings === 1 ? "" : "s"}`,
+  ].filter(Boolean);
+
+  let tone = "border-emerald-500/40 text-emerald-600 dark:text-emerald-400";
+  if (errors > 0) {
+    tone = "border-rose-500/50 bg-rose-500/10 text-rose-600 dark:text-rose-400";
+  } else if (warnings > 0) {
+    tone =
+      "border-amber-500/50 bg-amber-500/10 text-amber-600 dark:text-amber-400";
+  }
+
+  return (
+    <button
+      className={`flex items-center gap-1.5 border px-1.5 py-0.5 text-[11px] transition-opacity hover:opacity-80 ${tone}`}
+      onClick={onClick}
+      title="Jump to checks"
+      type="button"
+    >
+      <span aria-hidden>{errors > 0 ? "✕" : warnings > 0 ? "!" : "✓"}</span>
+      {parts.length > 0 ? parts.join(" · ") : "Passes all checks"}
     </button>
   );
 }
 
 export function LabPage() {
   const { theme, toggleTheme } = useTheme();
-  const [iconName, setIconName] = useState(DEFAULT_ICON);
-  const [variantState, setVariantState] = useState<Variant>("stroke");
+  const [initial] = useState(() => readSelection(DEFAULT_ICON));
+  const [iconName, setIconName] = useState(initial.icon);
+  const [variantState, setVariantState] = useState<Variant>(initial.variant);
 
   const availableVariants = getVariantsWithGeometry(iconName);
-  const variant: Variant = availableVariants.includes(variantState)
-    ? variantState
-    : (availableVariants[0] ?? "stroke");
+  const variant = resolveVariant(iconName, variantState);
 
   const node = getIconNode(iconName, variant);
 
   const [query, setQuery] = useState("");
-  const [pixelSize, setPixelSize] = useState(480);
-  const [strokeWidth, setStrokeWidth] = useState(2);
-  const [showGrid, setShowGrid] = useState(true);
-  const [showKeylines, setShowKeylines] = useState(true);
-  const [showAnchors, setShowAnchors] = useState(true);
-  const [showControls, setShowControls] = useState(true);
-  const [showBounds, setShowBounds] = useState(false);
-  const [perPiece, setPerPiece] = useState(false);
+  // Opening on an icon that breaks the margin shows the bounds that draw it.
+  const { view, setPref, toggle } = useViewPrefs(
+    failsMargin(initial.icon, resolveVariant(initial.icon, initial.variant))
+      ? { bounds: true }
+      : undefined
+  );
   const [isolatedPiece, setIsolatedPiece] = useState<number | null>(null);
   // Which check filters are active. Empty = show all icons.
-  const [activeChecks, setActiveChecks] = useState<Set<CheckId>>(new Set());
+  const [activeChecks, setActiveChecks] = useState<Set<CheckId>>(
+    initial.checks
+  );
+
+  const searchRef = useRef<HTMLInputElement>(null);
+  const inspectorRef = useRef<HTMLDivElement>(null);
 
   const pieces = useMemo(() => (node ? flattenPieces(node) : []), [node]);
   const checkCounts = useMemo(() => getCheckCounts(), []);
+  // Checks no icon fails have nothing to filter to, so they get no chip.
+  const failingChecks = CHECKS.filter((c) => checkCounts[c.id] > 0);
+
+  useEffect(() => {
+    writeSelection({ icon: iconName, variant, checks: activeChecks });
+  }, [iconName, variant, activeChecks]);
 
   const toggleCheck = (id: CheckId) => {
     setActiveChecks((prev) => {
@@ -179,20 +256,75 @@ export function LabPage() {
     );
   }, [query, activeChecks]);
 
+  const isFiltering = query.trim() !== "" || activeChecks.size > 0;
+  const clearFilters = () => {
+    setQuery("");
+    setActiveChecks(new Set());
+  };
+
+  // Switching to an icon that breaks the margin turns on the bounds overlay,
+  // so the problem is visible without hunting for the toggle.
+  const revealMarginIssue = (name: string, preferred: Variant) => {
+    if (failsMargin(name, resolveVariant(name, preferred))) {
+      setPref("bounds", true);
+    }
+  };
+
   const setIcon = (name: string) => {
     setIsolatedPiece(null);
     setIconName(name);
+    revealMarginIssue(name, variantState);
   };
 
-  const gridIds = {
-    stroke: useId(),
-    grid: useId(),
-    keylines: useId(),
-    anchors: useId(),
-    controls: useId(),
-    bounds: useId(),
-    perPiece: useId(),
+  const setVariant = (v: Variant) => {
+    setVariantState(v);
+    revealMarginIssue(iconName, v);
   };
+
+  // Move through the filtered list; from outside it, start at either end.
+  const step = (delta: number) => {
+    if (filtered.length === 0) {
+      return;
+    }
+    const i = filtered.indexOf(iconName);
+    const next =
+      i === -1
+        ? delta > 0
+          ? 0
+          : filtered.length - 1
+        : Math.min(filtered.length - 1, Math.max(0, i + delta));
+    setIcon(filtered[next]);
+  };
+
+  useShortcuts({
+    arrowdown: () => step(1),
+    arrowup: () => step(-1),
+    "/": () => searchRef.current?.focus(),
+    escape: () => setIsolatedPiece(null),
+    ...Object.fromEntries(
+      OVERLAYS.map((o) => [o.shortcut.toLowerCase(), () => toggle(o.key)])
+    ),
+  });
+
+  const onSearchKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      step(e.key === "ArrowDown" ? 1 : -1);
+    } else if (e.key === "Enter") {
+      if (filtered.length > 0 && !filtered.includes(iconName)) {
+        setIcon(filtered[0]);
+      }
+      e.currentTarget.blur();
+    } else if (e.key === "Escape") {
+      if (query) {
+        setQuery("");
+      } else {
+        e.currentTarget.blur();
+      }
+    }
+  };
+
+  const overlayId = useId();
 
   const totalAnchors = pieces.reduce((s, p) => s + p.parsed.anchors.length, 0);
   const totalControls = pieces.reduce(
@@ -228,18 +360,25 @@ export function LabPage() {
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
         {/* ── Left: icon picker ─────────────────────────────── */}
         <aside className="flex shrink-0 flex-col overflow-hidden border-border border-b lg:w-64 lg:border-r lg:border-b-0">
-          <div className="flex min-h-0 flex-col p-3">
-            <Input
-              className="mb-2"
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search icons…"
-              type="search"
-              value={query}
-            />
+          <div className="flex min-h-0 flex-1 flex-col p-3">
+            <div className="relative mb-2">
+              <Input
+                className="peer pr-8"
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={onSearchKey}
+                placeholder="Search icons…"
+                ref={searchRef}
+                type="search"
+                value={query}
+              />
+              <Kbd className="absolute top-1.5 right-1.5 peer-focus:hidden">
+                /
+              </Kbd>
+            </div>
 
             {/* Spec-check filters — each narrows the list to a flagged subset. */}
-            <div className="mb-2 flex flex-col gap-1.5">
-              {CHECKS.map((check) => (
+            <div className="mb-2 flex flex-wrap gap-1">
+              {failingChecks.map((check) => (
                 <FilterToggle
                   accent={check.accent}
                   active={activeChecks.has(check.id)}
@@ -252,43 +391,80 @@ export function LabPage() {
               ))}
             </div>
 
+            <div className="mb-1 flex items-center justify-between px-2 text-[10px] text-muted-foreground tabular-nums">
+              <span>
+                {isFiltering
+                  ? `${filtered.length} of ${ICON_NODE_NAMES.length}`
+                  : `${ICON_NODE_NAMES.length} icons`}
+                {activeChecks.size > 1 && " · failing all selected checks"}
+              </span>
+              {isFiltering && (
+                <button
+                  className="hover:text-foreground"
+                  onClick={clearFilters}
+                  type="button"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+
             <div className="min-h-0 flex-1 overflow-y-auto pr-1">
               {filtered.length === 0 ? (
-                <p className="px-2 py-4 text-muted-foreground text-xs">
-                  No icons match.
-                </p>
+                <div className="flex flex-col items-start gap-1 px-2 py-4 text-muted-foreground text-xs">
+                  <p>No icons match.</p>
+                  <Button
+                    className="h-auto p-0 text-xs"
+                    onClick={clearFilters}
+                    size="sm"
+                    variant="link"
+                  >
+                    Clear filters
+                  </Button>
+                </div>
               ) : (
                 <ul className="flex flex-col gap-0.5">
-                  {filtered.map((name) => (
-                    <li key={name}>
-                      <button
-                        className={`flex w-full items-center gap-1.5 px-2 py-1 text-left text-xs transition-colors ${
-                          name === iconName
-                            ? "bg-foreground text-background"
-                            : "text-muted-foreground hover:bg-muted/40 hover:text-foreground"
-                        }`}
-                        onClick={() => setIcon(name)}
-                        type="button"
-                      >
-                        <span className="flex size-4 shrink-0 items-center justify-center">
-                          <IconGlyph name={name} size={16} />
-                        </span>
-                        <span className="flex-1 truncate">{name}</span>
-                        {CHECKS.filter((c) => getIconFlags(name).has(c.id)).map(
-                          (c) => (
+                  {filtered.map((name) => {
+                    const selected = name === iconName;
+                    return (
+                      <li key={name}>
+                        <button
+                          aria-current={selected}
+                          className={`flex w-full items-center gap-1.5 px-2 py-1 text-left text-xs transition-colors ${
+                            selected
+                              ? "bg-foreground text-background"
+                              : "text-muted-foreground hover:bg-muted/40 hover:text-foreground"
+                          }`}
+                          onClick={() => setIcon(name)}
+                          ref={selected ? scrollIntoView : undefined}
+                          type="button"
+                        >
+                          <span className="flex size-4 shrink-0 items-center justify-center">
+                            <IconGlyph name={name} size={16} />
+                          </span>
+                          <span className="flex-1 truncate">{name}</span>
+                          {CHECKS.filter((c) =>
+                            getIconFlags(name).has(c.id)
+                          ).map((c) => (
                             <span
                               className={`size-1.5 shrink-0 rounded-full ${FILTER_ACCENTS[c.accent].dot}`}
                               key={c.id}
                               title={c.hint}
                             />
-                          )
-                        )}
-                      </button>
-                    </li>
-                  ))}
+                          ))}
+                        </button>
+                      </li>
+                    );
+                  })}
                 </ul>
               )}
             </div>
+
+            <p className="flex items-center gap-1.5 px-2 pt-2 text-[10px] text-muted-foreground">
+              <Kbd>↑</Kbd>
+              <Kbd>↓</Kbd>
+              browse icons
+            </p>
           </div>
         </aside>
 
@@ -297,19 +473,31 @@ export function LabPage() {
           {/* Legend — pinned to the top-right corner of the canvas area. */}
           <div className="absolute top-4 right-4 z-10">
             <LabLegend
-              showAnchors={showAnchors}
-              showBounds={showBounds}
-              showControls={showControls}
-              showGrid={showGrid}
-              showKeylines={showKeylines}
+              showAnchors={view.anchors}
+              showBounds={view.bounds}
+              showControls={view.controls}
+              showGrid={view.grid}
+              showKeylines={view.keylines}
             />
           </div>
 
           <div className="flex w-full items-center justify-between gap-3">
-            <div className="flex flex-col">
-              <h2 className="font-medium text-sm">
-                {humanizeIconName(iconName)}
-              </h2>
+            <div className="flex flex-col items-start gap-1">
+              <div className="flex items-center gap-2">
+                <h2 className="font-medium text-sm">
+                  {humanizeIconName(iconName)}
+                </h2>
+                <CheckStatus
+                  name={iconName}
+                  onClick={() =>
+                    inspectorRef.current?.scrollIntoView({
+                      behavior: "smooth",
+                      block: "start",
+                    })
+                  }
+                  variant={variant}
+                />
+              </div>
               <span className="font-mono text-[11px] text-muted-foreground">
                 {iconName}.svg · 24×24
               </span>
@@ -324,7 +512,7 @@ export function LabPage() {
                         : "text-muted-foreground hover:text-foreground"
                     }`}
                     key={v}
-                    onClick={() => setVariantState(v)}
+                    onClick={() => setVariant(v)}
                     type="button"
                   >
                     {v}
@@ -341,14 +529,14 @@ export function LabPage() {
                 isolatedPiece={isolatedPiece}
                 margin={getIconMargin(iconName, variant)}
                 node={node}
-                perPiece={perPiece}
-                pixelSize={pixelSize}
-                showAnchors={showAnchors}
-                showBounds={showBounds}
-                showControls={showControls}
-                showGrid={showGrid}
-                showKeylines={showKeylines}
-                strokeWidth={strokeWidth}
+                perPiece={view.perPiece}
+                pixelSize={view.zoom}
+                showAnchors={view.anchors}
+                showBounds={view.bounds}
+                showControls={view.controls}
+                showGrid={view.grid}
+                showKeylines={view.keylines}
+                strokeWidth={view.strokeWidth}
               />
             </div>
           ) : (
@@ -377,7 +565,7 @@ export function LabPage() {
               <div className="flex items-center justify-center rounded-none border border-border bg-muted/10 p-4">
                 <PackageRender
                   name={iconName}
-                  strokeWidth={strokeWidth}
+                  strokeWidth={view.strokeWidth}
                   variant={variant}
                 />
               </div>
@@ -401,13 +589,13 @@ export function LabPage() {
                   max={720}
                   min={192}
                   onValueChange={(v) =>
-                    setPixelSize(Array.isArray(v) ? v[0] : v)
+                    setPref("zoom", Array.isArray(v) ? v[0] : v)
                   }
                   step={24}
-                  value={[pixelSize]}
+                  value={[view.zoom]}
                 />
                 <span className="w-8 shrink-0 text-right tabular-nums">
-                  {Math.round((pixelSize / 24) * 10) / 10}×
+                  {Math.round((view.zoom / 24) * 10) / 10}×
                 </span>
               </div>
 
@@ -421,13 +609,13 @@ export function LabPage() {
                     max={3}
                     min={0.5}
                     onValueChange={(v) =>
-                      setStrokeWidth(Array.isArray(v) ? v[0] : v)
+                      setPref("strokeWidth", Array.isArray(v) ? v[0] : v)
                     }
                     step={0.25}
-                    value={[strokeWidth]}
+                    value={[view.strokeWidth]}
                   />
                   <span className="w-8 shrink-0 text-right tabular-nums">
-                    {strokeWidth.toFixed(2)}
+                    {view.strokeWidth.toFixed(2)}
                   </span>
                 </div>
               )}
@@ -440,28 +628,15 @@ export function LabPage() {
               <span className="font-medium text-muted-foreground">
                 Overlays
               </span>
-              {(
-                [
-                  ["grid", "Pixel grid", showGrid, setShowGrid],
-                  ["keylines", "Keylines", showKeylines, setShowKeylines],
-                  ["anchors", "Anchor points", showAnchors, setShowAnchors],
-                  [
-                    "controls",
-                    "Control handles",
-                    showControls,
-                    setShowControls,
-                  ],
-                  ["bounds", "Bounding box", showBounds, setShowBounds],
-                  ["perPiece", "Color per piece", perPiece, setPerPiece],
-                ] as const
-              ).map(([key, label, value, setter]) => (
-                <Label htmlFor={gridIds[key]} key={key}>
+              {OVERLAYS.map(({ key, label, shortcut }) => (
+                <Label htmlFor={`${overlayId}-${key}`} key={key}>
                   <Checkbox
-                    checked={value}
-                    id={gridIds[key]}
-                    onCheckedChange={(c) => setter(c === true)}
+                    checked={view[key]}
+                    id={`${overlayId}-${key}`}
+                    onCheckedChange={(c) => setPref(key, c === true)}
                   />
                   <span className="text-muted-foreground">{label}</span>
+                  <Kbd className="ml-auto">{shortcut}</Kbd>
                 </Label>
               ))}
             </div>
@@ -469,7 +644,15 @@ export function LabPage() {
             <Separator />
 
             {/* Checks + sidecar metadata for the current icon */}
-            <IconInspector name={iconName} variant={variant} />
+            <div className="scroll-mt-4" ref={inspectorRef}>
+              <IconInspector
+                name={iconName}
+                onShowBounds={
+                  view.bounds ? undefined : () => setPref("bounds", true)
+                }
+                variant={variant}
+              />
+            </div>
 
             <Separator />
 
@@ -481,12 +664,13 @@ export function LabPage() {
                 </span>
                 {isolatedPiece !== null && (
                   <Button
-                    className="h-auto p-0 text-xs"
+                    className="h-auto gap-1.5 p-0 text-xs"
                     onClick={() => setIsolatedPiece(null)}
                     size="sm"
                     variant="link"
                   >
                     Show all
+                    <Kbd>Esc</Kbd>
                   </Button>
                 )}
               </div>
