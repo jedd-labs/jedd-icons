@@ -19,8 +19,9 @@ A pnpm + Turbo monorepo that builds and distributes a set of SVG icons as publis
 - `pnpm lint` / `pnpm check` — `ultracite check` (Biome). `pnpm format` / `pnpm fix` — `ultracite fix`.
 - `pnpm typecheck` — `turbo typecheck` (per-package `tsc --noEmit`).
 - `pnpm knip` — find unused files, exports, and dependencies. **Run after removing code or deps.**
+- `pnpm test` — `turbo test`: vitest suites in `tools/build-icons` (cleaning, check rules, codegen, geometry) and `packages/shared`.
 
-There is **no test suite** in this repo. The quality gate is lint + typecheck + knip. Locally it's enforced by Lefthook git hooks (pre-commit lints staged files; pre-push runs `turbo typecheck` + `ultracite check`). In CI, the `verify` job runs build → typecheck → lint → `pnpm knip` on every PR and push to `main`, and is a required status check on `main`. Bypass the local hooks with `git commit --no-verify` or `LEFTHOOK=0 git push`.
+The quality gate is `icons:check` + lint + test + typecheck + knip. Locally it's enforced by Lefthook git hooks (pre-commit lints staged files; pre-push runs `turbo typecheck` + `ultracite check`). CI (`.github/workflows/ci.yml`) runs on every PR and push to `main` as two jobs, both required status checks on `main`: `Icons` runs `pnpm icons:check` (no build needed; issues show as annotations on the PR's files), and `Lint, typecheck & build` runs lint → test → build → typecheck. `pnpm knip` is not in CI yet. Bypass the local hooks with `git commit --no-verify` or `LEFTHOOK=0 git push`.
 
 Node >= 20, pnpm 11.5.1. Dependency versions are pinned centrally in `pnpm-workspace.yaml` under `catalog:` — packages reference `"catalog:"` instead of literal versions, so add/bump deps there.
 

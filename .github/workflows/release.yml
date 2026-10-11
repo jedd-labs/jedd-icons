@@ -31,9 +31,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # Skip lefthook git hooks in CI. The changesets action makes internal
-      # commits/pushes; the pre-push hook runs `turbo typecheck`, which fails in
-      # this job because it never builds the generated artifacts that typecheck
-      # needs (shared/dist, generated icons/). Hooks are a local-dev gate only.
+      # commits/pushes, which would trigger the pre-push typecheck + lint; the
+      # CI workflow already gates main, so hooks are a local-dev gate only.
       LEFTHOOK: "0"
     steps:
       - name: Checkout

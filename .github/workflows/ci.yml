@@ -16,6 +16,34 @@ permissions:
   contents: read
 
 jobs:
+  # Source SVGs + their .json metadata. Needs no build, so icon problems are
+  # reported within seconds, as annotations on the PR's changed files.
+  icons:
+    name: Icons
+    runs-on: ubuntu-latest
+    env:
+      # Don't run lefthook git hooks in CI — this workflow runs the checks
+      # explicitly below, and the hooks would only duplicate (or interfere).
+      LEFTHOOK: "0"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check icons
+        run: pnpm icons:check
+
   verify:
     name: Lint, typecheck & build
     runs-on: ubuntu-latest
@@ -39,13 +67,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # Build first: typecheck depends on generated artifacts (generated icons/,
-      # shared/dist) that only exist after a build.
+      # Cheap checks first, so they fail before the build runs.
+      - name: Lint
+        run: pnpm lint
+
+      - name: Test
+        run: pnpm test
+
       - name: Build
         run: pnpm build
 
       - name: Typecheck
         run: pnpm typecheck
-
-      - name: Lint
-        run: pnpm lint

@@ -25,7 +25,7 @@ pre-commit:
       glob: "*.{js,jsx,ts,tsx,json,jsonc}"
       run: pnpm exec ultracite check {staged_files}
 
-# Quality gate before pushing — CI does not run lint/typecheck on PRs, so this is it.
+# Quick gate before pushing; CI runs the same checks (and more) on every PR.
 pre-push:
   parallel: true
   commands:

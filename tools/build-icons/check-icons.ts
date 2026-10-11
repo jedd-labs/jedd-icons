@@ -6,11 +6,13 @@
  * Exits 1 on any error; warnings flag what may be intended.
  *
  * Auto-discovers variant subdirectories under icons/ (e.g. stroke/, fill/).
+ * On GitHub Actions, issues are printed as annotations so they show on the
+ * PR's changed files.
  *
  * Usage: tsx tools/build-icons/check-icons.ts
  */
 import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { checkIcon, checkMetadata } from "./check-icons.lib";
 import type { Issue } from "./check-rules";
@@ -26,16 +28,39 @@ const variants = readdirSync(ICONS_DIR, { withFileTypes: true })
   .map((d) => d.name)
   .sort();
 
+const GITHUB_ACTIONS = process.env.GITHUB_ACTIONS === "true";
+
 let checked = 0;
 let errors = 0;
 let warnings = 0;
 
+// Escaping for GitHub workflow commands: https://github.com/actions/toolkit/blob/main/packages/core/src/command.ts
+function escapeData(s: string) {
+  return s
+    .replaceAll("%", "%25")
+    .replaceAll("\r", "%0D")
+    .replaceAll("\n", "%0A");
+}
+
+function escapeProperty(s: string) {
+  return escapeData(s).replaceAll(":", "%3A").replaceAll(",", "%2C");
+}
+
+/** `file` is relative to icons/, e.g. `stroke/arrow-down.svg`. */
 function report(file: string, { severity, message }: Issue) {
   if (severity === "error") {
     errors++;
-    console.error(`[check-icons] ${file}: error: ${message}`);
   } else {
     warnings++;
+  }
+  if (GITHUB_ACTIONS) {
+    const path = escapeProperty(`icons/${file}`);
+    console.log(
+      `::${severity} file=${path},title=icons%3Acheck::${escapeData(`${file}: ${message}`)}`
+    );
+  } else if (severity === "error") {
+    console.error(`[check-icons] ${file}: error: ${message}`);
+  } else {
     console.warn(`[check-icons] ${file}: warning: ${message}`);
   }
 }
@@ -56,8 +81,13 @@ for (const variant of variants) {
     const meta = existsSync(metaPath)
       ? readFileSync(metaPath, "utf8")
       : undefined;
-    for (const issue of [...checkIcon(svg, variant), ...checkMetadata(meta)]) {
+    for (const issue of checkIcon(svg, variant)) {
       report(`${variant}/${file}`, issue);
+    }
+    // Point metadata issues at the .json, unless it's the one that's missing.
+    const metaFile = meta === undefined ? file : basename(metaPath);
+    for (const issue of checkMetadata(meta)) {
+      report(`${variant}/${metaFile}`, issue);
     }
   }
   for (const file of entries.filter((f) => f.endsWith(".json")).sort()) {

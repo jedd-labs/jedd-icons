@@ -5,7 +5,11 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".env*",
+        "$TURBO_ROOT$/tools/build-icons/**"
+      ],
       "outputs": [".output/**", "dist/**"]
     },
     "gen": {
