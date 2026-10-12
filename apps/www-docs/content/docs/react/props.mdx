@@ -25,6 +25,9 @@ attributes** (`className`, `onClick`, `style`, `aria-*`, `focusable`, …).
 | `strokeWidth` | `2` | stroke variant only |
 | `absoluteStrokeWidth` | `false` | see below |
 
+To change these defaults for every icon, wrap your app in `JeddProvider` — see
+[Global styling](/docs/react/global-styling).
+
 import { getMDXComponents } from "@/components/mdx";
 import StylingModel from "../../_shared/styling-model.mdx";
 
@@ -39,10 +42,17 @@ In React the variant is fixed by which entry point you import from —
 ## Exported types
 
 ```ts
-import type { IconProps, JeddIcon, IconNode, Variant } from "@jedd-icons/react";
+import type {
+  IconProps,
+  JeddIcon,
+  JeddProviderProps,
+  IconNode,
+  Variant,
+} from "@jedd-icons/react";
 ```
 
 - **`IconProps`** — the props every icon accepts (extends `SVGProps`).
 - **`JeddIcon`** — the type of an icon component (`ForwardRefExoticComponent`).
+- **`JeddProviderProps`** — the props `JeddProvider` accepts.
 - **`IconNode`** — the raw icon geometry tuple.
 - **`Variant`** — `"stroke" | "fill"`.

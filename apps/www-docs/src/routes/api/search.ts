@@ -51,15 +51,22 @@ const fillIndexes = fillNames.map((name) => ({
   tag: "icons",
 }));
 
-const server = createSearchAPI("advanced", {
-  language: "english",
-  indexes: [...docsIndexes, ...strokeIndexes, ...fillIndexes],
-});
+// Built on the first request, not at module load: Orama yields with
+// setTimeout while indexing, which Cloudflare Workers forbids in global scope.
+let server: ReturnType<typeof createSearchAPI> | undefined;
+
+function getServer() {
+  server ??= createSearchAPI("advanced", {
+    language: "english",
+    indexes: [...docsIndexes, ...strokeIndexes, ...fillIndexes],
+  });
+  return server;
+}
 
 export const Route = createFileRoute("/api/search")({
   server: {
     handlers: {
-      GET: async ({ request }) => server.GET(request),
+      GET: async ({ request }) => getServer().GET(request),
     },
   },
 });
