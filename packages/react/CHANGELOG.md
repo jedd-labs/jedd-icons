@@ -1,5 +1,11 @@
 # @jedd-icons/react
 
+## 0.6.1
+
+### Patch Changes
+
+- [#161](https://github.com/jedd-labs/jedd-icons/pull/161) [`98a1dbc`](https://github.com/jedd-labs/jedd-icons/commit/98a1dbc3060646fc6ba325e47c757c80c78d35dc) Thanks [@mnove](https://github.com/mnove)! - `@jedd-icons/react` and `@jedd-icons/core` now always release together under the same version number.
+
 ## 0.6.0
 
 ### Minor Changes
