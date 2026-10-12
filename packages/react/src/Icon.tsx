@@ -2,6 +2,7 @@
 
 import { resolveStrokeWidth, variantDefaultsCamel } from "@jedd-icons/shared";
 import { createElement, forwardRef, type ReactNode } from "react";
+import { useJeddContext } from "./JeddProvider";
 import type { IconNode, IconNodeChild, IconProps, Variant } from "./types";
 
 interface InternalProps extends IconProps {
@@ -14,16 +15,24 @@ const Icon = forwardRef<SVGSVGElement, InternalProps>(
     {
       iconNode,
       variant = "stroke",
-      size = 24,
-      color = "currentColor",
-      strokeWidth = 2,
-      absoluteStrokeWidth = false,
+      size: sizeProp,
+      color: colorProp,
+      strokeWidth: strokeWidthProp,
+      absoluteStrokeWidth: absoluteStrokeWidthProp,
       className,
       children,
       ...rest
     },
     ref
   ) => {
+    // Precedence: icon prop → nearest JeddProvider → built-in default.
+    const context = useJeddContext();
+    const size = sizeProp ?? context.size ?? 24;
+    const color = colorProp ?? context.color ?? "currentColor";
+    const strokeWidth = strokeWidthProp ?? context.strokeWidth ?? 2;
+    const absoluteStrokeWidth =
+      absoluteStrokeWidthProp ?? context.absoluteStrokeWidth ?? false;
+
     const defaults = variantDefaultsCamel[variant];
 
     const hasA11y =

@@ -1,0 +1,82 @@
+---
+title: Global styling
+description: Set default size, color, and stroke width for every icon.
+icon: Globe
+---
+
+To change the defaults for every icon in your app — for example a lighter
+stroke of **1.5** — wrap it in `JeddProvider` or use CSS.
+
+## JeddProvider
+
+`JeddProvider` sets default `size`, `color`, `strokeWidth`, and
+`absoluteStrokeWidth` for every icon inside it, from both `@jedd-icons/react`
+and `@jedd-icons/react/fill`:
+
+```tsx
+import { Check, JeddProvider } from "@jedd-icons/react";
+
+export function App() {
+  return (
+    <JeddProvider strokeWidth={1.5}>
+      <Check />                   {/* stroke 1.5 */}
+      <Check strokeWidth={3} />   {/* a prop on the icon still wins */}
+    </JeddProvider>
+  );
+}
+```
+
+Each value is resolved in this order: the prop on the icon, then the nearest
+`JeddProvider`, then the built-in default (`24`, `currentColor`, `2`, `false`).
+
+<TypeTable
+  type={{
+    size: { type: "number | string", description: "Default width and height." },
+    color: { type: "string", description: "Default stroke (stroke variant) or fill (fill variant)." },
+    strokeWidth: { type: "number | string", description: "Default stroke width. Ignored by the fill variant." },
+    absoluteStrokeWidth: { type: "boolean", description: "Keep a constant visual stroke width at any size by default." },
+  }}
+/>
+
+### Nesting providers
+
+A nested provider only overrides the values it sets and keeps the rest from
+the provider above it:
+
+```tsx
+<JeddProvider strokeWidth={1.5} color="#0f172a">
+  <Sidebar />
+  <JeddProvider size={16}>
+    {/* 16px, stroke 1.5, #0f172a */}
+    <Toolbar />
+  </JeddProvider>
+</JeddProvider>
+```
+
+<Callout type="info">
+  `JeddProvider` uses React context, so it's a client component (marked
+  `"use client"`, like the icons). With React Server Components you can still
+  render it from a server layout and pass your server components as its
+  children.
+</Callout>
+
+## CSS
+
+Every icon carries the `jedd` class, so a stylesheet rule also works and needs
+no wrapper:
+
+```css
+.jedd {
+  stroke-width: 1.5;
+}
+```
+
+<Callout type="warn">
+  CSS takes precedence over the attributes the props set, so wherever this rule
+  applies, `strokeWidth` on an individual icon stops working (as does `size`,
+  if you also set `width` / `height` in CSS). Use `JeddProvider` if you want
+  per-icon props to keep overriding the default.
+</Callout>
+
+See the [props reference](/docs/react/props) for keeping the stroke constant
+at any size with CSS.

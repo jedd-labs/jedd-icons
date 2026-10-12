@@ -37,3 +37,24 @@ these.
   /* style one specific icon */
 }
 ```
+
+You can also set defaults for every icon this way, for example a lighter stroke:
+
+```css
+.jedd {
+  stroke-width: 1.5;
+}
+```
+
+CSS takes precedence over the attributes the options set, so where a rule like
+this applies, setting `strokeWidth` on a single icon has no effect.
+
+To keep the stroke the same visual thickness at any size with CSS — the
+equivalent of `absoluteStrokeWidth`, but also when the size comes from CSS
+`width` / `height` — add `vector-effect` to the icon's shapes:
+
+```css
+.jedd * {
+  vector-effect: non-scaling-stroke;
+}
+```
