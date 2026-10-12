@@ -51,14 +51,12 @@
     "dev": "pnpm gen && tsdown --config-loader tsx --watch",
     "typecheck": "tsc --noEmit"
   },
-  "dependencies": {
-    "@jedd-icons/react": "workspace:^"
-  },
   "peerDependencies": {
     "motion": "^13",
     "react": "^17 || ^18 || ^19"
   },
   "devDependencies": {
+    "@jedd-icons/shared": "workspace:*",
     "@types/react": "catalog:",
     "motion": "catalog:",
     "react": "catalog:",

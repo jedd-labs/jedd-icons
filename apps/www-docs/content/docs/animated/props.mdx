@@ -9,7 +9,7 @@ import Status from "../../_shared/animated-status.mdx";
 
 <Status components={getMDXComponents()} />
 
-Animated icons accept **every prop of `@jedd-icons/react`** — `size`, `color`,
+Animated icons accept **every prop of `@jedd-icons/react`'s icons** — `size`, `color`,
 `strokeWidth`, `absoluteStrokeWidth` and all SVG attributes (see
 [React props](/docs/react/props)) — plus the props below.
 
@@ -61,6 +61,9 @@ and any HTML attribute, passed to the `<span>` (or merged onto the child with
 An icon inside follows the wrapper's trigger. Its own `animation` and options
 win over the wrapper's; its own trigger, when active, takes over.
 
+To set any of these for every icon at once, wrap your app in `JeddProvider` —
+see [Global styling](/docs/animated/global-styling).
+
 ## Exported types
 
 ```ts
@@ -71,6 +74,8 @@ import type {
   AnimationName,
   AnimationOptions,
   AnimationTriggers,
+  JeddProviderProps,
+  ReducedMotion,
 } from "@jedd-icons/react-animated";
 ```
 
@@ -80,3 +85,5 @@ import type {
 - **`AnimateIconProps`** — the props of `<AnimateIcon>`.
 - **`AnimationTriggers`** / **`AnimationOptions`** — the two groups of props
   above.
+- **`JeddProviderProps`** — the props `JeddProvider` accepts.
+- **`ReducedMotion`** — `"user" | "always" | "never"`.

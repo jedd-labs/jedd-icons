@@ -5,6 +5,7 @@ import {
   Check,
   Download,
   Heart,
+  JeddProvider,
   Loader,
   Lock,
   presets,
@@ -150,6 +151,40 @@ export function OwnAnimationsTable() {
           ))}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+const PROVIDER_ICONS = [ArrowRight, RefreshCw, Trash, Settings, Loader];
+
+function ProviderRow({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-6 bg-background px-5 py-4">
+      <span className="w-48 shrink-0 font-mono text-[11px] text-muted-foreground">
+        {label}
+      </span>
+      <div className="flex flex-wrap gap-5">
+        {PROVIDER_ICONS.map((Icon) => (
+          <Icon animateOnHover key={Icon.displayName} size={28} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** The same icons without and with a `JeddProvider` — hover them quickly. */
+export function ProviderDemo({ className }: { className?: string }) {
+  return (
+    <div
+      className={cn(
+        "not-prose flex flex-col gap-px border border-border bg-border/40",
+        className
+      )}
+    >
+      <ProviderRow label="no provider" />
+      <JeddProvider completeOnStop strokeWidth={1.5}>
+        <ProviderRow label="strokeWidth={1.5} completeOnStop" />
+      </JeddProvider>
     </div>
   );
 }

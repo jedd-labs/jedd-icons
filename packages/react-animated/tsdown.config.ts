@@ -7,8 +7,10 @@ export default defineConfig({
   // One output module per source file, so each icon tree-shakes on its own.
   unbundle: true,
   deps: {
-    // Peer dependencies and @jedd-icons/react (whose Icon renders every
-    // animated icon) are installed alongside — never bundle them.
-    neverBundle: ["react", "react/jsx-runtime", "motion", "@jedd-icons/react"],
+    // Peer dependencies — never bundle them.
+    neverBundle: ["react", "react/jsx-runtime", "motion"],
+    // @jedd-icons/shared is an internal monorepo package — bundle it in so the
+    // published package depends on no other Jedd package.
+    alwaysBundle: ["@jedd-icons/shared"],
   },
 });

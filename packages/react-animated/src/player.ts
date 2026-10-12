@@ -5,6 +5,7 @@ import {
   type DOMKeyframesDefinition,
 } from "motion";
 import type { Animation, Value } from "./animation-types";
+import type { ReducedMotion } from "./JeddProvider";
 
 /** How a play behaves over time; see `AnimationOptions` in `types.ts`. */
 export interface PlayOptions {
@@ -16,6 +17,7 @@ export interface PlayOptions {
   /** Milliseconds between runs when looping. */
   loopDelay: number;
   persistOnAnimateEnd: boolean;
+  reducedMotion: ReducedMotion;
 }
 
 /** Plays animations on one rendered icon. Framework-free: it only needs the `<svg>`. */
@@ -52,9 +54,11 @@ const PATH_LENGTH_ATTRS = [
 
 const PART_INDEX = /^\d+$/;
 
-const prefersReducedMotion = () =>
-  typeof window !== "undefined" &&
-  window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+const reduceMotion = (setting: ReducedMotion) =>
+  setting === "always" ||
+  (setting === "user" &&
+    typeof window !== "undefined" &&
+    window.matchMedia?.("(prefers-reduced-motion: reduce)").matches);
 
 export function createPlayer(svg: SVGSVGElement): Player {
   // Every element animated so far, with the values to return it to.
@@ -212,7 +216,7 @@ export function createPlayer(svg: SVGSVGElement): Player {
     cancel();
     active = true;
     current = options;
-    if (prefersReducedMotion()) {
+    if (reduceMotion(options.reducedMotion)) {
       return;
     }
     if (options.delay > 0 && !(await sleep(options.delay))) {

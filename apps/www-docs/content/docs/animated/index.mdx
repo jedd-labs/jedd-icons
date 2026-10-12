@@ -21,9 +21,11 @@ Hover the icons below:
 
 ## How it works
 
-- **Same icons, same look at rest.** Each icon renders through
-  `@jedd-icons/react`, so an animated icon that isn't playing is pixel-for-pixel
-  the static one. Swapping the import is the whole migration.
+- **Same icons, same look at rest.** Icons are built from the same source SVGs
+  and styling as `@jedd-icons/react`, so an animated icon that isn't playing
+  looks exactly like the static one. Swapping the import is the whole
+  migration.
+- **Standalone.** It depends on no other Jedd package — just React and Motion.
 - **Every icon animates.** All icons get the [presets](/docs/animated/animations#presets)
   — `draw`, `draw-loop`, `pulse`, `wiggle`. Many also have animations designed
   for what they depict: the arrow points, the trash lid lifts, the loader
@@ -31,7 +33,7 @@ Hover the icons below:
 - **Built on [Motion](https://motion.dev).** Motion is a peer dependency, so
   apps that already use it don't ship it twice.
 - **Respects reduced motion.** Visitors who ask their OS for reduced motion see
-  still icons.
+  still icons — or choose otherwise with [`JeddProvider`](/docs/animated/global-styling).
 
 ## Next steps
 

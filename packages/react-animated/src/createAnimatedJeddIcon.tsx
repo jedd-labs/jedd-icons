@@ -1,6 +1,5 @@
 "use client";
 
-import { Icon } from "@jedd-icons/react";
 import {
   createElement,
   forwardRef,
@@ -9,6 +8,8 @@ import {
   useMemo,
   useRef,
 } from "react";
+import Icon from "./Icon";
+import { useJeddContext } from "./JeddProvider";
 import { createPlayer, type Player, type PlayOptions } from "./player";
 import { presets } from "./presets";
 import type {
@@ -47,14 +48,18 @@ function pickAnimation(
   );
 }
 
-/** Its own options, then the parent's, then the defaults. A tap plays to the end. */
+/**
+ * Each option from the icon, then the <AnimateIcon> around it, then the
+ * nearest JeddProvider, then the default. A tap always plays to the end.
+ */
 function playOptions(
   own: AnimationOptions,
   inherited: AnimationOptions,
+  provider: ReturnType<typeof useJeddContext>,
   tap: boolean
 ): PlayOptions {
   const pick = <K extends keyof AnimationOptions>(key: K) =>
-    own[key] ?? inherited[key];
+    own[key] ?? inherited[key] ?? provider[key];
   return {
     completeOnStop: (pick("completeOnStop") ?? false) || tap,
     delay: pick("delay") ?? 0,
@@ -62,14 +67,15 @@ function playOptions(
     loop: pick("loop") ?? false,
     loopDelay: pick("loopDelay") ?? 0,
     persistOnAnimateEnd: pick("persistOnAnimateEnd") ?? false,
+    reducedMotion: provider.reducedMotion ?? "user",
   };
 }
 
 /**
  * An animated icon component. `iconNode` is the icon's unmerged source
  * geometry with `data-part`/`data-group` markers; `animations` are the icon's
- * own, played on top of the presets. Renders through `@jedd-icons/react`'s
- * `Icon`, so it takes the same props and renders the same at rest.
+ * own, played on top of the presets. Takes the same props as the icons of
+ * `@jedd-icons/react` and renders the same at rest (see `Icon.tsx`).
  */
 export default function createAnimatedJeddIcon<N extends string = never>(
   iconName: string,
@@ -113,6 +119,7 @@ export default function createAnimatedJeddIcon<N extends string = never>(
       const svgRef = useRef<SVGSVGElement>(null);
       const playerRef = useRef<Player | null>(null);
       const parent = useContext(AnimateIconContext);
+      const provider = useJeddContext();
       const own = useTrigger(
         {
           animate,
@@ -139,6 +146,7 @@ export default function createAnimatedJeddIcon<N extends string = never>(
           persistOnAnimateEnd,
         },
         parent?.options ?? {},
+        provider,
         own.trigger ? own.tap : Boolean(parent?.tap)
       );
 
@@ -174,6 +182,7 @@ export default function createAnimatedJeddIcon<N extends string = never>(
         options.loop,
         options.loopDelay,
         options.persistOnAnimateEnd,
+        options.reducedMotion,
       ]);
 
       const setRefs = useMemo(() => mergeRefs(ref, svgRef), [ref]);

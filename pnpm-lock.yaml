@@ -342,11 +342,10 @@ importers:
         version: 6.0.3
 
   packages/react-animated:
-    dependencies:
-      '@jedd-icons/react':
-        specifier: workspace:^
-        version: link:../react
     devDependencies:
+      '@jedd-icons/shared':
+        specifier: workspace:*
+        version: link:../shared
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.18

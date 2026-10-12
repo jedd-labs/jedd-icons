@@ -10,7 +10,8 @@ Jedd icons for React that animate, powered by [Motion](https://motion.dev).
 pnpm add @jedd-icons/react-animated motion
 ```
 
-> Requires React 17, 18 or 19 and Motion 13 (peer dependencies).
+> Requires React 17, 18 or 19 and Motion 13 (peer dependencies). Standalone:
+> it needs no other Jedd package.
 
 ## Usage
 
@@ -53,6 +54,25 @@ and some have their own animations; `ArrowRight.animations` lists them.
 | `initialOnAnimateEnd` | `false` | Snap back to rest when a run ends. |
 
 Animations don't play for users who ask for reduced motion.
+
+## Global defaults
+
+`JeddProvider` sets defaults for every icon inside it: the styling props of
+`@jedd-icons/react`'s provider (`size`, `color`, `strokeWidth`,
+`absoluteStrokeWidth`), the animation options above, and `reducedMotion`
+(`"user"` follows the OS setting, `"always"` never animates, `"never"` always
+does). A prop on an icon still wins.
+
+```tsx
+import { JeddProvider } from "@jedd-icons/react-animated";
+
+<JeddProvider strokeWidth={1.5} completeOnStop>
+  <App />
+</JeddProvider>
+```
+
+It only reaches animated icons; static icons from `@jedd-icons/react` use that
+package's own `JeddProvider`. The `.jedd` CSS class styles both.
 
 ## License
 

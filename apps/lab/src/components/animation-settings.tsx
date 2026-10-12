@@ -13,6 +13,7 @@ import { cn } from "@workspace/ui/lib/utils";
 import { useId } from "react";
 import {
   type AnimationPrefs,
+  REDUCED_MOTION,
   TRIGGERS,
   type Trigger,
   type useAnimationPrefs,
@@ -93,6 +94,56 @@ function MsField({
   );
 }
 
+/** A labelled dropdown of options, each showing the prop it comes to. */
+function SelectRow<V extends string>({
+  hint,
+  label,
+  onChange,
+  options,
+  value,
+}: {
+  hint?: string;
+  label: string;
+  onChange: (value: V) => void;
+  options: readonly { value: V; label: string; props: string }[];
+  value: V;
+}) {
+  const current = options.find((o) => o.value === value);
+  return (
+    <div className="flex items-center gap-2" title={hint}>
+      <span className="w-20 shrink-0 text-muted-foreground">{label}</span>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          className={cn(
+            buttonVariants({ variant: "outline", size: "sm" }),
+            "min-w-0 flex-1 justify-between font-normal"
+          )}
+        >
+          {current?.label}
+          <span className="truncate font-mono text-[10px] text-muted-foreground">
+            {current?.props}
+          </span>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuRadioGroup
+            onValueChange={(v) => onChange(v as V)}
+            value={value}
+          >
+            {options.map((o) => (
+              <DropdownMenuRadioItem closeOnClick key={o.value} value={o.value}>
+                {o.label}
+                <span className="ml-auto font-mono text-[10px] text-muted-foreground">
+                  {o.props}
+                </span>
+              </DropdownMenuRadioItem>
+            ))}
+          </DropdownMenuRadioGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  );
+}
+
 /** The animated render's trigger and options, for the Lab's sidebar. */
 export function AnimationSettings({
   prefs,
@@ -101,7 +152,6 @@ export function AnimationSettings({
   isDefault,
 }: ReturnType<typeof useAnimationPrefs>) {
   const id = useId();
-  const trigger = TRIGGERS.find((t) => t.value === prefs.trigger);
   const set =
     <K extends keyof AnimationPrefs>(key: K) =>
     (value: AnimationPrefs[K]) =>
@@ -123,41 +173,12 @@ export function AnimationSettings({
         )}
       </div>
 
-      <div className="flex items-center gap-2">
-        <span className="w-20 shrink-0 text-muted-foreground">Trigger</span>
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            className={cn(
-              buttonVariants({ variant: "outline", size: "sm" }),
-              "flex-1 justify-between font-normal"
-            )}
-          >
-            {trigger?.label}
-            <span className="font-mono text-[10px] text-muted-foreground">
-              {trigger?.props}
-            </span>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuRadioGroup
-              onValueChange={(v) => setPref("trigger", v as Trigger)}
-              value={prefs.trigger}
-            >
-              {TRIGGERS.map((t) => (
-                <DropdownMenuRadioItem
-                  closeOnClick
-                  key={t.value}
-                  value={t.value}
-                >
-                  {t.label}
-                  <span className="ml-auto font-mono text-[10px] text-muted-foreground">
-                    {t.props}
-                  </span>
-                </DropdownMenuRadioItem>
-              ))}
-            </DropdownMenuRadioGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+      <SelectRow
+        label="Trigger"
+        onChange={set("trigger")}
+        options={TRIGGERS}
+        value={prefs.trigger}
+      />
 
       <MsField
         id={`${id}-delay`}
@@ -175,6 +196,14 @@ export function AnimationSettings({
           value={prefs.loopDelay}
         />
       )}
+
+      <SelectRow
+        hint="JeddProvider reducedMotion"
+        label="Reduced motion"
+        onChange={set("reducedMotion")}
+        options={REDUCED_MOTION}
+        value={prefs.reducedMotion}
+      />
 
       {TOGGLES.filter((t) => !t.only || t.only === prefs.trigger).map(
         ({ key, label, prop, hint }) => (

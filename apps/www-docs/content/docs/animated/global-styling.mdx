@@ -1,0 +1,122 @@
+---
+title: Global styling
+description: Set default styling and animation options for every animated icon.
+icon: Globe
+---
+
+import { getMDXComponents } from "@/components/mdx";
+import { ProviderDemo } from "@/components/animated-demos";
+import Status from "../../_shared/animated-status.mdx";
+
+<Status components={getMDXComponents()} />
+
+To change the defaults for every animated icon in your app — a lighter stroke,
+icons that always finish their animation — wrap it in `JeddProvider`, or use
+CSS for styling.
+
+## JeddProvider
+
+`@jedd-icons/react-animated` has its own `JeddProvider`. It takes the same
+styling props as [the one in `@jedd-icons/react`](/docs/react/global-styling)
+— `size`, `color`, `strokeWidth`, `absoluteStrokeWidth` — plus the animation
+options and `reducedMotion`:
+
+```tsx
+import { ArrowRight, JeddProvider } from "@jedd-icons/react-animated";
+
+export function App() {
+  return (
+    <JeddProvider strokeWidth={1.5} completeOnStop>
+      <ArrowRight animateOnHover />                  {/* stroke 1.5, finishes on a quick hover */}
+      <ArrowRight animateOnHover strokeWidth={3} />  {/* a prop on the icon still wins */}
+    </JeddProvider>
+  );
+}
+```
+
+Hover both rows — the second is inside `<JeddProvider strokeWidth={1.5} completeOnStop>`:
+
+<ProviderDemo />
+
+Each value is resolved in this order: the prop on the icon, then the
+[`<AnimateIcon>`](/docs/animated/usage#animating-from-a-larger-element) around
+it (for animation options), then the nearest `JeddProvider`, then the built-in
+default.
+
+<TypeTable
+  type={{
+    size: { type: "number | string", description: "Default width and height. Built-in: 24." },
+    color: { type: "string", description: 'Default stroke color. Built-in: "currentColor".' },
+    strokeWidth: { type: "number | string", description: "Default stroke width. Built-in: 2." },
+    absoluteStrokeWidth: { type: "boolean", description: "Keep a constant visual stroke width at any size by default." },
+    delay: { type: "number", description: "Default milliseconds before an animation starts." },
+    loop: { type: "boolean", description: "Repeat animations while their trigger is active." },
+    loopDelay: { type: "number", description: "Default milliseconds between loops." },
+    completeOnStop: { type: "boolean", description: "Finish the current run before returning to rest when stopped." },
+    persistOnAnimateEnd: { type: "boolean", description: "Stay where the animation ended instead of returning to rest." },
+    initialOnAnimateEnd: { type: "boolean", description: "Snap back to rest, without a transition, when a run ends." },
+    reducedMotion: { type: '"user" | "always" | "never"', default: '"user"', description: "Whether icons animate for visitors who ask for reduced motion — see below." },
+  }}
+/>
+
+### Nesting providers
+
+A nested provider only overrides the values it sets and keeps the rest from
+the provider above it:
+
+```tsx
+<JeddProvider strokeWidth={1.5} completeOnStop>
+  <Sidebar />
+  <JeddProvider size={16} delay={100}>
+    {/* 16px, stroke 1.5, finishes on stop, starts after 100ms */}
+    <Toolbar />
+  </JeddProvider>
+</JeddProvider>
+```
+
+### Reduced motion
+
+By default (`"user"`), icons don't animate for visitors whose system asks for
+reduced motion. `reducedMotion` changes that for everything inside the
+provider, with the same values as Motion's `MotionConfig`:
+
+| Value | Icons animate… |
+| --- | --- |
+| `"user"` | unless the visitor's system asks for reduced motion (default). |
+| `"always"` | never — motion is always reduced. Handy for tests and screenshots. |
+| `"never"` | always, whatever the system setting. Use with care. |
+
+### Using both packages
+
+The packages are independent, so each `JeddProvider` only reaches its own
+icons: the one from `@jedd-icons/react` styles static icons, the one from
+`@jedd-icons/react-animated` styles animated icons. An app that uses both
+wraps it in both — or uses CSS.
+
+<Callout type="info">
+  `JeddProvider` uses React context, so it's a client component (marked
+  `"use client"`, like the icons). With React Server Components you can still
+  render it from a server layout and pass your server components as its
+  children.
+</Callout>
+
+## CSS
+
+Animated icons carry the same `jedd` class as the static ones, so one
+stylesheet rule styles both packages and needs no wrapper:
+
+```css
+.jedd {
+  stroke-width: 1.5;
+}
+```
+
+Animations never change the stroke width or color, so this works while icons
+play too.
+
+<Callout type="warn">
+  CSS takes precedence over the attributes the props set, so wherever this rule
+  applies, `strokeWidth` on an individual icon stops working (as does `size`,
+  if you also set `width` / `height` in CSS). Use `JeddProvider` if you want
+  per-icon props to keep overriding the default.
+</Callout>

@@ -91,13 +91,19 @@ See [Props](/docs/animated/props) for all of them.
 
 When the visitor's system asks for reduced motion
 (`prefers-reduced-motion: reduce`), icons don't animate — they stay at rest.
+To change that for your app, set `reducedMotion` on
+[`JeddProvider`](/docs/animated/global-styling#reduced-motion).
 
 ## Using it with the static package
 
-There's no need to: an animated icon without a trigger is the static icon.
-If a file uses both, rename one import:
+There's no need to: an animated icon without a trigger looks just like the
+static icon. If a file uses both, rename one import:
 
 ```tsx
 import { ArrowRight } from "@jedd-icons/react";
 import { ArrowRight as AnimatedArrowRight } from "@jedd-icons/react-animated";
 ```
+
+The two packages are independent, so each has its own `JeddProvider`: the
+static one styles static icons, the animated one styles animated icons. The
+`.jedd` CSS class works for both — see [Global styling](/docs/animated/global-styling).

@@ -50,13 +50,13 @@ Naming: `chevron-right.svg` (kebab) → `ChevronRight` component (Pascal). This 
 
 ### Animated runtime (hand-written, not generated)
 
-`packages/react-animated/src/{player.ts,createAnimatedJeddIcon.tsx,AnimateIcon.tsx,useTrigger.ts,presets.ts,animation-types.ts,types.ts}`. Icons render through `@jedd-icons/react`'s `Icon` (same props, same output at rest); `player.ts` is framework-free and drives the rendered `<svg>` with Motion's vanilla `animate()` by `data-part`/`data-group` selectors. `animation-types.ts` is import-free: it's the data format shared with `animations/types.ts`. Presets (`draw`, `draw-loop`, `pulse`, `wiggle`) apply to every icon; an icon without its own `default` plays `draw`.
+`packages/react-animated/src/{Icon.tsx,JeddProvider.tsx,player.ts,createAnimatedJeddIcon.tsx,AnimateIcon.tsx,useTrigger.ts,presets.ts,animation-types.ts,types.ts}`. The package is **standalone** — no runtime dependency on `@jedd-icons/react`; like it, it bundles `@jedd-icons/shared`. `Icon.tsx` is an internal (unexported) stroke-only counterpart of `packages/react/src/Icon.tsx`: root attributes and stroke-width maths come from `shared`, but prop precedence, `aria-hidden` and children handling are duplicated — **keep the two `Icon.tsx` in step** so an icon renders the same from either package. Its `JeddProvider` is its own context (doesn't reach static icons, and the static one doesn't reach these): the four styling props, the animation options and `reducedMotion`; an option resolves icon prop → `<AnimateIcon>` → provider → default. `player.ts` is framework-free and drives the rendered `<svg>` with Motion's vanilla `animate()` by `data-part`/`data-group` selectors. `animation-types.ts` is import-free: it's the data format shared with `animations/types.ts`. Presets (`draw`, `draw-loop`, `pulse`, `wiggle`) apply to every icon; an icon without its own `default` plays `draw`.
 
 ## Packages
 
 - `@jedd-icons/shared` (private) — types + variant defaults + `resolveStrokeWidth`. Built first; `react`/`core` depend on it.
 - `@jedd-icons/react` / `@jedd-icons/core` — the two **published** packages (npm, public). Both expose `.` and `./fill` subpath exports.
-- `@jedd-icons/react-animated` (private for now, not published) — animated icons on Motion (peer dependency), depends on `@jedd-icons/react`. The Lab previews it under each stroke icon.
+- `@jedd-icons/react-animated` (private for now, not published) — animated icons on Motion (peer dependency), standalone (no dependency on `@jedd-icons/react`). The Lab previews it under each stroke icon.
 - `@workspace/ui` (private) — shadcn/ui component library consumed by the docs app. Add components with `pnpm dlx shadcn@latest add <name> -c apps/www-docs`; they land in `packages/ui/src/components/` and import as `@workspace/ui/components/<name>`.
 - `apps/www-docs` — the gallery + docs site. TanStack Start + Vite + Fumadocs (MDX), deployed to Cloudflare via Wrangler. `predev`/`prebuild` run `gen-data` (`gen-releases` + `gen-contributors`) and fumadocs generation; the TanStack `routeTree.gen.ts` is generated and lint-ignored.
 

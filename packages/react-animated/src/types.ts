@@ -1,8 +1,7 @@
-import type { IconProps } from "@jedd-icons/react";
-import type { ForwardRefExoticComponent, RefAttributes } from "react";
+import type { ForwardRefExoticComponent, RefAttributes, SVGProps } from "react";
 import type { PresetName } from "./presets";
 
-export type { IconNode, IconProps } from "@jedd-icons/react";
+export type { IconNode, IconNodeChild } from "@jedd-icons/shared";
 export type {
   AnimatableValues,
   Animation,
@@ -13,6 +12,14 @@ export type {
   Transition,
 } from "./animation-types";
 export type { PresetName } from "./presets";
+
+/** The styling props, as in `@jedd-icons/react`. */
+export interface IconProps extends Omit<SVGProps<SVGSVGElement>, "ref"> {
+  absoluteStrokeWidth?: boolean;
+  color?: string;
+  size?: number | string;
+  strokeWidth?: number | string;
+}
 
 /** What starts an animation. A string trigger also picks which animation plays. */
 export interface AnimationTriggers<N extends string = string> {

@@ -2,6 +2,7 @@ import * as AnimatedLib from "@jedd-icons/react-animated";
 import {
   type AnimatedJeddIcon,
   AnimateIcon,
+  JeddProvider,
   presets,
 } from "@jedd-icons/react-animated";
 import { Button, buttonVariants } from "@workspace/ui/components/button";
@@ -109,7 +110,7 @@ export function AnimatedRender({
   // The last pick may not exist on the next icon.
   const animation = Component.animations.includes(picked) ? picked : "default";
   const props = animationProps(animation, prefs);
-  const code = toJsx(pascal, props);
+  const code = toJsx(pascal, props, prefs.reducedMotion);
   // Any change remounts the icons, so each setting starts from rest.
   const key = `${code}-${replays}`;
 
@@ -146,48 +147,50 @@ export function AnimatedRender({
         </div>
       </div>
 
-      <div className="flex flex-1 flex-wrap items-end justify-center gap-x-8 gap-y-4 py-4">
-        {SIZES.map((size) => (
-          <div className="flex flex-col items-center gap-1.5" key={size}>
-            <div className="flex h-24 items-center justify-center">
-              <Component
-                key={key}
-                size={size}
-                strokeWidth={strokeWidth}
-                {...props}
-              />
+      <JeddProvider reducedMotion={prefs.reducedMotion}>
+        <div className="flex flex-1 flex-wrap items-end justify-center gap-x-8 gap-y-4 py-4">
+          {SIZES.map((size) => (
+            <div className="flex flex-col items-center gap-1.5" key={size}>
+              <div className="flex h-24 items-center justify-center">
+                <Component
+                  key={key}
+                  size={size}
+                  strokeWidth={strokeWidth}
+                  {...props}
+                />
+              </div>
+              <span className="text-[10px] text-muted-foreground tabular-nums">
+                {size}
+              </span>
             </div>
-            <span className="text-[10px] text-muted-foreground tabular-nums">
-              {size}
+          ))}
+          {/* Driven from a larger element, with the same animation and options. */}
+          <div className="flex flex-col items-center gap-1.5">
+            <div className="flex h-24 items-center justify-center">
+              <AnimateIcon
+                animateOnHover
+                animation={animation}
+                asChild
+                completeOnStop={prefs.completeOnStop}
+                delay={prefs.delay}
+                initialOnAnimateEnd={prefs.initialOnAnimateEnd}
+                persistOnAnimateEnd={prefs.persistOnAnimateEnd}
+              >
+                <Button size="sm" variant="outline">
+                  Next
+                  <Component strokeWidth={strokeWidth} />
+                </Button>
+              </AnimateIcon>
+            </div>
+            <span
+              className="text-[10px] text-muted-foreground"
+              title="<AnimateIcon animateOnHover asChild> around a button"
+            >
+              in button
             </span>
           </div>
-        ))}
-        {/* Driven from a larger element, with the same animation and options. */}
-        <div className="flex flex-col items-center gap-1.5">
-          <div className="flex h-24 items-center justify-center">
-            <AnimateIcon
-              animateOnHover
-              animation={animation}
-              asChild
-              completeOnStop={prefs.completeOnStop}
-              delay={prefs.delay}
-              initialOnAnimateEnd={prefs.initialOnAnimateEnd}
-              persistOnAnimateEnd={prefs.persistOnAnimateEnd}
-            >
-              <Button size="sm" variant="outline">
-                Next
-                <Component strokeWidth={strokeWidth} />
-              </Button>
-            </AnimateIcon>
-          </div>
-          <span
-            className="text-[10px] text-muted-foreground"
-            title="<AnimateIcon animateOnHover asChild> around a button"
-          >
-            in button
-          </span>
         </div>
-      </div>
+      </JeddProvider>
 
       <div className="flex min-h-0 flex-col">
         <div className="flex items-center justify-between px-1 pb-1.5">

@@ -3,6 +3,11 @@
 export { AnimateIcon, type AnimateIconProps } from "./AnimateIcon";
 export { default as createAnimatedJeddIcon } from "./createAnimatedJeddIcon";
 export * from "./icons";
+export {
+  JeddProvider,
+  type JeddProviderProps,
+  type ReducedMotion,
+} from "./JeddProvider";
 export { presets } from "./presets";
 export type {
   AnimatableValues,
