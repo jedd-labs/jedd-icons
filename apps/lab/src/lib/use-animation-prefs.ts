@@ -1,4 +1,4 @@
-import type { ReducedMotion } from "@jedd-icons/react-animated";
+import { presets, type ReducedMotion } from "@jedd-icons/react-animated";
 import { useEffect, useState } from "react";
 
 const STORAGE_KEY = "jedd-lab-animation";
@@ -13,6 +13,13 @@ export const TRIGGERS = [
 ] as const;
 
 export type Trigger = (typeof TRIGGERS)[number]["value"];
+
+/** `JeddProvider`'s `fallbackAnimation`: what `default` plays without an icon's own. */
+export const FALLBACKS = Object.keys(presets).map((name) => ({
+  value: name,
+  label: name,
+  props: name === "draw" ? "built-in" : `"${name}"`,
+}));
 
 /** `JeddProvider`'s `reducedMotion`, as the render offers it. */
 export const REDUCED_MOTION = [
@@ -40,6 +47,8 @@ const DEFAULT_ANIMATION_PREFS = {
   initialOnAnimateEnd: false,
   /** `animateOnViewOnce`; In view only. */
   viewOnce: true,
+  /** `JeddProvider fallbackAnimation` around the render. */
+  fallbackAnimation: "draw",
   /** `JeddProvider reducedMotion` around the render. */
   reducedMotion: "user" as ReducedMotion,
 };
@@ -71,6 +80,9 @@ function loadPrefs(): AnimationPrefs {
   }
   if (!isTrigger(prefs.trigger)) {
     prefs.trigger = DEFAULT_ANIMATION_PREFS.trigger;
+  }
+  if (!(String(prefs.fallbackAnimation) in presets)) {
+    prefs.fallbackAnimation = DEFAULT_ANIMATION_PREFS.fallbackAnimation;
   }
   if (!REDUCED_MOTION.some((r) => r.value === prefs.reducedMotion)) {
     prefs.reducedMotion = DEFAULT_ANIMATION_PREFS.reducedMotion;
@@ -145,16 +157,8 @@ export function animationProps(
   return props;
 }
 
-/**
- * `<Name prop prop="x" prop={1} />`, as a consumer would write it, inside a
- * `JeddProvider` when `reducedMotion` isn't the default.
- */
-export function toJsx(
-  name: string,
-  props: Props,
-  reducedMotion: ReducedMotion = "user"
-): string {
-  const attrs = Object.entries(props).map(([key, value]) => {
+const toAttrs = (props: Props) =>
+  Object.entries(props).map(([key, value]) => {
     if (value === true) {
       return key;
     }
@@ -162,8 +166,30 @@ export function toJsx(
       ? `${key}="${value}"`
       : `${key}={${value}}`;
   });
-  const icon = `<${[name, ...attrs].join(" ")} />`;
-  return reducedMotion === "user"
+
+/** The `JeddProvider` props the render's settings come to, without defaults. */
+export function providerProps(prefs: AnimationPrefs): Props {
+  const props: Props = {};
+  if (prefs.fallbackAnimation !== "draw") {
+    props.fallbackAnimation = prefs.fallbackAnimation;
+  }
+  if (prefs.reducedMotion !== "user") {
+    props.reducedMotion = prefs.reducedMotion;
+  }
+  return props;
+}
+
+/**
+ * `<Name prop prop="x" prop={1} />`, as a consumer would write it, inside a
+ * `JeddProvider` when any provider setting isn't the default.
+ */
+export function toJsx(
+  name: string,
+  props: Props,
+  provider: Props = {}
+): string {
+  const icon = `<${[name, ...toAttrs(props)].join(" ")} />`;
+  return Object.keys(provider).length === 0
     ? icon
-    : `<JeddProvider reducedMotion="${reducedMotion}">\n  ${icon}\n</JeddProvider>`;
+    : `<${["JeddProvider", ...toAttrs(provider)].join(" ")}>\n  ${icon}\n</JeddProvider>`;
 }

@@ -4,8 +4,9 @@ import type { IconAnimations } from "../types";
 const CLOCKWISE = [5, 4, 3, 2, 1, 6, 7, 0];
 
 export default {
+  default: "spin",
   animations: {
-    default: {
+    spin: {
       icon: {
         animate: { rotate: [0, 360] },
         transition: { duration: 1, ease: "linear" },

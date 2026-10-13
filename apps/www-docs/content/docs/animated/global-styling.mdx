@@ -55,6 +55,7 @@ default.
     completeOnStop: { type: "boolean", description: "Finish the current run before returning to rest when stopped." },
     persistOnAnimateEnd: { type: "boolean", description: "Stay where the animation ended instead of returning to rest." },
     initialOnAnimateEnd: { type: "boolean", description: "Snap back to rest, without a transition, when a run ends." },
+    fallbackAnimation: { type: "PresetName | string", default: '"draw"', description: "What \"default\" plays for icons that don't choose their own — see below." },
     reducedMotion: { type: '"user" | "always" | "never"', default: '"user"', description: "Whether icons animate for visitors who ask for reduced motion — see below." },
   }}
 />
@@ -73,6 +74,22 @@ the provider above it:
   </JeddProvider>
 </JeddProvider>
 ```
+
+### Fallback animation
+
+Icons with their own animations choose which one their default plays
+(`ArrowRight` nudges, `Trash` lifts its lid). The others play the fallback —
+`draw`, unless you pick another:
+
+```tsx
+<JeddProvider fallbackAnimation="pulse">
+  <Toolbar /> {/* icons without their own default pulse; ArrowRight still nudges */}
+</JeddProvider>
+```
+
+It takes a preset (`draw`, `draw-loop`, `pulse`, `wiggle`). It can also name
+an animation some icons have, like `spin`: those icons spin, and the ones
+without it play `draw`.
 
 ### Reduced motion
 

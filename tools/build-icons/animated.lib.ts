@@ -2,6 +2,7 @@
 // icon's animation file against its geometry, marking the geometry's parts for
 // the runtime, and rendering the generated module.
 import type { IconAnimations } from "../../animations/types";
+import { presets } from "../../packages/react-animated/src/presets";
 import { type IconNode, type IconNodeChild, toCamelAttrs } from "./build.lib";
 import { kebabToPascal } from "./naming";
 
@@ -137,48 +138,88 @@ function checkValue(
   );
 }
 
+/** The `default` pointer, and animation names that are reserved. */
+function checkNames({
+  animations,
+  default: defaultName,
+}: IconAnimations): string[] {
+  const errors: string[] = [];
+  if (
+    defaultName !== undefined &&
+    !(defaultName in animations || defaultName in presets)
+  ) {
+    errors.push(
+      `default "${defaultName}" is neither one of its animations nor a preset (${Object.keys(presets).join(", ")})`
+    );
+  }
+  for (const name of Object.keys(animations)) {
+    if (name === "default") {
+      errors.push(
+        'an animation can\'t be named "default": name it for its motion and point `default` at it'
+      );
+    } else if (name in presets) {
+      errors.push(
+        `animation "${name}" has a preset's name: pick another, or point \`default\` at the preset`
+      );
+    }
+  }
+  return errors;
+}
+
+/** One animation's targets and values, against the icon's elements. */
+function checkAnimation(
+  name: string,
+  animation: IconAnimations["animations"][string],
+  parts: IconNode,
+  groups: Record<string, readonly number[]>
+): string[] {
+  const targets = Object.entries(animation);
+  if (targets.length === 0) {
+    return [`animation "${name}" has no targets`];
+  }
+  const errors: string[] = [];
+  for (const [key, part] of targets) {
+    const where = `animation "${name}", target "${key}"`;
+    const target = targetParts(key, parts, groups);
+    if (!target) {
+      errors.push(
+        `${where}: no such element or group (elements are 0–${parts.length - 1})`
+      );
+      continue;
+    }
+    const values = Object.entries(part.animate);
+    if (values.length === 0) {
+      errors.push(`${where}: nothing to animate`);
+    }
+    const times = part.transition?.times;
+    for (const [value, frames] of values) {
+      errors.push(...checkValue(where, value, frames, target));
+      if (times && (!Array.isArray(frames) || frames.length !== times.length)) {
+        errors.push(
+          `${where}: transition.times needs one entry per ${value} keyframe`
+        );
+      }
+    }
+  }
+  return errors;
+}
+
 /**
  * Problems with an icon's animation file, checked against the icon's source
  * elements (unmerged, in source order). Empty when it's valid.
  */
 export function checkAnimations(
   parts: IconNode,
-  { animations, groups = {} }: IconAnimations
+  definition: IconAnimations
 ): string[] {
-  const errors = checkGroups(groups, parts.length);
-  for (const [name, animation] of Object.entries(animations)) {
-    const targets = Object.entries(animation);
-    if (targets.length === 0) {
-      errors.push(`animation "${name}" has no targets`);
-    }
-    for (const [key, part] of targets) {
-      const where = `animation "${name}", target "${key}"`;
-      const target = targetParts(key, parts, groups);
-      if (!target) {
-        errors.push(
-          `${where}: no such element or group (elements are 0–${parts.length - 1})`
-        );
-        continue;
-      }
-      const values = Object.entries(part.animate);
-      if (values.length === 0) {
-        errors.push(`${where}: nothing to animate`);
-      }
-      const times = part.transition?.times;
-      for (const [value, frames] of values) {
-        errors.push(...checkValue(where, value, frames, target));
-        if (
-          times &&
-          (!Array.isArray(frames) || frames.length !== times.length)
-        ) {
-          errors.push(
-            `${where}: transition.times needs one entry per ${value} keyframe`
-          );
-        }
-      }
-    }
-  }
-  return errors;
+  const groups = definition.groups ?? {};
+  return [
+    ...checkGroups(groups, parts.length),
+    ...checkNames(definition),
+    ...Object.entries(definition.animations).flatMap(([name, animation]) =>
+      checkAnimation(name, animation, parts, groups)
+    ),
+  ];
 }
 
 /**
@@ -223,7 +264,8 @@ export function animatedIconNode(
 export function renderAnimatedIconFile(
   name: string,
   iconNode: IconNode,
-  animations: IconAnimations["animations"]
+  animations: IconAnimations["animations"],
+  defaultName?: string
 ): string {
   const componentName = kebabToPascal(name);
   const names = Object.keys(animations)
@@ -236,7 +278,7 @@ const __iconNode: IconNode = ${JSON.stringify(iconNode)}
 
 const __animations: Animations = ${JSON.stringify(animations)}
 
-const ${componentName} = createAnimatedJeddIcon${names ? `<${names}>` : ""}("${name}", __iconNode, __animations)
+const ${componentName} = createAnimatedJeddIcon${names ? `<${names}>` : ""}("${name}", __iconNode, __animations${defaultName ? `, ${JSON.stringify(defaultName)}` : ""})
 
 export default ${componentName}
 `;

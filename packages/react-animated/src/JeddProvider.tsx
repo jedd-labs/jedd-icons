@@ -7,7 +7,7 @@ import {
   useContext,
   useMemo,
 } from "react";
-import type { AnimationOptions, IconProps } from "./types";
+import type { AnimationOptions, IconProps, PresetName } from "./types";
 
 /**
  * Whether to animate for visitors who ask their OS for reduced motion:
@@ -21,6 +21,12 @@ type JeddDefaults = Pick<
   "absoluteStrokeWidth" | "color" | "size" | "strokeWidth"
 > &
   AnimationOptions & {
+    /**
+     * What `default` plays for icons that don't declare their own: a preset
+     * (`draw`, `draw-loop`, `pulse`, `wiggle`), or a name some icons have
+     * (those that don't play `draw`). Built-in: `draw`.
+     */
+    fallbackAnimation?: PresetName | (string & Record<never, never>);
     reducedMotion?: ReducedMotion;
   };
 
@@ -33,9 +39,9 @@ const JeddContext = createContext<JeddDefaults>({});
 /**
  * Sets defaults for every animated icon below it: the styling props of
  * `@jedd-icons/react`'s `JeddProvider` (`size`, `color`, `strokeWidth`,
- * `absoluteStrokeWidth`), the animation options, and `reducedMotion`. Props on
- * an icon (or an `<AnimateIcon>` around it) still win; a nested provider only
- * overrides the values it sets.
+ * `absoluteStrokeWidth`), the animation options, `fallbackAnimation` and
+ * `reducedMotion`. Props on an icon (or an `<AnimateIcon>` around it) still
+ * win; a nested provider only overrides the values it sets.
  */
 export function JeddProvider({
   children,
@@ -49,6 +55,7 @@ export function JeddProvider({
   loop,
   loopDelay,
   persistOnAnimateEnd,
+  fallbackAnimation,
   reducedMotion,
 }: JeddProviderProps) {
   const parent = useContext(JeddContext);
@@ -64,6 +71,7 @@ export function JeddProvider({
       loop: loop ?? parent.loop,
       loopDelay: loopDelay ?? parent.loopDelay,
       persistOnAnimateEnd: persistOnAnimateEnd ?? parent.persistOnAnimateEnd,
+      fallbackAnimation: fallbackAnimation ?? parent.fallbackAnimation,
       reducedMotion: reducedMotion ?? parent.reducedMotion,
     }),
     [
@@ -78,6 +86,7 @@ export function JeddProvider({
       loop,
       loopDelay,
       persistOnAnimateEnd,
+      fallbackAnimation,
       reducedMotion,
     ]
   );

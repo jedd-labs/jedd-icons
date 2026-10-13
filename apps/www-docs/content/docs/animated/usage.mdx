@@ -40,8 +40,8 @@ false. With `loop`, the animation repeats for as long as the trigger is active.
 
 ## Picking an animation
 
-Each icon plays `default` unless you pick another, by giving the trigger a
-name or with `animation`:
+Each icon plays its **default** unless you pick another, by giving the trigger
+a name or with `animation`:
 
 ```tsx
 <ArrowRight animateOnHover="pointing" />
@@ -49,9 +49,17 @@ name or with `animation`:
 ```
 
 Every icon has the presets (`draw`, `draw-loop`, `pulse`, `wiggle`); many have
-their own too — see [Animations](/docs/animated/animations). Your editor
-suggests each icon's names; a name the icon doesn't have plays `default`.
-`ArrowRight.animations` lists them at runtime.
+their own too, each named for its motion — see
+[Animations](/docs/animated/animations).
+
+`"default"` isn't an animation of its own: it points at one. An icon with its
+own animations picks one as its default (`ArrowRight`'s is `nudge`); icons
+without one play the fallback, `draw` — which you can change with
+[`fallbackAnimation`](/docs/animated/global-styling#fallback-animation).
+
+Your editor suggests each icon's names. A name the icon doesn't have plays its
+default (and logs a warning in development). `ArrowRight.animations` lists the
+names at runtime, and `ArrowRight.defaultAnimation` the one its default plays.
 
 ## Animating from a larger element
 

@@ -13,6 +13,7 @@ import { cn } from "@workspace/ui/lib/utils";
 import { useId } from "react";
 import {
   type AnimationPrefs,
+  FALLBACKS,
   REDUCED_MOTION,
   TRIGGERS,
   type Trigger,
@@ -196,6 +197,14 @@ export function AnimationSettings({
           value={prefs.loopDelay}
         />
       )}
+
+      <SelectRow
+        hint="JeddProvider fallbackAnimation — what default plays for icons without their own"
+        label="Fallback"
+        onChange={set("fallbackAnimation")}
+        options={FALLBACKS}
+        value={prefs.fallbackAnimation}
+      />
 
       <SelectRow
         hint="JeddProvider reducedMotion"

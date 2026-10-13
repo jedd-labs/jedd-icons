@@ -23,12 +23,13 @@ Animated icons accept **every prop of `@jedd-icons/react`'s icons** — `size`, 
     animateOnView: { type: "boolean | AnimationName", default: "false", description: "Plays when it's in the viewport." },
     animateOnViewOnce: { type: "boolean", default: "true", description: "Only the first time it's in view." },
     animateOnViewMargin: { type: "string", description: 'IntersectionObserver root margin, e.g. "0px 0px -20% 0px".' },
-    animation: { type: "AnimationName", default: '"default"', description: "Which animation plays." },
+    animation: { type: "AnimationName", default: '"default"', description: "Which animation plays. \"default\" is the icon's chosen one, or the fallback." },
   }}
 />
 
 `AnimationName` suggests the icon's own animations, `"default"` and the
-presets. Any other name plays `default`.
+presets. Any other name plays the icon's default and logs a warning in
+development.
 
 ## Options
 
@@ -81,7 +82,8 @@ import type {
 
 - **`AnimatedIconProps`** — the props every animated icon accepts.
 - **`AnimatedJeddIcon`** — the type of an animated icon component, with its
-  `animations` list.
+  `animations` list and `defaultAnimation` (what its default plays, or
+  `undefined` when it plays the fallback).
 - **`AnimateIconProps`** — the props of `<AnimateIcon>`.
 - **`AnimationTriggers`** / **`AnimationOptions`** — the two groups of props
   above.

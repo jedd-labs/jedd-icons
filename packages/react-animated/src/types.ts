@@ -62,7 +62,8 @@ export interface AnimatedIconProps<N extends string = string>
 
 /**
  * An icon's animation names, suggested by the editor. Any other string is
- * accepted too (it plays `default`), so every icon fits `AnimatedJeddIcon` —
+ * accepted too (it plays the icon's default and warns in development), so
+ * every icon fits `AnimatedJeddIcon` —
  * e.g. in an array of icons or an `icon` prop.
  */
 export type AnimationName<N extends string> =
@@ -75,6 +76,12 @@ export type AnimatedJeddIcon<N extends string = string> =
   ForwardRefExoticComponent<
     AnimatedIconProps<AnimationName<N>> & RefAttributes<SVGSVGElement>
   > & {
-    /** Every animation this icon can play: its own, then the presets. */
+    /** Every animation this icon can play: its own, `default`, the presets. */
     readonly animations: readonly AnimationName<N>[];
+    /**
+     * What `default` plays, as the icon declares it (one of its own or a
+     * preset); undefined when it plays the fallback — `JeddProvider`'s
+     * `fallbackAnimation`, else `draw`.
+     */
+    readonly defaultAnimation: AnimationName<N> | undefined;
   };

@@ -106,7 +106,8 @@ async function main() {
       renderAnimatedIconFile(
         name,
         animatedIconNode(parts, definition?.groups),
-        definition?.animations ?? {}
+        definition?.animations ?? {},
+        definition?.default
       )
     );
     indexLines.push(

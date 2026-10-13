@@ -36,8 +36,9 @@ element, `1` the next, and so on. Open the icon in the Lab
 import type { IconAnimations } from "../types";
 
 export default {
+  default: "nudge",
   animations: {
-    default: {
+    nudge: {
       icon: { animate: { x: 3 }, transition: { duration: 0.3, ease: "easeInOut" } },
     },
     pointing: {
@@ -63,8 +64,16 @@ value to animate there and back, or an array of keyframes. `origin` sets the
 transform origin (`"0% 100%"` for a lid hinged at its corner), and
 `transition` takes `duration`, `delay`, `ease` and `times` (seconds, 0–1).
 
-Keep it plain data — no functions — and name the motion after what it shows:
-`default` first, then names like `pointing` or `out`.
+Keep it plain data — no functions.
+
+**Name each animation for its motion** — `nudge`, `spin`, `lift`, `pointing`
+— and reuse a name another icon already has when the motion is the same (three
+icons `spin` already), so `<AnimateIcon animation="spin">` means the same
+everywhere. `"default"` and the preset names are reserved.
+
+**Point `default` at the one that plays when none is picked** — one of the
+icon's animations, or a preset (`default: "pulse"`). Leave it out and the icon
+plays the fallback (`draw`, or the app's `fallbackAnimation`).
 
 </Step>
 <Step>
@@ -76,9 +85,10 @@ pnpm --filter @jedd-icons/react-animated gen
 ```
 
 The build checks the file against the SVG and stops with a clear message if a
-target doesn't exist, a value doesn't fit its element, or a `d` keyframe can't
+target doesn't exist, a value doesn't fit its element, a `d` keyframe can't
 morph from the source path (it needs the same commands and number of
-coordinates). Then preview it in the Lab, under the icon's **Motion** panel,
+coordinates), `default` points at a name that doesn't exist, or an animation
+uses a reserved name. Then preview it in the Lab, under the icon's **Motion** panel,
 with every trigger and option in the sidebar.
 
 </Step>

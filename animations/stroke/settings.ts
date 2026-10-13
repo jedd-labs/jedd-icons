@@ -2,8 +2,9 @@ import type { IconAnimations } from "../types";
 
 // 0: hub, 1: gear.
 export default {
+  default: "spin",
   animations: {
-    default: {
+    spin: {
       1: {
         animate: { rotate: [0, 360] },
         transition: { duration: 1.2, ease: "easeInOut" },

@@ -2,14 +2,15 @@ import type { IconAnimations } from "../types";
 
 // 0: shaft, 1: head.
 export default {
+  default: "nudge",
   animations: {
-    default: {
+    nudge: {
       icon: {
         animate: { x: 3 },
         transition: { duration: 0.3, ease: "easeInOut" },
       },
     },
-    "default-loop": {
+    "nudge-loop": {
       icon: {
         animate: { x: [0, 3, 0] },
         transition: { duration: 0.6, ease: "easeInOut" },

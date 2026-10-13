@@ -36,8 +36,8 @@ describe("checkAnimations", () => {
       check({
         groups: { arrow: [0, 1] },
         animations: {
-          default: { arrow: { animate: { x: 3 } } },
-          draw: { "*": { animate: { pathLength: [0, 1] } } },
+          nudge: { arrow: { animate: { x: 3 } } },
+          sketch: { "*": { animate: { pathLength: [0, 1] } } },
           spin: { icon: { animate: { rotate: [0, 360] } } },
           grow: { 2: { animate: { r: [3, 4, 3] } } },
         },
@@ -49,14 +49,14 @@ describe("checkAnimations", () => {
     expect(
       check({
         groups: { far: [1, 7] },
-        animations: { default: { 5: { animate: { x: 1 } } } },
+        animations: { nudge: { 5: { animate: { x: 1 } } } },
       })
     ).toEqual([
       'group "far": element 7 doesn\'t exist (the icon has 3)',
-      'animation "default", target "5": no such element or group (elements are 0–2)',
+      'animation "nudge", target "5": no such element or group (elements are 0–2)',
     ]);
     expect(
-      check({ animations: { default: { lid: { animate: { x: 1 } } } } })
+      check({ animations: { nudge: { lid: { animate: { x: 1 } } } } })
     ).toHaveLength(1);
   });
 
@@ -64,7 +64,7 @@ describe("checkAnimations", () => {
     expect(
       check({
         groups: { a: [0], b: [0], icon: [1] },
-        animations: { default: { a: { animate: { x: 1 } } } },
+        animations: { nudge: { a: { animate: { x: 1 } } } },
       })
     ).toEqual([
       'group "b": element 0 is already in group "a"',
@@ -77,7 +77,7 @@ describe("checkAnimations", () => {
       check({
         groups: { arrow: [0, 1] },
         animations: {
-          default: {
+          nudge: {
             0: { animate: { r: 4 } },
             arrow: { animate: { pathLength: [0, 1] } },
             icon: { animate: { d: "M1 1" } },
@@ -86,10 +86,10 @@ describe("checkAnimations", () => {
         },
       })
     ).toEqual([
-      'animation "default", target "0": r needs a <circle>, not a <path>',
-      'animation "default", target "1": "fill" isn\'t a value the runtime animates',
-      'animation "default", target "arrow": pathLength draws a stroke, so it needs an element, not a group',
-      'animation "default", target "icon": d is per element, so it needs a single element',
+      'animation "nudge", target "0": r needs a <circle>, not a <path>',
+      'animation "nudge", target "1": "fill" isn\'t a value the runtime animates',
+      'animation "nudge", target "arrow": pathLength draws a stroke, so it needs an element, not a group',
+      'animation "nudge", target "icon": d is per element, so it needs a single element',
     ]);
   });
 
@@ -101,6 +101,26 @@ describe("checkAnimations", () => {
     });
     expect(errors).toHaveLength(1);
     expect(errors[0]).toContain('d keyframe 1 ("M5 12L15 12")');
+  });
+
+  it("accepts a default that points at its own animation or a preset", () => {
+    const nudge = { icon: { animate: { x: 3 } } };
+    expect(check({ default: "nudge", animations: { nudge } })).toEqual([]);
+    expect(check({ default: "pulse", animations: { nudge } })).toEqual([]);
+  });
+
+  it("flags a default that points nowhere, and reserved animation names", () => {
+    const nudge = { icon: { animate: { x: 3 } } };
+    expect(
+      check({
+        default: "nuge",
+        animations: { default: nudge, draw: nudge },
+      })
+    ).toEqual([
+      'default "nuge" is neither one of its animations nor a preset (draw, draw-loop, pulse, wiggle)',
+      'an animation can\'t be named "default": name it for its motion and point `default` at it',
+      'animation "draw" has a preset\'s name: pick another, or point `default` at the preset',
+    ]);
   });
 
   it("flags transition.times that don't match the keyframes", () => {
@@ -164,12 +184,14 @@ describe("animatedIconNode", () => {
 
 describe("renderAnimatedIconFile", () => {
   it("types the component with the icon's own animation names", () => {
-    const file = renderAnimatedIconFile("arrow-right", [], {
-      default: {},
-      pointing: {},
-    });
+    const file = renderAnimatedIconFile(
+      "arrow-right",
+      [],
+      { nudge: {}, pointing: {} },
+      "nudge"
+    );
     expect(file).toContain(
-      'const ArrowRight = createAnimatedJeddIcon<"default" | "pointing">("arrow-right", __iconNode, __animations)'
+      'const ArrowRight = createAnimatedJeddIcon<"nudge" | "pointing">("arrow-right", __iconNode, __animations, "nudge")'
     );
   });
 

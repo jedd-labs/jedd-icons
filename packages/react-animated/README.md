@@ -34,9 +34,11 @@ import { AnimateIcon, ArrowRight } from "@jedd-icons/react-animated";
 ```
 
 Every icon can play the presets — `draw`, `draw-loop`, `pulse`, `wiggle` —
-and some have their own animations; `ArrowRight.animations` lists them.
-`default` plays unless another is picked; for icons without their own it's
-`draw`.
+and some have their own, named for their motion (`nudge`, `spin`…);
+`ArrowRight.animations` lists them. `default` plays unless another is picked:
+it points at the icon's chosen animation (`ArrowRight.defaultAnimation`, e.g.
+`"nudge"`), or the fallback for icons without one — `draw`, or
+`JeddProvider`'s `fallbackAnimation`.
 
 | Prop | Default | |
 | --- | --- | --- |
@@ -59,7 +61,8 @@ Animations don't play for users who ask for reduced motion.
 
 `JeddProvider` sets defaults for every icon inside it: the styling props of
 `@jedd-icons/react`'s provider (`size`, `color`, `strokeWidth`,
-`absoluteStrokeWidth`), the animation options above, and `reducedMotion`
+`absoluteStrokeWidth`), the animation options above, `fallbackAnimation` (what `default` plays for
+icons without their own) and `reducedMotion`
 (`"user"` follows the OS setting, `"always"` never animates, `"never"` always
 does). A prop on an icon still wins.
 

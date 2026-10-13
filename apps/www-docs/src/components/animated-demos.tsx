@@ -127,7 +127,7 @@ export function OwnAnimationsTable() {
           <tr>
             <th className="px-3 py-2 font-medium">Icon</th>
             <th className="px-3 py-2 font-medium">
-              Animations (hover to play)
+              Animations (hover to play) · ★ = its default
             </th>
           </tr>
         </thead>
@@ -137,11 +137,14 @@ export function OwnAnimationsTable() {
               <td className="px-3 py-2 font-mono text-xs">{name}</td>
               <td className="px-3 py-2">
                 <div className="flex flex-wrap gap-2">
-                  {["default", ...Icon.animations.filter(isOwn)].map((a) => (
+                  {Icon.animations.filter(isOwn).map((a) => (
                     <AnimateIcon animateOnHover asChild key={a}>
                       <span className="inline-flex cursor-default items-center gap-1.5 border border-border px-2 py-1 font-mono text-xs hover:bg-muted/40">
                         <Icon animation={a} size={16} />
                         {a}
+                        {a === Icon.defaultAnimation && (
+                          <span className="text-muted-foreground">★</span>
+                        )}
                       </span>
                     </AnimateIcon>
                   ))}

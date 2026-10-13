@@ -23,6 +23,7 @@ import { getPascalName } from "@/lib/icon-nodes";
 import {
   type AnimationPrefs,
   animationProps,
+  providerProps,
   REPLAYABLE,
   toJsx,
 } from "@/lib/use-animation-prefs";
@@ -33,10 +34,13 @@ const SIZES = [24, 48, 96] as const;
 
 function AnimationPicker({
   animations,
+  defaultsTo,
   onChange,
   value,
 }: {
   animations: readonly string[];
+  /** What `default` plays, e.g. "nudge" or "draw (fallback)". */
+  defaultsTo: string;
   onChange: (animation: string) => void;
   value: string;
 }) {
@@ -45,6 +49,8 @@ function AnimationPicker({
     { label: "This icon", items: ["default", ...own] },
     { label: "Presets", items: Object.keys(presets) },
   ];
+  const label = (a: string) =>
+    a === "default" ? `default → ${defaultsTo}` : a;
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -53,12 +59,12 @@ function AnimationPicker({
           "min-w-36 justify-between font-normal"
         )}
       >
-        <span className="font-mono">{value}</span>
+        <span className="truncate font-mono">{label(value)}</span>
         <span aria-hidden className="text-[10px] text-muted-foreground">
           ▾
         </span>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-44">
+      <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuRadioGroup onValueChange={onChange} value={value}>
           {groups.map((group, i) => (
             <DropdownMenuGroup key={group.label}>
@@ -66,7 +72,7 @@ function AnimationPicker({
               <DropdownMenuLabel>{group.label}</DropdownMenuLabel>
               {group.items.map((a) => (
                 <DropdownMenuRadioItem closeOnClick key={a} value={a}>
-                  <span className="font-mono">{a}</span>
+                  <span className="font-mono">{label(a)}</span>
                 </DropdownMenuRadioItem>
               ))}
             </DropdownMenuGroup>
@@ -110,7 +116,7 @@ export function AnimatedRender({
   // The last pick may not exist on the next icon.
   const animation = Component.animations.includes(picked) ? picked : "default";
   const props = animationProps(animation, prefs);
-  const code = toJsx(pascal, props, prefs.reducedMotion);
+  const code = toJsx(pascal, props, providerProps(prefs));
   // Any change remounts the icons, so each setting starts from rest.
   const key = `${code}-${replays}`;
 
@@ -141,13 +147,20 @@ export function AnimatedRender({
           )}
           <AnimationPicker
             animations={Component.animations}
+            defaultsTo={
+              Component.defaultAnimation ??
+              `${prefs.fallbackAnimation} (fallback)`
+            }
             onChange={setPicked}
             value={animation}
           />
         </div>
       </div>
 
-      <JeddProvider reducedMotion={prefs.reducedMotion}>
+      <JeddProvider
+        fallbackAnimation={prefs.fallbackAnimation}
+        reducedMotion={prefs.reducedMotion}
+      >
         <div className="flex flex-1 flex-wrap items-end justify-center gap-x-8 gap-y-4 py-4">
           {SIZES.map((size) => (
             <div className="flex flex-col items-center gap-1.5" key={size}>
