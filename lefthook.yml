@@ -29,7 +29,9 @@ pre-commit:
 pre-push:
   parallel: true
   commands:
+    # knip runs after typecheck, whose codegen (`gen`, the Lab's `gen-data`)
+    # writes the generated files it needs to resolve imports.
     typecheck:
-      run: pnpm turbo typecheck
+      run: pnpm turbo typecheck && pnpm knip
     lint:
       run: pnpm exec ultracite check

@@ -77,5 +77,10 @@ jobs:
       - name: Build
         run: pnpm build
 
+      # Unused files, exports and dependencies. After the build, so the
+      # generated sources it resolves imports through exist.
+      - name: Knip
+        run: pnpm knip --reporter github-actions
+
       - name: Typecheck
         run: pnpm typecheck

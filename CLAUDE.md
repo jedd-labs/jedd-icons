@@ -18,10 +18,10 @@ A pnpm + Turbo monorepo that builds and distributes a set of SVG icons as publis
 - `pnpm --filter @jedd-icons/react dev` — gen + tsdown `--watch` for the React package.
 - `pnpm lint` / `pnpm check` — `ultracite check` (Biome). `pnpm format` / `pnpm fix` — `ultracite fix`.
 - `pnpm typecheck` — `turbo typecheck` (per-package `tsc --noEmit`).
-- `pnpm knip` — find unused files, exports, and dependencies. **Run after removing code or deps.**
+- `pnpm knip` — find unused files, exports, and dependencies (config in `knip.json`). Needs the generated sources, so run `pnpm build` or `pnpm typecheck` first on a fresh checkout. **Run after removing code or deps.**
 - `pnpm test` — `turbo test`: vitest suites in `tools/build-icons` (cleaning, check rules, codegen, geometry) and `packages/shared`.
 
-The quality gate is `icons:check` + lint + test + typecheck + knip. Locally it's enforced by Lefthook git hooks (pre-commit lints staged files; pre-push runs `turbo typecheck` + `ultracite check`). CI (`.github/workflows/ci.yml`) runs on every PR and push to `main` as two jobs, both required status checks on `main`: `Icons` runs `pnpm icons:check` (no build needed; issues show as annotations on the PR's files), and `Lint, typecheck & build` runs lint → test → build → typecheck. `pnpm knip` is not in CI yet. Bypass the local hooks with `git commit --no-verify` or `LEFTHOOK=0 git push`.
+The quality gate is `icons:check` + lint + test + typecheck + knip. Locally it's enforced by Lefthook git hooks (pre-commit lints staged files; pre-push runs `turbo typecheck` then `knip`, alongside `ultracite check`). CI (`.github/workflows/ci.yml`) runs on every PR and push to `main` as two jobs, both required status checks on `main`: `Icons` runs `pnpm icons:check` (no build needed; issues show as annotations on the PR's files), and `Lint, typecheck & build` runs lint → test → build → knip → typecheck (knip needs the generated sources, so it runs after the build; findings show as PR annotations). Bypass the local hooks with `git commit --no-verify` or `LEFTHOOK=0 git push`.
 
 Node >= 20, pnpm 11.5.1. Dependency versions are pinned centrally in `pnpm-workspace.yaml` under `catalog:` — packages reference `"catalog:"` instead of literal versions, so add/bump deps there.
 
@@ -49,7 +49,7 @@ Naming: `chevron-right.svg` (kebab) → `ChevronRight` component (Pascal). This 
 
 - `@jedd-icons/shared` (private) — types + variant defaults + `resolveStrokeWidth`. Built first; `react`/`core` depend on it.
 - `@jedd-icons/react` / `@jedd-icons/core` — the two **published** packages (npm, public). Both expose `.` and `./fill` subpath exports.
-- `@workspace/ui` (private) — shadcn/ui component library consumed by the docs app. Add components with `pnpm dlx shadcn@latest add <name> -c apps/www-docs`; they land in `packages/ui/src/components/` and import as `@workspace/ui/components/<name>`.
+- `@workspace/ui` (private) — shadcn/ui component library consumed by the docs app. Add components with `pnpm dlx shadcn@latest add <name> -c apps/www-docs`; they land in `packages/ui/src/components/` and import as `@workspace/ui/components/<name>`. There's no `./hooks/*` export yet (knip flags an export with no files): if a component brings a hook (e.g. `sidebar` → `use-mobile`), add `"./hooks/*": "./src/hooks/*.ts"` back to `packages/ui/package.json` `exports`.
 - `apps/www-docs` — the gallery + docs site. TanStack Start + Vite + Fumadocs (MDX), deployed to Cloudflare via Wrangler. `predev`/`prebuild` run `gen-data` (`gen-releases` + `gen-contributors`) and fumadocs generation; the TanStack `routeTree.gen.ts` is generated and lint-ignored.
 
 ## Releasing

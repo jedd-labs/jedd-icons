@@ -8,9 +8,9 @@ export const siteUrl = "https://jeddicons.com";
 
 // Default social-share image (1200×630). Absolute URL so crawlers on other
 // hosts (Slack, X, Discord) can resolve it. Lives in public/.
-export const ogImageUrl = `${siteUrl}/og.png`;
+const ogImageUrl = `${siteUrl}/og.png`;
 // The X/Twitter handle to attribute shared cards to. Empty string = omit.
-export const twitterHandle = "";
+const twitterHandle = "";
 
 interface SocialMetaInput {
   /** One-to-two sentence share-card description. */

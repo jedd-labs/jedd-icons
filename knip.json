@@ -14,12 +14,7 @@
       "entry": ["src/fill.ts"]
     },
     "apps/www-docs": {
-      "entry": [
-        "src/router.tsx",
-        "src/start.ts",
-        "vite.config.ts",
-        "source.config.ts"
-      ],
+      "entry": ["vite.config.ts"],
       "vite": false
     },
     "tools/*": {

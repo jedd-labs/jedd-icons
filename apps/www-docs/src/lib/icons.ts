@@ -115,11 +115,6 @@ export const CATEGORIES: { count: number; name: string }[] = Object.entries(
   .map(([name, names]) => ({ name, count: names.length }))
   .sort((a, b) => a.name.localeCompare(b.name));
 
-/** PascalCase icon names belonging to a category. */
-export function getCategoryIcons(category: string): string[] {
-  return iconCategoriesData.byCategory[category] ?? [];
-}
-
 // Generated from the icon `.json` sidecars by `pnpm gen-tags`. Free-text search
 // keywords, keyed by PascalCase component name, plus an inverted tag → names index.
 const iconTagsData = iconTags as {
