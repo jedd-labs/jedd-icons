@@ -6,6 +6,8 @@ import { Label } from "@workspace/ui/components/label";
 import { Separator } from "@workspace/ui/components/separator";
 import { Slider } from "@workspace/ui/components/slider";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { AnimatedRender } from "@/components/animated-render";
+import { AnimationSettings } from "@/components/animation-settings";
 import { IconInspector } from "@/components/icon-inspector";
 import { LabCanvas } from "@/components/lab-canvas";
 import { LabLegend } from "@/components/lab-legend";
@@ -29,6 +31,7 @@ import {
 import { humanizeIconName, type Variant } from "@/lib/icons";
 import { readSelection, writeSelection } from "@/lib/selection-url";
 import { flattenPieces } from "@/lib/svg-path";
+import { useAnimationPrefs } from "@/lib/use-animation-prefs";
 import { useShortcuts } from "@/lib/use-shortcuts";
 import { useTheme } from "@/lib/use-theme";
 import { type Overlay, useViewPrefs } from "@/lib/use-view-prefs";
@@ -202,6 +205,7 @@ export function LabPage() {
       ? { bounds: true }
       : undefined
   );
+  const animationPrefs = useAnimationPrefs();
   const [isolatedPiece, setIsolatedPiece] = useState<number | null>(null);
   // Which check filters are active. Empty = show all icons.
   const [activeChecks, setActiveChecks] = useState<Set<CheckId>>(
@@ -469,18 +473,7 @@ export function LabPage() {
         </aside>
 
         {/* ── Center: canvas ────────────────────────────────── */}
-        <main className="relative flex min-w-0 flex-1 flex-col items-center gap-6 overflow-auto border-border border-b bg-muted p-6 lg:border-r lg:border-b-0">
-          {/* Legend — pinned to the top-right corner of the canvas area. */}
-          <div className="absolute top-4 right-4 z-10">
-            <LabLegend
-              showAnchors={view.anchors}
-              showBounds={view.bounds}
-              showControls={view.controls}
-              showGrid={view.grid}
-              showKeylines={view.keylines}
-            />
-          </div>
-
+        <main className="flex min-w-0 flex-1 flex-col items-center gap-6 overflow-auto border-border border-b bg-muted p-6 lg:border-r lg:border-b-0">
           <div className="flex w-full items-center justify-between gap-3">
             <div className="flex flex-col items-start gap-1">
               <div className="flex items-center gap-2">
@@ -522,28 +515,42 @@ export function LabPage() {
             )}
           </div>
 
-          {node ? (
-            <div className="flex items-center justify-center overflow-auto rounded-none border border-border bg-muted/10">
-              <LabCanvas
-                fill={variant === "fill"}
-                isolatedPiece={isolatedPiece}
-                margin={getIconMargin(iconName, variant)}
-                node={node}
-                perPiece={view.perPiece}
-                pixelSize={view.zoom}
-                showAnchors={view.anchors}
-                showBounds={view.bounds}
-                showControls={view.controls}
-                showGrid={view.grid}
-                showKeylines={view.keylines}
-                strokeWidth={view.strokeWidth}
-              />
-            </div>
-          ) : (
-            <p className="py-12 text-muted-foreground text-sm">
-              No geometry available for this icon.
-            </p>
-          )}
+          {/* Canvas + animated render, side by side; they wrap when narrow. */}
+          <div className="flex w-full flex-wrap items-stretch justify-center gap-6">
+            {node ? (
+              <div className="flex max-w-full shrink-0 items-center justify-center overflow-auto rounded-none border border-border bg-muted/10">
+                <LabCanvas
+                  fill={variant === "fill"}
+                  isolatedPiece={isolatedPiece}
+                  margin={getIconMargin(iconName, variant)}
+                  node={node}
+                  perPiece={view.perPiece}
+                  pixelSize={view.zoom}
+                  showAnchors={view.anchors}
+                  showBounds={view.bounds}
+                  showControls={view.controls}
+                  showGrid={view.grid}
+                  showKeylines={view.keylines}
+                  strokeWidth={view.strokeWidth}
+                />
+              </div>
+            ) : (
+              <p className="py-12 text-muted-foreground text-sm">
+                No geometry available for this icon.
+              </p>
+            )}
+
+            {/* Animated package (stroke only for now). */}
+            {node && variant === "stroke" && (
+              <div className="flex min-w-72 max-w-xl flex-1 basis-72 rounded-none border border-border bg-background p-4">
+                <AnimatedRender
+                  name={iconName}
+                  prefs={animationPrefs.prefs}
+                  strokeWidth={view.strokeWidth}
+                />
+              </div>
+            )}
+          </div>
 
           {/* Stats */}
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-muted-foreground text-xs tabular-nums">
@@ -640,6 +647,22 @@ export function LabPage() {
                 </Label>
               ))}
             </div>
+
+            <LabLegend
+              showAnchors={view.anchors}
+              showBounds={view.bounds}
+              showControls={view.controls}
+              showGrid={view.grid}
+              showKeylines={view.keylines}
+            />
+
+            {/* Animated render (stroke only, like the render itself) */}
+            {node && variant === "stroke" && (
+              <>
+                <Separator />
+                <AnimationSettings {...animationPrefs} />
+              </>
+            )}
 
             <Separator />
 

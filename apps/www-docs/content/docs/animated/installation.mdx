@@ -1,0 +1,44 @@
+---
+title: Installation
+description: Add @jedd-icons/react-animated and Motion to your project.
+icon: Download
+---
+
+import { getMDXComponents } from "@/components/mdx";
+import Status from "../../_shared/animated-status.mdx";
+
+<Status components={getMDXComponents()} />
+
+Once it's released, install the package together with Motion:
+
+```npm
+npm i @jedd-icons/react-animated motion
+```
+
+<Callout type="info">
+  `react` (`^17 || ^18 || ^19`) and `motion` (`^13`) are **peer
+  dependencies**. The package needs no other Jedd package — you don't need
+  `@jedd-icons/react` alongside it.
+</Callout>
+
+## Requirements
+
+- **TypeScript** — types ship with the package, including each icon's
+  animation names.
+- **Bundler** — any ESM-aware bundler (Vite, webpack, Rollup, esbuild, …). A
+  CommonJS (`require`) entry point is also provided.
+- **Server components** — the modules are marked `"use client"`, so a server
+  component can render them; they start animating once the page hydrates.
+
+## Verify the install
+
+```tsx
+import { ArrowRight } from "@jedd-icons/react-animated";
+
+export function Demo() {
+  return <ArrowRight animateOnHover />;
+}
+```
+
+If the arrow nudges right when you hover it, you're set — head to
+[Usage](/docs/animated/usage).

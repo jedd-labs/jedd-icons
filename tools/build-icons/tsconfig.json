@@ -8,6 +8,8 @@
   },
   "include": [
     "./build.ts",
+    "./animated.lib.ts",
+    "./build-animated.ts",
     "./build.lib.ts",
     "./check-icons.ts",
     "./check-icons.lib.ts",
@@ -16,6 +18,7 @@
     "./clean-icons.lib.ts",
     "./gen-icon-nodes.ts",
     "./naming.ts",
-    "./*.test.ts"
+    "./*.test.ts",
+    "../../animations/**/*.ts"
   ]
 }

@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@jedd-icons/react": "workspace:*",
+    "@jedd-icons/react-animated": "workspace:*",
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-start": "catalog:",
     "@workspace/ui": "workspace:*",

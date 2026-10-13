@@ -1,0 +1,101 @@
+---
+title: Adding animations
+description: Give an icon animations of its own with a small motion file.
+icon: Plus
+---
+
+import { getMDXComponents } from "@/components/mdx";
+import Status from "../../_shared/animated-status.mdx";
+
+<Status components={getMDXComponents()} />
+
+An icon's shape lives in its SVG; how it moves lives in a separate file,
+`animations/<variant>/<icon>.ts`, next to nothing else. The build combines the
+two, so a redrawn icon keeps its animations without copying any geometry.
+
+<Steps>
+<Step>
+
+### Find the parts
+
+Animations target the SVG's elements **by position**: `0` is the first
+element, `1` the next, and so on. Open the icon in the Lab
+(`pnpm --filter lab dev`) to see them listed under **Pieces**.
+
+```xml title="icons/stroke/arrow-right.svg"
+<path d="M5 12H19"/>                           <!-- 0: shaft -->
+<path d="M12 4.92893L19.0711 12L12 19.0711"/>  <!-- 1: head -->
+```
+
+</Step>
+<Step>
+
+### Write the motion
+
+```ts title="animations/stroke/arrow-right.ts"
+import type { IconAnimations } from "../types";
+
+export default {
+  default: "nudge",
+  animations: {
+    nudge: {
+      icon: { animate: { x: 3 }, transition: { duration: 0.3, ease: "easeInOut" } },
+    },
+    pointing: {
+      0: { animate: { d: "M5 12H15" } },
+      1: { animate: { d: "M8 4.92893L15.0711 12L8 19.0711" } },
+    },
+  },
+} satisfies IconAnimations;
+```
+
+Each animation maps **targets** to what they do:
+
+- an element by position (`0`, `1`, …);
+- a **group** you declare in `groups: { lid: [0, 2] }` — the elements move
+  together, as one `<g>`;
+- `"icon"` — every element as one;
+- `"*"` — every element on its own.
+
+Values: `x`, `y` (viewBox units), `rotate` (degrees), `scale`, `scaleX`,
+`scaleY`, `opacity`, `pathLength`/`pathOffset` (stroke drawing), and the
+element's own geometry — `d` on a path, `r`/`cx`/`cy` on a circle. Give one
+value to animate there and back, or an array of keyframes. `origin` sets the
+transform origin (`"0% 100%"` for a lid hinged at its corner), and
+`transition` takes `duration`, `delay`, `ease` and `times` (seconds, 0–1).
+
+Keep it plain data — no functions.
+
+**Name each animation for its motion** — `nudge`, `spin`, `lift`, `pointing`
+— and reuse a name another icon already has when the motion is the same (three
+icons `spin` already), so `<AnimateIcon animation="spin">` means the same
+everywhere. `"default"` and the preset names are reserved.
+
+**Point `default` at the one that plays when none is picked** — one of the
+icon's animations, or a preset (`default: "pulse"`). Leave it out and the icon
+plays the fallback (`draw`, or the app's `fallbackAnimation`).
+
+</Step>
+<Step>
+
+### Build and preview
+
+```bash
+pnpm --filter @jedd-icons/react-animated gen
+```
+
+The build checks the file against the SVG and stops with a clear message if a
+target doesn't exist, a value doesn't fit its element, a `d` keyframe can't
+morph from the source path (it needs the same commands and number of
+coordinates), `default` points at a name that doesn't exist, or an animation
+uses a reserved name. Then preview it in the Lab, under the icon's **Motion** panel,
+with every trigger and option in the sidebar.
+
+</Step>
+</Steps>
+
+<Callout type="warn">
+  Because targets are positions, **re-exporting an animated icon with its
+  elements in a different order breaks its animations.** Keep the element
+  order when you redraw it, and check it in the Lab afterwards.
+</Callout>

@@ -1,0 +1,45 @@
+---
+title: Introduction
+description: Jedd Icons that move, for React — powered by Motion.
+icon: Sparkles
+---
+
+import { getMDXComponents } from "@/components/mdx";
+import { AnimatedIconGrid } from "@/components/animated-demos";
+import Status from "../../_shared/animated-status.mdx";
+
+<Status components={getMDXComponents()} />
+
+`@jedd-icons/react-animated` is the animated edition of
+[`@jedd-icons/react`](/docs/react): **every icon, under the same name, with the
+same props** — plus props that play an animation on hover, on click, when it
+scrolls into view, or whenever you say.
+
+Hover the icons below:
+
+<AnimatedIconGrid />
+
+## How it works
+
+- **Same icons, same look at rest.** Icons are built from the same source SVGs
+  and styling as `@jedd-icons/react`, so an animated icon that isn't playing
+  looks exactly like the static one. Swapping the import is the whole
+  migration.
+- **Standalone.** It depends on no other Jedd package — just React and Motion.
+- **Every icon animates.** All icons get the [presets](/docs/animated/animations#presets)
+  — `draw`, `draw-loop`, `pulse`, `wiggle`. Many also have animations designed
+  for what they depict: the arrow points, the trash lid lifts, the loader
+  spins.
+- **Built on [Motion](https://motion.dev).** Motion is a peer dependency, so
+  apps that already use it don't ship it twice.
+- **Respects reduced motion.** Visitors who ask their OS for reduced motion see
+  still icons — or choose otherwise with [`JeddProvider`](/docs/animated/global-styling).
+
+## Next steps
+
+<Cards>
+  <Card title="Installation" href="/docs/animated/installation" description="Add the package and Motion." />
+  <Card title="Usage" href="/docs/animated/usage" description="Triggers, picking an animation, animating from a button." />
+  <Card title="Animations" href="/docs/animated/animations" description="The presets and each icon's own animations." />
+  <Card title="Props" href="/docs/animated/props" description="Every prop, explained." />
+</Cards>
