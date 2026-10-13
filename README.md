@@ -12,6 +12,12 @@
   ·
   <a href="https://github.com/jedd-labs/jedd-icons/blob/main/LICENSE">License</a>
 </p>
+<p align="center">
+  <a href="https://www.npmjs.com/package/@jedd-icons/react"><img src="https://img.shields.io/npm/v/@jedd-icons/react?label=%40jedd-icons%2Freact" alt="npm version"></a>
+  <a href="https://www.npmjs.com/package/@jedd-icons/react"><img src="https://img.shields.io/npm/dm/@jedd-icons/react" alt="npm downloads"></a>
+  <a href="https://github.com/jedd-labs/jedd-icons/actions/workflows/ci.yml"><img src="https://github.com/jedd-labs/jedd-icons/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
+  <a href="https://github.com/jedd-labs/jedd-icons/blob/main/LICENSE"><img src="https://img.shields.io/github/license/jedd-labs/jedd-icons" alt="License"></a>
+</p>
 
 # jedd-icons
 

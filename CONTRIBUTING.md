@@ -41,6 +41,10 @@ Pick the package(s), choose a bump level, and write a one-line summary. The
 summary you write **becomes the public changelog line**, so write it for users.
 Commit the generated `.changeset/*.md` file with your PR.
 
+`@jedd-icons/react` and `@jedd-icons/core` always share a version number (a
+`fixed` group in `.changeset/config.json`): a changeset for either one releases
+both.
+
 You do **not** need a changeset for docs-only, chore, CI, or internal-package
 (`@jedd-icons/shared`, `@workspace/ui`) changes.
 

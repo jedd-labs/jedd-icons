@@ -1,5 +1,17 @@
 # @jedd-icons/react
 
+## 0.6.1
+
+### Patch Changes
+
+- [#161](https://github.com/jedd-labs/jedd-icons/pull/161) [`98a1dbc`](https://github.com/jedd-labs/jedd-icons/commit/98a1dbc3060646fc6ba325e47c757c80c78d35dc) Thanks [@mnove](https://github.com/mnove)! - `@jedd-icons/react` and `@jedd-icons/core` now always release together under the same version number.
+
+## 0.6.0
+
+### Minor Changes
+
+- [#158](https://github.com/jedd-labs/jedd-icons/pull/158) [`ef4c638`](https://github.com/jedd-labs/jedd-icons/commit/ef4c638a7efcec2a364c0f251e2218261e65ee1d) Thanks [@mnove](https://github.com/mnove)! - Add `JeddProvider` to set default `size`, `color`, `strokeWidth` and `absoluteStrokeWidth` for every icon inside it, e.g. `<JeddProvider strokeWidth={1.5}>`. Props on an icon still take precedence.
+
 ## 0.5.1
 
 ### Patch Changes

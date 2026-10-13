@@ -5,7 +5,7 @@
     { "repo": "jedd-labs/jedd-icons" }
   ],
   "commit": false,
-  "fixed": [],
+  "fixed": [["@jedd-icons/react", "@jedd-icons/core"]],
   "linked": [],
   "access": "public",
   "baseBranch": "main",
