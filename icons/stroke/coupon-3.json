@@ -1,0 +1,17 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "coupon",
+    "voucher",
+    "discount",
+    "offer",
+    "promotion",
+    "ticket",
+    "deal",
+    "promo",
+    "ecommerce",
+    "store"
+  ],
+  "categories": ["actions", "ecommerce"]
+}
