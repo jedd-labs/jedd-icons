@@ -114,26 +114,62 @@ function stripDefaultAttr(
   );
 }
 
+// Dash patterns that draw a solid line anyway, so stripping them is harmless.
+const NO_DASHES = new Set(["", "none", "0"]);
+
 /**
- * Describes what cleaning discards that changes how the icon renders, so it's
- * fixed in the design tool rather than silently shipping a different icon.
- * These can't be checked afterwards: the cleaned file no longer has them.
+ * What cleaning would drop from one element that changes how it renders, as
+ * messages naming the element and the fix in the design tool.
  */
-export function droppedFeatures(svg: string): string[] {
-  // <defs> (clip paths) are export artifacts whose contents never render.
-  const source = svg.replace(/<defs\b[^>]*>[\s\S]*?<\/defs>/g, "");
+function elementDroppedFeatures(tag: string, attrs: string): string[] {
+  const attr = (name: string) =>
+    attrs.match(new RegExp(`\\s${name}="([^"]*)"`))?.[1];
+  const id = attr("id");
+  const element = id ? `<${tag} id="${id}">` : `<${tag}>`;
+  const layer = id
+    ? `the layer "${id}"`
+    : `this ${tag === "g" ? "group" : "layer"}`;
   const dropped: string[] = [];
-  if (/<g\b[^>]*\stransform="/.test(source)) {
+
+  const transform = attr("transform");
+  if (tag === "g" && transform !== undefined) {
     dropped.push(
-      'transform="…" on a group is dropped when the group is unwrapped — reset the rotation/position in the design tool (or flatten the shape) so the exported coordinates are final'
+      `${element} has transform="${transform}". Cleaning unwraps groups and would drop it, so the shapes inside would ship without that rotation/move. Fix in the design tool: flatten ${layer} (⌘E) or reset its rotation/position, then re-export.`
     );
   }
-  if (/\sstroke-dasharray="/.test(source)) {
+
+  const dashes = attr("stroke-dasharray");
+  if (dashes !== undefined && !NO_DASHES.has(dashes.trim())) {
+    const root = tag === "svg";
     dropped.push(
-      "stroke-dasharray is stripped, so dashes will render as a solid line — draw the dashes as separate strokes"
+      `${element} has stroke-dasharray="${dashes}"${root ? " (on the root, so every stroke)" : ""}. Icons can't use dash patterns, so cleaning would strip it and the dashed line would ship solid. Fix in the design tool: draw each dash of ${root ? "the icon" : layer} as its own stroke, then re-export.`
     );
   }
   return dropped;
+}
+
+/**
+ * Describes what cleaning discards that changes how the icon renders, so it's
+ * fixed in the design tool rather than silently shipping a different icon.
+ * These can't be checked afterwards: the cleaned file no longer has them, so
+ * `clean-icons` leaves an icon with any of them uncleaned. One message per
+ * problem, naming its line, tag, layer (the exported `id`) and value.
+ */
+export function droppedFeatures(svg: string): string[] {
+  // <defs> (clip paths) are export artifacts whose contents never render.
+  const defs = [...svg.matchAll(/<defs\b[^>]*>[\s\S]*?<\/defs>/g)].map(
+    (m) => [m.index, m.index + m[0].length] as const
+  );
+  return [...svg.matchAll(/<([a-zA-Z][\w:-]*)\b([^>]*)>/g)]
+    .filter(
+      (m) => !defs.some(([start, end]) => m.index >= start && m.index < end)
+    )
+    .flatMap((m) => {
+      const line = svg.slice(0, m.index).split("\n").length;
+      return elementDroppedFeatures(m[1], m[2]).map(
+        (message) => `line ${line}: ${message}`
+      );
+    });
 }
 
 export function cleanSvg(svg: string, rootAttrs: string): string {

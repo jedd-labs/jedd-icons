@@ -24,8 +24,8 @@ describe("checkIcon", () => {
     const out = messages(
       `<svg><g transform="rotate(90)"><path d="M1 1" stroke-dasharray="4 2"/></g></svg>`
     ).join("\n");
-    expect(out).toContain("not normalized");
-    expect(out).toContain("on a group is dropped");
+    expect(out).toContain("leaves it as exported");
+    expect(out).toContain('<g> has transform="rotate(90)"');
     expect(out).toContain("stroke-dasharray");
   });
 

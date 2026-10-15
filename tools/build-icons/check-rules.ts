@@ -5,7 +5,7 @@
 export const RULES = {
   "not-normalized": {
     label: "Not cleaned",
-    hint: "The source SVG isn't normalized yet — run `pnpm icons:clean`",
+    hint: "The source SVG isn't normalized yet — run `pnpm icons:clean`, or first fix what it reports in the design tool",
   },
   unsupported: {
     label: "Unsupported elements",

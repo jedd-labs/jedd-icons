@@ -136,6 +136,35 @@ describe("droppedFeatures", () => {
     expect(dropped).toContain("stroke-dasharray");
   });
 
+  it("names each element's line, layer and value", () => {
+    expect(
+      droppedFeatures(
+        `<svg>\n<g id="Arrow" transform="rotate(45 12 12)">\n<path d="M1 1"/>\n<path id="Dashes" d="M2 2" stroke-dasharray="2 2"/>\n</g>\n</svg>`
+      )
+    ).toEqual([
+      expect.stringMatching(
+        /^line 2: <g id="Arrow"> has transform="rotate\(45 12 12\)"\..*flatten the layer "Arrow"/
+      ),
+      expect.stringMatching(
+        /^line 4: <path id="Dashes"> has stroke-dasharray="2 2"\..*ship solid.*layer "Dashes"/
+      ),
+    ]);
+  });
+
+  it("flags a dash pattern on the root, which every stroke inherits", () => {
+    expect(
+      droppedFeatures(`<svg stroke-dasharray="4"><path d="M1 1"/></svg>`)
+    ).toEqual([expect.stringContaining("(on the root, so every stroke)")]);
+  });
+
+  it("ignores dash patterns that draw a solid line anyway", () => {
+    expect(
+      droppedFeatures(
+        `<svg><path d="M1 1" stroke-dasharray="none"/><path d="M2 2" stroke-dasharray="0"/></svg>`
+      )
+    ).toEqual([]);
+  });
+
   it("ignores the clip-path frame Figma wraps exports in", () => {
     expect(
       droppedFeatures(

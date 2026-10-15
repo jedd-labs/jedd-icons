@@ -176,13 +176,17 @@ export function checkIcon(svg: string, variant: string): Issue[] {
   const issues: Issue[] = [];
   const cleaned = cleanSvg(svg, rootAttrs);
   if (cleaned !== svg) {
+    const dropped = droppedFeatures(svg);
     issues.push(
       {
         rule: "not-normalized",
         severity: "error",
-        message: "not normalized — run `pnpm icons:clean`",
+        message:
+          dropped.length > 0
+            ? "not normalized, and `pnpm icons:clean` leaves it as exported until what's below is fixed in the design tool (cleaning would change how it looks)"
+            : "not normalized — run `pnpm icons:clean`",
       },
-      ...droppedFeatures(svg).map((message) => ({
+      ...dropped.map((message) => ({
         rule: "not-normalized" as const,
         severity: "error" as const,
         message,
