@@ -12,11 +12,6 @@ allowBuilds:
   msw: false
   sharp: true
   workerd: true
-overrides:
-  # Pinned: mdast-util-to-markdown >=2.1.3 sends fumadocs-core 16.15.4's MDX
-  # stringifier into infinite recursion ("Maximum call stack size exceeded"
-  # building the docs). Drop once fumadocs is bumped and the docs build passes.
-  mdast-util-to-markdown: 2.1.2
 catalog:
   # Tooling
   "@biomejs/biome": 2.4.15
@@ -70,9 +65,9 @@ catalog:
   "@fontsource-variable/hubot-sans": ^5.3.0
 
   # Fumadocs
-  fumadocs-core: 16.15.4
-  fumadocs-mdx: 15.4.0
-  fumadocs-ui: 16.15.4
+  fumadocs-core: 16.17.7
+  fumadocs-mdx: 15.4.8
+  fumadocs-ui: 16.17.7
 
   # TanStack
   "@tanstack/react-router": 1.170.45
