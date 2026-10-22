@@ -1,0 +1,17 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "truck",
+    "electric",
+    "vehicle",
+    "transport",
+    "eco",
+    "green",
+    "energy",
+    "van",
+    "haulage",
+    "lorry"
+  ],
+  "categories": ["ecommerce", "devices"]
+}

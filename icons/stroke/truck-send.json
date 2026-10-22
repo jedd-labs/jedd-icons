@@ -1,0 +1,18 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "truck",
+    "send",
+    "delivery",
+    "shipping",
+    "transport",
+    "logistics",
+    "dispatch",
+    "ecommerce",
+    "van",
+    "haulage",
+    "lorry"
+  ],
+  "categories": ["ecommerce", "actions"]
+}
