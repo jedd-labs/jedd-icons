@@ -1,0 +1,17 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "invoice",
+    "bill",
+    "billing",
+    "receipt",
+    "payment",
+    "document",
+    "finance",
+    "ecommerce",
+    "tax",
+    "statement"
+  ],
+  "categories": ["files", "ecommerce"]
+}
