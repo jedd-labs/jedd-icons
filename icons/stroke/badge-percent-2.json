@@ -1,0 +1,17 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "badge",
+    "percent",
+    "percentage",
+    "discount",
+    "sale",
+    "offer",
+    "promotion",
+    "verified",
+    "marketing",
+    "sticker"
+  ],
+  "categories": ["actions", "ecommerce"]
+}

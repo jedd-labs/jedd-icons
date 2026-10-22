@@ -1,0 +1,17 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "loyalty",
+    "card",
+    "membership",
+    "rewards",
+    "points",
+    "customer",
+    "account",
+    "ecommerce",
+    "stamp",
+    "club"
+  ],
+  "categories": ["account", "ecommerce"]
+}

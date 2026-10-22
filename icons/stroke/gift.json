@@ -1,0 +1,17 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "gift",
+    "present",
+    "birthday",
+    "celebration",
+    "reward",
+    "surprise",
+    "box",
+    "ecommerce",
+    "holiday",
+    "christmas"
+  ],
+  "categories": ["actions", "social", "ecommerce"]
+}
