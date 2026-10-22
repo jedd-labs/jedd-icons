@@ -1,0 +1,17 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "droplets",
+    "water",
+    "drops",
+    "liquid",
+    "rain",
+    "weather",
+    "fluid",
+    "drip",
+    "moisture",
+    "damp"
+  ],
+  "categories": ["weather"]
+}
