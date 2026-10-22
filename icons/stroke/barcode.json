@@ -1,0 +1,19 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "barcode",
+    "product",
+    "scan",
+    "checkout",
+    "inventory",
+    "retail",
+    "identifier",
+    "till",
+    "cart",
+    "transaction",
+    "purchase",
+    "packaging"
+  ],
+  "categories": ["actions", "ecommerce"]
+}
