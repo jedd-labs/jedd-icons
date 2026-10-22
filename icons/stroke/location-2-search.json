@@ -1,0 +1,16 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "location",
+    "pin",
+    "map",
+    "search",
+    "find",
+    "lookup",
+    "navigation",
+    "gps",
+    "waypoint"
+  ],
+  "categories": ["navigation"]
+}
