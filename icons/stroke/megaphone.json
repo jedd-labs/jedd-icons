@@ -1,0 +1,16 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "megaphone",
+    "announcement",
+    "broadcast",
+    "marketing",
+    "promotion",
+    "loudspeaker",
+    "public address",
+    "alert",
+    "notification"
+  ],
+  "categories": ["communication"]
+}
