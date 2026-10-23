@@ -1,0 +1,19 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "apple",
+    "fruit",
+    "food",
+    "produce",
+    "healthy",
+    "nutrition",
+    "grocery",
+    "snack",
+    "fresh",
+    "organic",
+    "vitamin",
+    "orchard"
+  ],
+  "categories": ["ecommerce"]
+}

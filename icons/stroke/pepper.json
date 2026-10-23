@@ -1,0 +1,16 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "pepper",
+    "chili",
+    "vegetable",
+    "food",
+    "produce",
+    "spicy",
+    "grocery",
+    "fresh",
+    "organic"
+  ],
+  "categories": ["ecommerce"]
+}
