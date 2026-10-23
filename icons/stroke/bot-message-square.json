@@ -1,0 +1,15 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "bot",
+    "robot",
+    "chatbot",
+    "message",
+    "chat",
+    "assistant",
+    "artificial intelligence",
+    "ai"
+  ],
+  "categories": ["communication", "development"]
+}
