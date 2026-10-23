@@ -1,0 +1,6 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": ["image", "picture", "photo", "minus", "remove", "delete", "media"],
+  "categories": ["media", "actions"]
+}

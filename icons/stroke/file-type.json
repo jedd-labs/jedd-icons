@@ -1,0 +1,6 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": ["file", "type", "text", "font", "format", "document", "typography"],
+  "categories": ["files", "text"]
+}

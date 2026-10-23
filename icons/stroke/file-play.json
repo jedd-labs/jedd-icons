@@ -1,0 +1,6 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": ["file", "play", "video", "media", "document", "movie", "film"],
+  "categories": ["files", "media"]
+}
