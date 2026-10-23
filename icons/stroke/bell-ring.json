@@ -1,0 +1,14 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "bell",
+    "notification",
+    "alert",
+    "ring",
+    "sound",
+    "alarm",
+    "reminder"
+  ],
+  "categories": ["communication"]
+}
