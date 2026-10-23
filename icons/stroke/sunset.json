@@ -1,0 +1,15 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "sunset",
+    "sun",
+    "evening",
+    "dusk",
+    "nightfall",
+    "weather",
+    "day",
+    "night"
+  ],
+  "categories": ["weather", "time"]
+}
