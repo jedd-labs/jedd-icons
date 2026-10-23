@@ -1,5 +1,47 @@
 # @jedd-icons/react
 
+## 0.7.0
+
+### Minor Changes
+
+- [#169](https://github.com/jedd-labs/jedd-icons/pull/169) [`91d9a88`](https://github.com/jedd-labs/jedd-icons/commit/91d9a8803ef496e67fe9c17cfb511e80fa3f27a6) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add badge-percent, badge-percent-2, gift, gift-2, loyalty-card
+
+- [#166](https://github.com/jedd-labs/jedd-icons/pull/166) [`110daa6`](https://github.com/jedd-labs/jedd-icons/commit/110daa6d7f32a37416e98553580e655cc716134b) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add coupon, coupon-2, coupon-3, coupon-percent, coupon-2-percent, coupon-3-percent
+
+- [#172](https://github.com/jedd-labs/jedd-icons/pull/172) [`2d4ee63`](https://github.com/jedd-labs/jedd-icons/commit/2d4ee637bbe46bbfca6c5b3bf3a1f9a5cf8e529f) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add megaphone, megaphone-2
+
+- [#178](https://github.com/jedd-labs/jedd-icons/pull/178) [`10dbcce`](https://github.com/jedd-labs/jedd-icons/commit/10dbcce39e25ffd38274ad2f8e5ed41c5f7d8ee8) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add audio-lines, audio-lines-off, audio-lines-x
+
+- [#175](https://github.com/jedd-labs/jedd-icons/pull/175) [`83165f4`](https://github.com/jedd-labs/jedd-icons/commit/83165f4b7085a973a31705db718d4bd9cca02962) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add inbox
+
+- [#181](https://github.com/jedd-labs/jedd-icons/pull/181) [`5c3da1a`](https://github.com/jedd-labs/jedd-icons/commit/5c3da1aad1b6fbf57a585378b6ce8c6b1aabc4a5) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add palette
+
+- [#171](https://github.com/jedd-labs/jedd-icons/pull/171) [`81c45ac`](https://github.com/jedd-labs/jedd-icons/commit/81c45ac6f7b0adb0385cec68498a4ab0371a00fd) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add flag-triangle-left, flag-triangle-right, location-2-home, location-2-off, location-2-search, location-2-x, location-2, location-check, location-heart, location-home, location-minus, location-off, location-plus, location-search, location-star, location
+
+- [#182](https://github.com/jedd-labs/jedd-icons/pull/182) [`b954950`](https://github.com/jedd-labs/jedd-icons/commit/b9549501af56e1ec3a3472a0b7b9a29c449aff78) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add cable
+
+- [#185](https://github.com/jedd-labs/jedd-icons/pull/185) [`1b67075`](https://github.com/jedd-labs/jedd-icons/commit/1b67075894f8632ae10d467613f1f434d83ef6d4) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add apple, pepper
+
+- [#184](https://github.com/jedd-labs/jedd-icons/pull/184) [`3978ff4`](https://github.com/jedd-labs/jedd-icons/commit/3978ff452121dd29b593039b865fd59394775997) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add snowflake, sunrise, sunset
+
+- [#170](https://github.com/jedd-labs/jedd-icons/pull/170) [`680a81f`](https://github.com/jedd-labs/jedd-icons/commit/680a81f18fd3a394f58609eb15b043afea3cea52) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add invoice icon
+
+- [#187](https://github.com/jedd-labs/jedd-icons/pull/187) [`2408815`](https://github.com/jedd-labs/jedd-icons/commit/2408815ad3d3fc48f1d97649b3dcc6f63e98535b) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add file-image, file-play, file-type, image-down, image-minus, image-off, image-plus, image-up, image, images
+
+- [#177](https://github.com/jedd-labs/jedd-icons/pull/177) [`7019d70`](https://github.com/jedd-labs/jedd-icons/commit/7019d70f1858fe3cf289bdd85a48f4b14b51c955) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add cloud-alert, cloud-angled-rain, cloud-backup, cloud-check, cloud-cog, cloud-download, cloud-fog, cloud-hail, cloud-little-rain, cloud-loading, cloud-minus, cloud-off, cloud-plus, cloud-search, cloud-snow, cloud-sync, cloud-upload, cloud-x, cloud-zap-angled-rain, cloud-zap, cloud
+
+- [#183](https://github.com/jedd-labs/jedd-icons/pull/183) [`28d7ef7`](https://github.com/jedd-labs/jedd-icons/commit/28d7ef7bc4230a1a2b4dce84355c036aaf36a2a5) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add bell, bell-check, bell-dot, bell-minus, bell-plus, bell-ring
+
+- [#186](https://github.com/jedd-labs/jedd-icons/pull/186) [`6160514`](https://github.com/jedd-labs/jedd-icons/commit/6160514edf7f55b35018dff40c6bfd2330636a93) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add circle
+
+- [#176](https://github.com/jedd-labs/jedd-icons/pull/176) [`2b07e5b`](https://github.com/jedd-labs/jedd-icons/commit/2b07e5be4a98f327702aa0af921af2e422707037) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add barcode
+
+- [#180](https://github.com/jedd-labs/jedd-icons/pull/180) [`3e8492a`](https://github.com/jedd-labs/jedd-icons/commit/3e8492aad23cb0226029cbdb3d1be596156a7652) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add bot, bot-off, bot-message-square
+
+- [#173](https://github.com/jedd-labs/jedd-icons/pull/173) [`9923125`](https://github.com/jedd-labs/jedd-icons/commit/99231257cf36cec1709dec7e5f169bf558429729) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add droplet, droplet-off, droplets, fire, fire-off
+
+- [#174](https://github.com/jedd-labs/jedd-icons/pull/174) [`c6ba182`](https://github.com/jedd-labs/jedd-icons/commit/c6ba182cbefa73ab62492fe8e6c4cac9b3f68ed0) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add truck, truck-delivery, truck-electric, truck-return, truck-send
+
 ## 0.6.1
 
 ### Patch Changes
