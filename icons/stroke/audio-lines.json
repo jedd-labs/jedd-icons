@@ -1,0 +1,20 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "audio",
+    "sound",
+    "volume",
+    "waveform",
+    "music",
+    "speaker",
+    "equalizer",
+    "equaliser",
+    "frequency",
+    "levels",
+    "playback",
+    "radio",
+    "broadcast"
+  ],
+  "categories": ["media"]
+}
