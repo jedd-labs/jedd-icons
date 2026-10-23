@@ -1,0 +1,14 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "cloud",
+    "off",
+    "disabled",
+    "unavailable",
+    "weather",
+    "offline",
+    "disconnect"
+  ],
+  "categories": ["weather", "devices"]
+}

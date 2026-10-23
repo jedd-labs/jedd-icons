@@ -1,0 +1,15 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "cloud",
+    "thunderstorm",
+    "lightning",
+    "rain",
+    "storm",
+    "weather",
+    "precipitation",
+    "bolt"
+  ],
+  "categories": ["weather"]
+}

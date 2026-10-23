@@ -1,0 +1,6 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": ["cloud", "x", "close", "remove", "delete", "unavailable", "weather"],
+  "categories": ["actions", "weather"]
+}
