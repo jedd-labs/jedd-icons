@@ -1,0 +1,15 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "circle",
+    "pause",
+    "stop",
+    "media",
+    "playback",
+    "control",
+    "audio",
+    "music"
+  ],
+  "categories": ["media", "shapes"]
+}
