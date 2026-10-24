@@ -1,0 +1,17 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "square",
+    "slash",
+    "prohibited",
+    "forbidden",
+    "ban",
+    "block",
+    "disable",
+    "divide",
+    "division",
+    "shortcut"
+  ],
+  "categories": ["actions", "shapes"]
+}

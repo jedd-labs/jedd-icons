@@ -1,0 +1,17 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "square",
+    "plus",
+    "add",
+    "new",
+    "create",
+    "increase",
+    "increment",
+    "positive",
+    "upgrade",
+    "operator"
+  ],
+  "categories": ["actions", "shapes"]
+}
