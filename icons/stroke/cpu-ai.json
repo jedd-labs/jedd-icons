@@ -1,0 +1,21 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "cpu",
+    "processor",
+    "chip",
+    "computer",
+    "hardware",
+    "artificial intelligence",
+    "ai",
+    "machine learning",
+    "cores",
+    "circuit",
+    "ram",
+    "specs",
+    "gigahertz",
+    "ghz"
+  ],
+  "categories": ["devices", "development"]
+}
