@@ -1,0 +1,19 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "vector",
+    "square",
+    "shape",
+    "path",
+    "anchor points",
+    "nodes",
+    "design",
+    "geometry",
+    "graphics",
+    "measure",
+    "select",
+    "box"
+  ],
+  "categories": ["design", "shapes"]
+}

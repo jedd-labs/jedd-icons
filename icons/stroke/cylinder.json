@@ -1,0 +1,16 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "cylinder",
+    "3d",
+    "shape",
+    "geometry",
+    "solid",
+    "object",
+    "elliptical",
+    "container",
+    "storage"
+  ],
+  "categories": ["shapes"]
+}
