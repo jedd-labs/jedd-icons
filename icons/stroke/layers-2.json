@@ -1,0 +1,15 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "layers",
+    "layer",
+    "stack",
+    "overlap",
+    "design",
+    "objects",
+    "duplicate",
+    "double"
+  ],
+  "categories": ["design", "layout"]
+}

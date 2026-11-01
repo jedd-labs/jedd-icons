@@ -1,0 +1,6 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": ["layers", "layer", "minus", "remove", "delete", "subtract", "stack"],
+  "categories": ["design", "layout", "actions"]
+}
