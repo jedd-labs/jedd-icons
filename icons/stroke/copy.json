@@ -1,0 +1,14 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "copy",
+    "duplicate",
+    "clipboard",
+    "clone",
+    "files",
+    "document",
+    "multiple"
+  ],
+  "categories": ["actions", "files"]
+}
