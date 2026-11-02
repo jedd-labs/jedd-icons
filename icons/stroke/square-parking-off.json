@@ -1,0 +1,15 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "square",
+    "parking",
+    "no parking",
+    "prohibited",
+    "disabled",
+    "vehicle",
+    "transport",
+    "park"
+  ],
+  "categories": ["navigation", "actions"]
+}

@@ -1,0 +1,16 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "square",
+    "arrow",
+    "left",
+    "direction",
+    "back",
+    "previous",
+    "button",
+    "keyboard",
+    "west"
+  ],
+  "categories": ["arrows"]
+}
