@@ -1,5 +1,27 @@
 # @jedd-icons/react
 
+## 0.8.0
+
+### Minor Changes
+
+- [#193](https://github.com/jedd-labs/jedd-icons/pull/193) [`f023ff7`](https://github.com/jedd-labs/jedd-icons/commit/f023ff794b860a387abbdc9e077bf24ffa88df9e) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add light-bulb, light-bulb-off
+
+- [#190](https://github.com/jedd-labs/jedd-icons/pull/190) [`0d8d266`](https://github.com/jedd-labs/jedd-icons/commit/0d8d266fa4114021f75f551ec5e9b747401ec228) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add layer-arrow-down, layer-arrow-up, layers-2, layers-arrow-down, layers-arrow-up, layers-minus, layers-plus, layers
+
+- [#195](https://github.com/jedd-labs/jedd-icons/pull/195) [`950aef2`](https://github.com/jedd-labs/jedd-icons/commit/950aef28373f6cd7d9811adc797852548e995161) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add circle-info, circle-letter-c, circle-letter-r
+
+- [#188](https://github.com/jedd-labs/jedd-icons/pull/188) [`0f8ab69`](https://github.com/jedd-labs/jedd-icons/commit/0f8ab693164d0334f70d833201162af09b570f0a) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add ban, circle-arrow-down, circle-arrow-left, circle-arrow-out-down-left, circle-arrow-out-down-right, circle-arrow-out-up-left, circle-arrow-out-up-right, circle-arrow-right, circle-arrow-up, circle-check-2, circle-check, circle-equal, circle-metro, circle-minus, circle-off, circle-parking-off, circle-parking, circle-pause, circle-play, circle-plus, circle-slash-2, circle-slash, circle-x
+
+- [#192](https://github.com/jedd-labs/jedd-icons/pull/192) [`9aa6a65`](https://github.com/jedd-labs/jedd-icons/commit/9aa6a6532b17431a89e3491f6c621c7b18e6045b) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add cpu, cpu-ai
+
+- [#196](https://github.com/jedd-labs/jedd-icons/pull/196) [`f65c45e`](https://github.com/jedd-labs/jedd-icons/commit/f65c45e13fefd09ac4bca9d2f85474f5bd4942dd) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add copy, copy-check, copy-images, copy-minus, copy-plus, copy-slash, copy-x
+
+- [#191](https://github.com/jedd-labs/jedd-icons/pull/191) [`d738614`](https://github.com/jedd-labs/jedd-icons/commit/d7386143a43242a82b8ca2bf28c92483677693bc) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add hard-drive, hard-drive-download, hard-drive-upload
+
+- [#194](https://github.com/jedd-labs/jedd-icons/pull/194) [`8ce18a1`](https://github.com/jedd-labs/jedd-icons/commit/8ce18a112ed4f62906d46bdbb3492ecaa68746e3) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add cone, cylinder, hexagon, octagon, pentagon, pyramid, rectangle-horizontal, rectangle-vertical, square-off, triangle, vector-shape, vector-square
+
+- [#189](https://github.com/jedd-labs/jedd-icons/pull/189) [`bf039ad`](https://github.com/jedd-labs/jedd-icons/commit/bf039ad51c2e17a6efec875d9481ff2c9b5ee69e) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add square-arrow-down, square-arrow-left, square-arrow-right, square-arrow-up, square-equal, square-minus, square-parking-off, square-parking, square-pause, square-play, square-plus, square-slash, square-x
+
 ## 0.7.0
 
 ### Minor Changes
