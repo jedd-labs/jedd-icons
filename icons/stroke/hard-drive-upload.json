@@ -1,0 +1,19 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "hard drive",
+    "storage",
+    "disk",
+    "upload",
+    "send",
+    "data",
+    "computer",
+    "server",
+    "ssd",
+    "backup",
+    "media",
+    "save"
+  ],
+  "categories": ["devices", "files", "actions"]
+}
