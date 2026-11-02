@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="butt" stroke-linejoin="miter">
+<rect x="4" y="4" width="16" height="16"/>
+<rect x="8" y="8" width="8" height="8"/>
+<path d="M23 18H20"/>
+<path d="M23 14H20"/>
+<path d="M23 10H20"/>
+<path d="M23 6H20"/>
+<path d="M4 18H1"/>
+<path d="M4 14H1"/>
+<path d="M4 10H1"/>
+<path d="M4 6H1"/>
+<path d="M6 4V1"/>
+<path d="M6 23V20"/>
+<path d="M10 4V1"/>
+<path d="M10 23V20"/>
+<path d="M14 4V1"/>
+<path d="M14 23V20"/>
+<path d="M18 4V1"/>
+<path d="M18 23V20"/>
+</svg>
