@@ -1,0 +1,6 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": ["circle", "parking", "vehicle", "car", "transport", "sign", "park"],
+  "categories": ["navigation"]
+}

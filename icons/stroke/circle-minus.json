@@ -1,0 +1,16 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "circle",
+    "minus",
+    "remove",
+    "subtract",
+    "decrease",
+    "delete",
+    "reduce",
+    "minimum",
+    "operator"
+  ],
+  "categories": ["actions", "shapes"]
+}
