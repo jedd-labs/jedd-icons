@@ -1,0 +1,21 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "layer",
+    "layers",
+    "arrow",
+    "up",
+    "raise",
+    "bring forward",
+    "arrange",
+    "front",
+    "top",
+    "lift",
+    "promote",
+    "reorder",
+    "stacking",
+    "depth"
+  ],
+  "categories": ["design", "layout"]
+}

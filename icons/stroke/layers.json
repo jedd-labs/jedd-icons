@@ -1,0 +1,19 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "layers",
+    "layer",
+    "stack",
+    "overlap",
+    "design",
+    "objects",
+    "arrange",
+    "pile",
+    "pages",
+    "sheets",
+    "copies",
+    "copy"
+  ],
+  "categories": ["design", "layout"]
+}
