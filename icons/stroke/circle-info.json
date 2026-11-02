@@ -1,0 +1,19 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "circle",
+    "info",
+    "information",
+    "help",
+    "details",
+    "about",
+    "hint",
+    "indicator",
+    "notice",
+    "status",
+    "support",
+    "tooltip"
+  ],
+  "categories": ["actions", "communication"]
+}
