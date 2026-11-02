@@ -1,0 +1,14 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "rectangle",
+    "horizontal",
+    "landscape",
+    "shape",
+    "geometry",
+    "wide",
+    "ratio"
+  ],
+  "categories": ["shapes"]
+}

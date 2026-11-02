@@ -1,0 +1,15 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "cone",
+    "3d",
+    "shape",
+    "geometry",
+    "solid",
+    "object",
+    "conical",
+    "funnel"
+  ],
+  "categories": ["shapes"]
+}

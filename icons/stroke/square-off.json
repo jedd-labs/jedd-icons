@@ -1,0 +1,16 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "square",
+    "off",
+    "disabled",
+    "hidden",
+    "shape",
+    "geometry",
+    "unchecked",
+    "toggle",
+    "checkbox"
+  ],
+  "categories": ["shapes", "actions"]
+}
