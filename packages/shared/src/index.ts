@@ -7,5 +7,6 @@ export {
   variantDefaults,
   variantDefaultsCamel,
 } from "./defaultAttributes";
+export { pascalToKebab } from "./naming";
 export { resolveStrokeWidth } from "./resolveStrokeWidth";
 export type { IconNode, IconNodeChild, Variant } from "./types";

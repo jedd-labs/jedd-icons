@@ -1,4 +1,5 @@
 import type { IconNode } from "@jedd-icons/shared";
+import { pascalToKebab } from "@jedd-icons/shared";
 import { type CreateElementOptions, createElement } from "./createElement";
 
 export interface CreateIconsOptions {
@@ -41,7 +42,9 @@ export function createIcons({
 
       const svg = createElement(iconNode, {
         ...elAttrs,
-        class: ["jedd", `jedd-${name}`, el.getAttribute("class")]
+        // `jedd-<kebab-name>`, matching the React components, whether the
+        // icon was registered as `ArrowDownLeft` or `arrow-down-left`.
+        class: ["jedd", `jedd-${pascalToKebab(name)}`, el.getAttribute("class")]
           .filter(Boolean)
           .join(" "),
       });

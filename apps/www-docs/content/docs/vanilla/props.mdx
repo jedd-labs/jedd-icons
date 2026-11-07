@@ -17,7 +17,7 @@ helper.
     strokeWidth: { type: "number | string", default: "2", description: "Stroke width (stroke variant only)." },
     absoluteStrokeWidth: { type: "boolean", default: "false", description: "Keep a constant visual stroke width at any size." },
     variant: { type: '"stroke" | "fill"', default: '"stroke"', description: "Which presentation defaults to apply." },
-    class: { type: "string", description: "Added alongside the jedd / jedd-<name> classes." },
+    class: { type: "string", description: "Class names set on the root <svg>. createElement adds no jedd classes of its own." },
     attrs: { type: "Record<string, string | number>", description: "Extra attributes set on the root <svg>." },
   }}
 />
