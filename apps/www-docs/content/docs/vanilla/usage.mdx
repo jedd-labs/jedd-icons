@@ -29,27 +29,6 @@ Icons are exported as **PascalCase** data objects (`arrow-down-left` →
 `ArrowDownLeft`), not as functions — you pass the data to `createElement`. See
 the [options reference](/docs/vanilla/props) for every field.
 
-## The fill variant
-
-<Callout type="info">
-  The fill variant is **coming soon** — the `/fill` subpath and its API are in
-  place, but the icon set isn't drawn yet. The usage below documents the API
-  ahead of the full set landing.
-</Callout>
-
-Filled icons live on the `/fill` subpath. Pass `variant: "fill"` so the helper
-applies the fill presentation defaults:
-
-```js
-import { createElement } from "@jedd-icons/core";
-import { CircleCheck } from "@jedd-icons/core/fill";
-
-const svg = createElement(CircleCheck, { size: 32, variant: "fill" });
-```
-
-For the fill variant, `color` sets the `fill` attribute and `strokeWidth` is
-ignored.
-
 ## createIcons (auto-replace)
 
 `createIcons` scans the DOM for placeholder elements and swaps them for rendered

@@ -7,7 +7,14 @@ import iconReleases from "generated/icon-releases.json";
 import iconTags from "generated/icon-tags.json";
 
 export type Variant = "stroke" | "fill";
-export const FILL_COMING_SOON = true;
+// Fill isn't being developed yet, so the site shows stroke only. The packages
+// still ship it (`@jedd-icons/react/fill`); flip this to bring it back here.
+export const SHOW_FILL = false;
+
+/** Variants the site shows, in canonical order (stroke before fill). */
+export const VISIBLE_VARIANTS: Variant[] = SHOW_FILL
+  ? ["stroke", "fill"]
+  : ["stroke"];
 
 // Non-icon exports of the package that must be filtered out.
 const RESERVED = new Set(["Icon", "createJeddIcon", "defaultAttributes"]);
@@ -41,20 +48,17 @@ export const VARIANT_MAPS: Record<Variant, Record<string, JeddIcon>> = {
   ),
 };
 
-/** Every unique icon name across all variants — used to enumerate /icons/* routes. */
+/** Every unique icon name across the visible variants — used to enumerate /icons/* routes. */
 export const ALL_ICON_NAMES = Array.from(
-  new Set([
-    ...VARIANT_ICONS.stroke.map((i) => i.name),
-    ...VARIANT_ICONS.fill.map((i) => i.name),
-  ])
+  new Set(VISIBLE_VARIANTS.flatMap((v) => VARIANT_ICONS[v].map((i) => i.name)))
 ).sort((a, b) => a.localeCompare(b));
 
-/** PascalCase component name → spaced words: "ChevronRight" → "Chevron Right". */
-/** Variants an icon exists in, in canonical order (stroke before fill). */
+/** Visible variants an icon exists in, in canonical order (stroke before fill). */
 export function getAvailableVariants(name: string): Variant[] {
-  return (["stroke", "fill"] as const).filter((v) => name in VARIANT_MAPS[v]);
+  return VISIBLE_VARIANTS.filter((v) => name in VARIANT_MAPS[v]);
 }
 
+/** PascalCase component name → spaced words: "ChevronRight" → "Chevron Right". */
 export function humanizeIconName(name: string) {
   return name
     .replace(/([a-z0-9])([A-Z])/g, "$1 $2")

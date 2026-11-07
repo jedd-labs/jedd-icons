@@ -50,27 +50,6 @@ icon is to set the CSS `color` of its container:
 See the [props reference](/docs/react/props) for the full list. To change the
 defaults for every icon at once, see [Global styling](/docs/react/global-styling).
 
-## The fill variant
-
-<Callout type="info">
-  The fill variant is **coming soon** — the `/fill` subpath and its API are in
-  place, but the icon set isn't drawn yet. The usage below documents the API
-  ahead of the full set landing.
-</Callout>
-
-Filled icons live on the `/fill` subpath:
-
-```tsx
-import { ChevronRight } from "@jedd-icons/react";        // stroke
-import { ChevronRight as ChevronRightFill } from "@jedd-icons/react/fill"; // fill
-
-<ChevronRight />        {/* stroke — color drives `stroke` */}
-<ChevronRightFill />    {/* fill — color drives `fill` */}
-```
-
-For the fill variant, `color` sets the `fill` attribute; `strokeWidth` and
-`absoluteStrokeWidth` have no effect.
-
 ## absoluteStrokeWidth
 
 By default, stroke width scales with the icon. Pass `absoluteStrokeWidth` to

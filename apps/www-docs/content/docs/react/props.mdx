@@ -10,8 +10,8 @@ attributes** (`className`, `onClick`, `style`, `aria-*`, `focusable`, …).
 <TypeTable
   type={{
     size: { type: "number | string", default: "24", description: "Sets both width and height." },
-    color: { type: "string", default: '"currentColor"', description: "stroke (stroke variant) or fill (fill variant)." },
-    strokeWidth: { type: "number | string", default: "2", description: "Stroke width. Ignored by the fill variant." },
+    color: { type: "string", default: '"currentColor"', description: "Sets the stroke color." },
+    strokeWidth: { type: "number | string", default: "2", description: "Stroke width." },
     absoluteStrokeWidth: { type: "boolean", default: "false", description: "Keep a constant visual stroke width regardless of size." },
   }}
 />
@@ -22,7 +22,7 @@ attributes** (`className`, `onClick`, `style`, `aria-*`, `focusable`, …).
 | --- | --- | --- |
 | `size` | `24` | px when numeric |
 | `color` | `currentColor` | inherits text color |
-| `strokeWidth` | `2` | stroke variant only |
+| `strokeWidth` | `2` | |
 | `absoluteStrokeWidth` | `false` | see below |
 
 To change these defaults for every icon, wrap your app in `JeddProvider` — see
@@ -33,12 +33,6 @@ import StylingModel from "../../_shared/styling-model.mdx";
 
 <StylingModel components={getMDXComponents()} />
 
-## Variant selection
-
-In React the variant is fixed by which entry point you import from —
-`@jedd-icons/react` for stroke, `@jedd-icons/react/fill` for fill. There is no
-`variant` prop on the component.
-
 ## Exported types
 
 ```ts
@@ -47,7 +41,6 @@ import type {
   JeddIcon,
   JeddProviderProps,
   IconNode,
-  Variant,
 } from "@jedd-icons/react";
 ```
 
@@ -55,4 +48,3 @@ import type {
 - **`JeddIcon`** — the type of an icon component (`ForwardRefExoticComponent`).
 - **`JeddProviderProps`** — the props `JeddProvider` accepts.
 - **`IconNode`** — the raw icon geometry tuple.
-- **`Variant`** — `"stroke" | "fill"`.

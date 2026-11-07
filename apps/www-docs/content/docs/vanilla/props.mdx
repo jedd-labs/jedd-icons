@@ -13,10 +13,9 @@ helper.
 <TypeTable
   type={{
     size: { type: "number | string", default: "24", description: "Sets both width and height." },
-    color: { type: "string", default: '"currentColor"', description: "stroke (stroke variant) or fill (fill variant)." },
-    strokeWidth: { type: "number | string", default: "2", description: "Stroke width (stroke variant only)." },
+    color: { type: "string", default: '"currentColor"', description: "Sets the stroke color." },
+    strokeWidth: { type: "number | string", default: "2", description: "Stroke width." },
     absoluteStrokeWidth: { type: "boolean", default: "false", description: "Keep a constant visual stroke width at any size." },
-    variant: { type: '"stroke" | "fill"', default: '"stroke"', description: "Which presentation defaults to apply." },
     class: { type: "string", description: "Class names set on the root <svg>. createElement adds no jedd classes of its own." },
     attrs: { type: "Record<string, string | number>", description: "Extra attributes set on the root <svg>." },
   }}
@@ -38,12 +37,6 @@ import StylingModel from "../../_shared/styling-model.mdx";
 
 <StylingModel components={getMDXComponents()} />
 
-## Variant selection
-
-In vanilla you select the variant with the `variant` option on `createElement`
-(or via `attrs.variant` in `createIcons`) — `"stroke"` (default) or `"fill"`.
-Import filled icon data from the `@jedd-icons/core/fill` subpath.
-
 ## Exported helpers and types
 
 ```ts
@@ -56,7 +49,6 @@ import {
 } from "@jedd-icons/core";
 import type {
   IconNode,
-  Variant,
   CreateElementOptions,
   CreateIconsOptions,
 } from "@jedd-icons/core";
