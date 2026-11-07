@@ -25,9 +25,11 @@ when icons of different sizes need to read as the same weight.
 
 ## CSS hooks
 
-Every rendered icon carries two class names you can target globally: `jedd` (on
-every icon) and `jedd-<name>` (per icon). Any class name you pass is appended to
-these.
+Icons rendered by the React components or by `createIcons` carry two class
+names you can target globally: `jedd` (on every icon) and `jedd-<name>` (per
+icon, in kebab-case). Any class name you pass is appended to these.
+`createElement` only receives the icon's data, not its name, so it adds no
+classes: pass your own with the `class` option.
 
 ```css
 .jedd {

@@ -1,5 +1,9 @@
+import { readdirSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { pascalToKebab } from "../../packages/shared/src/naming";
 import { kebabToPascal } from "./naming";
+
+const ICONS_DIR = new URL("../../icons/", import.meta.url);
 
 describe("kebabToPascal", () => {
   it("converts kebab-case to PascalCase", () => {
@@ -25,5 +29,23 @@ describe("kebabToPascal", () => {
 
   it("throws when the result would start with a digit", () => {
     expect(() => kebabToPascal("3d-cube")).toThrow(/cannot start with a digit/);
+  });
+});
+
+// `createIcons` (@jedd-icons/core) turns a registered component name back into
+// the `jedd-<name>` class, so every icon name has to survive the round trip.
+describe("pascalToKebab ∘ kebabToPascal", () => {
+  it("round-trips every icon name", () => {
+    const names = readdirSync(ICONS_DIR, { withFileTypes: true })
+      .filter((d) => d.isDirectory())
+      .flatMap((d) => readdirSync(new URL(`${d.name}/`, ICONS_DIR)))
+      .filter((f) => f.endsWith(".svg"))
+      .map((f) => f.slice(0, -".svg".length));
+
+    expect(names.length).toBeGreaterThan(0);
+    const mismatches = names.filter(
+      (name) => pascalToKebab(kebabToPascal(name)) !== name
+    );
+    expect(mismatches).toEqual([]);
   });
 });
