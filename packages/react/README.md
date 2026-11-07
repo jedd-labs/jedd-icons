@@ -22,8 +22,6 @@ import { ArrowDownLeft } from "@jedd-icons/react";
 <ArrowDownLeft />;
 ```
 
-Filled variants are available from `@jedd-icons/react/fill`.
-
 ## Documentation
 
 Browse the full icon gallery and docs at [jeddicons.com](https://jeddicons.com) · [jeddicons.com/docs](https://jeddicons.com/docs).

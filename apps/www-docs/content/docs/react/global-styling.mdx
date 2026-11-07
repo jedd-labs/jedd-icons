@@ -10,8 +10,7 @@ stroke of **1.5** — wrap it in `JeddProvider` or use CSS.
 ## JeddProvider
 
 `JeddProvider` sets default `size`, `color`, `strokeWidth`, and
-`absoluteStrokeWidth` for every icon inside it, from both `@jedd-icons/react`
-and `@jedd-icons/react/fill`:
+`absoluteStrokeWidth` for every icon inside it:
 
 ```tsx
 import { Check, JeddProvider } from "@jedd-icons/react";
@@ -32,8 +31,8 @@ Each value is resolved in this order: the prop on the icon, then the nearest
 <TypeTable
   type={{
     size: { type: "number | string", description: "Default width and height." },
-    color: { type: "string", description: "Default stroke (stroke variant) or fill (fill variant)." },
-    strokeWidth: { type: "number | string", description: "Default stroke width. Ignored by the fill variant." },
+    color: { type: "string", description: "Default stroke color." },
+    strokeWidth: { type: "number | string", description: "Default stroke width." },
     absoluteStrokeWidth: { type: "boolean", description: "Keep a constant visual stroke width at any size by default." },
   }}
 />

@@ -7,10 +7,9 @@ three steps: drop the SVG, add metadata, run the build.
 
 ### Drop the SVG
 
-Save your file at `icons/<variant>/<name>.svg` using **kebab-case**, where
-`<variant>` is `stroke` or `fill`. Icons must fit inside a `24×24` viewBox and
-use **strokes only** (no fills on child elements). The canonical root attributes
-are:
+Save your file at `icons/stroke/<name>.svg` using **kebab-case**. Icons must fit
+inside a `24×24` viewBox and use **strokes only** (no fills on child elements).
+The canonical root attributes are:
 
 ```xml
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -44,7 +43,7 @@ set on the root `<svg>` and inherited at render time so the `color` and
 
 ### Add metadata
 
-Create `icons/<variant>/<name>.json` next to the SVG. The required fields are
+Create `icons/stroke/<name>.json` next to the SVG. The required fields are
 `$schema`, `contributors`, `tags`, and `categories`:
 
 ```json

@@ -20,7 +20,6 @@ import { SiteFooter } from "@/components/site-footer";
 import { UsageTabs } from "@/components/usage-tabs";
 import {
   CATEGORIES,
-  FILL_COMING_SOON,
   getIconCategories,
   getIconContributors,
   getIconRelease,
@@ -30,6 +29,7 @@ import {
   VARIANT_ICONS,
   VARIANT_MAPS,
   type Variant,
+  VISIBLE_VARIANTS,
 } from "@/lib/icons";
 import { baseOptions } from "@/lib/layout.shared";
 import { appName, pageTitle, siteUrl, socialMeta } from "@/lib/shared";
@@ -101,33 +101,26 @@ function IconsPage() {
     return () => ro.disconnect();
   }, []);
 
-  const variantToggle = (
+  // Only shown when there's more than one variant to pick from.
+  const variantToggle = VISIBLE_VARIANTS.length > 1 && (
     <div className="flex shrink-0 overflow-hidden rounded-none border border-border">
-      {(["stroke", "fill"] as const).map((v) => {
-        const disabled = FILL_COMING_SOON && v === "fill";
-        return (
-          <button
-            className={`px-2.5 py-1 text-xs capitalize transition-colors ${
-              variant === v
-                ? "bg-foreground text-background"
-                : "text-muted-foreground hover:text-foreground"
-            } disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:text-muted-foreground`}
-            disabled={disabled}
-            key={v}
-            onClick={() => {
-              setVariant(v);
-              setSelected(null);
-            }}
-            title={disabled ? "Fill variants coming soon" : undefined}
-            type="button"
-          >
-            {v}
-            {disabled && (
-              <span className="ml-1 text-[10px] normal-case">soon</span>
-            )}
-          </button>
-        );
-      })}
+      {VISIBLE_VARIANTS.map((v) => (
+        <button
+          className={`px-2.5 py-1 text-xs capitalize transition-colors ${
+            variant === v
+              ? "bg-foreground text-background"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+          key={v}
+          onClick={() => {
+            setVariant(v);
+            setSelected(null);
+          }}
+          type="button"
+        >
+          {v}
+        </button>
+      ))}
     </div>
   );
 
