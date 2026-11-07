@@ -38,7 +38,7 @@ Drop an SVG, add metadata, run one command.
 
 ### 1. Drop the SVG
 
-Save your file at `icons/<name>.svg` using **kebab-case**. Icons must fit inside a 24x24 viewBox and use **strokes only** (no fills on child elements). The canonical root attributes are:
+Save your file at `icons/<variant>/<name>.svg` using **kebab-case**, where `<variant>` is `stroke` (the default) or `fill` (exported under the `/fill` subpath). Icons must fit inside a 24x24 viewBox and use **strokes only** (no fills on child elements). The canonical root attributes are:
 
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -61,11 +61,12 @@ Design rules:
 
 ### 2. Add metadata
 
-Create `icons/<name>.json` next to the SVG:
+Create `icons/<variant>/<name>.json` next to the SVG:
 
 ```json
 {
-  "$schema": "../icon.schema.json",
+  "$schema": "../../icon.schema.json",
+  "contributors": ["your-github-username"],
   "tags": ["search-keyword-1", "search-keyword-2"],
   "categories": ["shapes"]
 }
@@ -76,13 +77,12 @@ The full set of fields lives in `icon.schema.json` at the repo root. Useful opti
 ```json
 {
   "aliases": [{ "name": "older-name" }],
-  "contributors": ["yourname"],
   "deprecated": true,
   "deprecationReason": "Use new-name instead"
 }
 ```
 
-`categories` is an enum — valid values are listed in `icon.schema.json`.
+`$schema`, `contributors`, `tags` and `categories` are required. `categories` is an enum — valid values are listed in `icon.schema.json`.
 
 ### 3. Build everything
 
@@ -114,7 +114,7 @@ import { ChevronRight } from "@jedd-icons/react"
 pnpm --filter www-docs dev
 ```
 
-Open `http://localhost:3000`. Your icon shows up in the grid; the search box filters by name; the sliders demo the consumer-side `size` / `strokeWidth` / `color` / `absoluteStrokeWidth` props live.
+Open `http://localhost:3000/icons`. Your icon shows up in the grid; the search box filters by name; the sliders demo the consumer-side `size` / `strokeWidth` / `color` / `absoluteStrokeWidth` props live.
 
 ## Individual commands
 
