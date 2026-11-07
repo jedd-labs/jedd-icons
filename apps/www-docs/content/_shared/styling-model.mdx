@@ -1,14 +1,11 @@
 Both packages share the same styling model: four knobs — `size`, `color`,
-`strokeWidth`, and `absoluteStrokeWidth` — plus the stroke/fill variant
-distinction. Only the surface syntax differs (React props vs `createElement`
-options).
+`strokeWidth`, and `absoluteStrokeWidth`. Only the surface syntax differs
+(React props vs `createElement` options).
 
-## How `color` behaves per variant
+## How `color` works
 
-- **Stroke variant** — `color` sets the `stroke` attribute; the interior stays
-  transparent (`fill: none`).
-- **Fill variant** — `color` sets the `fill` attribute; `strokeWidth` and
-  `absoluteStrokeWidth` are ignored.
+`color` sets the `stroke` attribute; the interior stays transparent
+(`fill: none`).
 
 ## How `absoluteStrokeWidth` works
 

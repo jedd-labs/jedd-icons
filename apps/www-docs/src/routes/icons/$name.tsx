@@ -16,7 +16,6 @@ import { IconReleaseInfo } from "@/components/icon-release-info";
 import { SiteFooter } from "@/components/site-footer";
 import { UsageTabs } from "@/components/usage-tabs";
 import {
-  FILL_COMING_SOON,
   getAvailableVariants,
   getIconCategories,
   getIconContributors,
@@ -24,6 +23,7 @@ import {
   getIconTags,
   humanizeCategory,
   humanizeIconName,
+  SHOW_FILL,
   VARIANT_MAPS,
   type Variant,
 } from "@/lib/icons";
@@ -39,12 +39,12 @@ const COPY_RESET_DELAY_MS = 1200;
 export const Route = createFileRoute("/icons/$name")({
   component: IconPage,
   validateSearch: (search: Record<string, unknown>) => ({
-    variant: (search.variant === "fill" ? "fill" : "stroke") as Variant,
+    variant: (SHOW_FILL && search.variant === "fill"
+      ? "fill"
+      : "stroke") as Variant,
   }),
   loader: ({ params }) => {
-    const inStroke = params.name in VARIANT_MAPS.stroke;
-    const inFill = params.name in VARIANT_MAPS.fill;
-    if (!(inStroke || inFill)) {
+    if (getAvailableVariants(params.name).length === 0) {
       throw notFound();
     }
   },
@@ -68,12 +68,10 @@ export const Route = createFileRoute("/icons/$name")({
 
 function IconPage() {
   const { name } = Route.useParams();
-  const { variant: searchVariant } = Route.useSearch();
+  // validateSearch pins this to stroke while fill is hidden, which also
+  // neutralizes any stale `?variant=fill` link.
+  const { variant } = Route.useSearch();
   const navigate = Route.useNavigate();
-
-  // While fill is "coming soon" its tab is disabled, so the effective variant is
-  // pinned to stroke — this also neutralizes any stale `?variant=fill` link.
-  const variant: Variant = FILL_COMING_SOON ? "stroke" : searchVariant;
 
   // The selected variant lives in the URL search param — the single source of
   // truth — so tab changes stay shareable and keep the canonical URL honest.
@@ -303,7 +301,7 @@ function IconPage() {
                     )}
                   </div>
 
-                  {!FILL_COMING_SOON && availableVariants.length > 1 && (
+                  {availableVariants.length > 1 && (
                     <Tabs
                       onValueChange={(value) => setVariant(value as Variant)}
                       value={variant}
