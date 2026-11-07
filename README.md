@@ -38,7 +38,7 @@ Drop an SVG, add metadata, run one command.
 
 ### 1. Drop the SVG
 
-Save your file at `icons/<variant>/<name>.svg` using **kebab-case**, where `<variant>` is `stroke` (the default) or `fill` (exported under the `/fill` subpath). Icons must fit inside a 24x24 viewBox and use **strokes only** (no fills on child elements). The canonical root attributes are:
+Save your file at `icons/stroke/<name>.svg` using **kebab-case**. Icons must fit inside a 24x24 viewBox and use **strokes only** (no fills on child elements). The canonical root attributes are:
 
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -61,7 +61,7 @@ Design rules:
 
 ### 2. Add metadata
 
-Create `icons/<variant>/<name>.json` next to the SVG:
+Create `icons/stroke/<name>.json` next to the SVG:
 
 ```json
 {
