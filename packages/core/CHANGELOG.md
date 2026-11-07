@@ -1,5 +1,11 @@
 # @jedd-icons/core
 
+## 0.8.1
+
+### Patch Changes
+
+- [#198](https://github.com/jedd-labs/jedd-icons/pull/198) [`f905a94`](https://github.com/jedd-labs/jedd-icons/commit/f905a94f1a0239740ede9169871cd0f1494fbe1a) Thanks [@mnove](https://github.com/mnove)! - `createIcons` now adds the per-icon class in kebab-case (`jedd-arrow-down-left`), matching the React components, even when the icon is registered as `ArrowDownLeft`.
+
 ## 0.8.0
 
 ### Minor Changes
