@@ -49,7 +49,27 @@ import {
 } from "@jedd-icons/core";
 import type {
   IconNode,
+  Variant,
   CreateElementOptions,
   CreateIconsOptions,
 } from "@jedd-icons/core";
 ```
+
+- **`createElement(iconNode, options?)`** — builds an `<svg>` element from an
+  icon's data.
+- **`createIcons(options?)`** — replaces `data-jedd` placeholders in the page
+  with icons.
+- **`variantDefaults`** — the attributes set on the root `<svg>` for each
+  variant (`stroke`, `fill`): `viewBox`, size, `fill` / `stroke` and, for
+  stroke icons, the width, line caps and joins. `createElement` starts from
+  these before applying its options; use them to render icons yourself, for
+  example as an SVG string.
+- **`defaultAttributes`** — the same as `variantDefaults.stroke`, kept for
+  backward compatibility.
+- **`resolveStrokeWidth(strokeWidth, size, absolute)`** — the stroke width an
+  icon renders with: `strokeWidth × 24 / size` when `absolute` is `true`,
+  otherwise `strokeWidth` unchanged (see
+  [How `absoluteStrokeWidth` works](#how-absolutestrokewidth-works)).
+- **`IconNode`** — the raw icon geometry tuple.
+- **`Variant`** — `"stroke" | "fill"`.
+- **`CreateElementOptions`** / **`CreateIconsOptions`** — the options above.
