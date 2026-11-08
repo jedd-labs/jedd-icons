@@ -36,6 +36,16 @@ set on the root `<svg>` and inherited at render time so the `color` and
 - Stroke-only — no `fill` on child elements.
 - Keep geometry flat: no `<g>` groups, `<defs>`, or `<mask>`. The parser is
   intentionally simple.
+- Keep the parts separate: export each part of the icon (e.g. a bookmark and
+  the check inside it) as its own `<path>`, and don't merge them into one. Keep
+  each continuous stroke in one path, though; splitting it would break its
+  corners. The build merges paths when it generates the packages, so this only
+  affects the source files.
+- Export without layer names (Figma's "Include 'id' attribute" off);
+  `pnpm icons:clean` strips any `id`s anyway.
+- Export final coordinates: no rotated shapes (reset the rotation or flatten
+  with ⌘E), no Repeat groups (they export as `<use>`), and no dash patterns
+  (draw dashes as separate strokes). `pnpm icons:check` flags each of these.
 
 </Step>
 
@@ -81,7 +91,9 @@ pnpm icons
 This single command runs the full pipeline:
 
 1. **`icons:clean`** — normalizes root `<svg>` attributes and strips inline
-   presentation attributes from child elements.
+   presentation attributes from child elements. It refuses to clean an icon
+   whose group rotation or dash pattern it would drop, and names the layer to
+   fix in the design tool.
 2. **`icons:check`** — checks the normalized SVGs and their metadata without
    changing them, and stops on problems such as transforms, dots too short for
    Safari, geometry outside the 1px margin, or metadata that doesn't match
