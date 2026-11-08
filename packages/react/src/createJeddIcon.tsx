@@ -7,6 +7,11 @@ import type { IconNode, IconProps, JeddIcon, Variant } from "./types";
 const toPascalCase = (s: string) =>
   s.replace(/(^|-)([a-z0-9])/g, (_, __, c) => c.toUpperCase());
 
+/**
+ * Internal: only the generated (gitignored) icon modules import this, so knip
+ * can't see its uses.
+ * @lintignore
+ */
 export default function createJeddIcon(
   iconName: string,
   iconNode: IconNode,

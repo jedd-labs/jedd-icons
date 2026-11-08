@@ -16,15 +16,11 @@ export const VISIBLE_VARIANTS: Variant[] = SHOW_FILL
   ? ["stroke", "fill"]
   : ["stroke"];
 
-// Non-icon exports of the package that must be filtered out.
-const RESERVED = new Set(["Icon", "createJeddIcon", "defaultAttributes"]);
-
 function extractIcons(lib: Record<string, unknown>) {
+  // Icons are forwardRef objects; this drops the package's other runtime
+  // export, `JeddProvider` (a function).
   return Object.entries(lib)
-    .filter(
-      ([name, value]) =>
-        !RESERVED.has(name) && typeof value === "object" && value !== null
-    )
+    .filter(([, value]) => typeof value === "object" && value !== null)
     .map(([name, Component]) => ({ name, Component: Component as JeddIcon }))
     .sort((a, b) => a.name.localeCompare(b.name));
 }

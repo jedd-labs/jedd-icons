@@ -25,7 +25,7 @@
       },
       "style": {
         // We use PascalCase component files (Icon.tsx) and camelCase utils
-        // (createJeddIcon.tsx, defaultAttributes.ts) by convention.
+        // (createJeddIcon.tsx) by convention.
         "useFilenamingConvention": "off",
         "noNestedTernary": "off"
       },
@@ -74,15 +74,6 @@
             "noLabelWithoutControl": "off",
             "useSemanticElements": "off"
           }
-        }
-      }
-    },
-    {
-      // Generated icon package: thin re-exports of shared defaults.
-      "includes": ["packages/react/src/defaultAttributes.ts"],
-      "linter": {
-        "rules": {
-          "style": { "noExportedImports": "off" }
         }
       }
     },

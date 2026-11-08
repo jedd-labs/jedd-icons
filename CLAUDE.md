@@ -43,7 +43,7 @@ Naming: `chevron-right.svg` (kebab) → `ChevronRight` component (Pascal). This 
 
 ### React runtime (hand-written, not generated)
 
-`packages/react/src/{Icon.tsx,createJeddIcon.tsx,types.ts,defaultAttributes.ts}` are the real source. `createJeddIcon(name, iconNode, variant)` wraps the shared `Icon` component, injecting `jedd jedd-<name>` classes. `Icon` applies consumer props (`size`, `color`, `strokeWidth`, `absoluteStrokeWidth`) and pulls variant defaults + `resolveStrokeWidth` from `@jedd-icons/shared`. `absoluteStrokeWidth` keeps stroke visually constant across sizes.
+`packages/react/src/{Icon.tsx,createJeddIcon.tsx,JeddProvider.tsx,types.ts}` are the real source; `Icon` and `createJeddIcon` are internal (not exported from the package). `createJeddIcon(name, iconNode, variant)` wraps the shared `Icon` component, injecting `jedd jedd-<name>` classes. `Icon` applies consumer props (`size`, `color`, `strokeWidth`, `absoluteStrokeWidth`) and pulls variant defaults + `resolveStrokeWidth` from `@jedd-icons/shared`. `absoluteStrokeWidth` keeps stroke visually constant across sizes.
 
 ## Packages
 
