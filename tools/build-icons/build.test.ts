@@ -252,9 +252,9 @@ describe("renderReactIconFile", () => {
   });
 
   it("emits the variant argument for a non-default variant", () => {
-    const out = renderReactIconFile("arrow-right", node as never, "fill");
+    const out = renderReactIconFile("arrow-right", node as never, "rounded");
     expect(out).toContain(
-      `const ArrowRight = createJeddIcon("arrow-right", __iconNode, "fill")`
+      `const ArrowRight = createJeddIcon("arrow-right", __iconNode, "rounded")`
     );
   });
 

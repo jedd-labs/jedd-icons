@@ -1,10 +1,10 @@
 // The selected icon, variant and check filters live in the URL
-// (`?icon=clock-9&variant=fill&check=margin`), so a reload keeps them and a
+// (`?icon=clock-9&variant=rounded&check=margin`), so a reload keeps them and a
 // link opens the Lab on the same icon.
 
 import { CHECKS, type CheckId } from "@/lib/checks";
 import { ICON_NODE_NAMES } from "@/lib/icon-nodes";
-import type { Variant } from "@/lib/icons";
+import { VARIANTS, type Variant } from "@/lib/icons";
 
 export interface Selection {
   checks: Set<CheckId>;
@@ -24,7 +24,7 @@ export function readSelection(fallbackIcon: string): Selection {
   const icon = params.get("icon");
   return {
     icon: icon && ICON_NODE_NAMES.includes(icon) ? icon : fallbackIcon,
-    variant: params.get("variant") === "fill" ? "fill" : "stroke",
+    variant: VARIANTS.find((v) => v === params.get("variant")) ?? "stroke",
     checks: new Set(params.getAll("check").filter(isCheckId)),
   };
 }

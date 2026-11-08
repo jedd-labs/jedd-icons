@@ -7,7 +7,7 @@
  * exported and reported, with exit code 1: once cleaned, nothing would be
  * left for `icons:check` to catch.
  *
- * Auto-discovers variant subdirectories under icons/ (e.g. stroke/, fill/).
+ * Auto-discovers variant subdirectories under icons/ (e.g. stroke/).
  *
  * Usage: tsx tools/build-icons/clean-icons.ts
  */

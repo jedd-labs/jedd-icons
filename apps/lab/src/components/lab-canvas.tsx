@@ -26,12 +26,10 @@ function PieceShape({
   piece,
   dimmed,
   perPiece,
-  fill,
 }: {
   piece: IconPiece;
   dimmed: boolean;
   perPiece: boolean;
-  fill: boolean;
 }) {
   const color = perPiece
     ? PIECE_COLORS[piece.index % PIECE_COLORS.length]
@@ -55,9 +53,7 @@ function PieceShape({
     ...(typeof linecap === "string"
       ? { strokeLinecap: linecap as "butt" | "round" | "square" }
       : {}),
-    ...(color
-      ? { stroke: fill ? "none" : color, fill: fill ? color : "none" }
-      : {}),
+    ...(color ? { stroke: color } : {}),
   };
 
   switch (piece.tag) {
@@ -99,7 +95,6 @@ function PieceShape({
 }
 
 export interface LabCanvasProps {
-  fill: boolean;
   /** Index of the piece to isolate, or null to show all. */
   isolatedPiece: number | null;
   /** The icon's margin measurement from `icons:check`, for the bounds overlay. */
@@ -128,7 +123,6 @@ export function LabCanvas({
   showControls,
   perPiece,
   isolatedPiece,
-  fill,
   margin,
 }: LabCanvasProps) {
   const pieces = useMemo(() => flattenPieces(node), [node]);
@@ -225,8 +219,8 @@ export function LabCanvas({
             x-ray renders identically to the published icons — Jedd icons are
             sharp/squared, not rounded. See tools/build-icons/clean-icons.lib.ts. */}
         <g
-          fill={fill ? "currentColor" : "none"}
-          stroke={fill ? "none" : "currentColor"}
+          fill="none"
+          stroke="currentColor"
           strokeLinecap="butt"
           strokeLinejoin="miter"
           strokeWidth={strokeWidth}
@@ -234,7 +228,6 @@ export function LabCanvas({
           {pieces.map((piece) => (
             <PieceShape
               dimmed={isolatedPiece !== null && isolatedPiece !== piece.index}
-              fill={fill}
               key={piece.index}
               perPiece={perPiece}
               piece={piece}

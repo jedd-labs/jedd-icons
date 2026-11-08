@@ -7,12 +7,6 @@
       "ignoreDependencies": ["@biomejs/biome"]
     },
     "packages/*": {},
-    "packages/react": {
-      "entry": ["src/fill.ts"]
-    },
-    "packages/core": {
-      "entry": ["src/fill.ts"]
-    },
     "apps/www-docs": {
       "entry": ["vite.config.ts"],
       "vite": false

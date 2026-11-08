@@ -1,5 +1,4 @@
 import type { JeddIcon } from "@jedd-icons/react";
-import type { Variant } from "@/lib/icons";
 
 interface IconPreviewProps {
   absolute: boolean;
@@ -10,12 +9,10 @@ interface IconPreviewProps {
   component: JeddIcon | null | undefined;
   size: number;
   strokeWidth: number;
-  variant: Variant;
 }
 
 export function IconPreview({
   component: Component,
-  variant,
   size,
   strokeWidth,
   absolute,
@@ -30,10 +27,9 @@ export function IconPreview({
 
   return (
     <Component
+      absoluteStrokeWidth={absolute}
       size={size}
-      {...(variant === "stroke"
-        ? { strokeWidth, absoluteStrokeWidth: absolute }
-        : {})}
+      strokeWidth={strokeWidth}
       {...(color ? { color } : {})}
       aria-hidden={ariaHidden}
     />

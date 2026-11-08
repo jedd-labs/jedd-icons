@@ -525,7 +525,6 @@ export function LabPage() {
           {node ? (
             <div className="flex items-center justify-center overflow-auto rounded-none border border-border bg-muted/10">
               <LabCanvas
-                fill={variant === "fill"}
                 isolatedPiece={isolatedPiece}
                 margin={getIconMargin(iconName, variant)}
                 node={node}
@@ -599,26 +598,24 @@ export function LabPage() {
                 </span>
               </div>
 
-              {variant === "stroke" && (
-                <div className="flex items-center gap-2">
-                  <span className="w-14 shrink-0 text-muted-foreground">
-                    Stroke
-                  </span>
-                  <Slider
-                    className="flex-1"
-                    max={3}
-                    min={0.5}
-                    onValueChange={(v) =>
-                      setPref("strokeWidth", Array.isArray(v) ? v[0] : v)
-                    }
-                    step={0.25}
-                    value={[view.strokeWidth]}
-                  />
-                  <span className="w-8 shrink-0 text-right tabular-nums">
-                    {view.strokeWidth.toFixed(2)}
-                  </span>
-                </div>
-              )}
+              <div className="flex items-center gap-2">
+                <span className="w-14 shrink-0 text-muted-foreground">
+                  Stroke
+                </span>
+                <Slider
+                  className="flex-1"
+                  max={3}
+                  min={0.5}
+                  onValueChange={(v) =>
+                    setPref("strokeWidth", Array.isArray(v) ? v[0] : v)
+                  }
+                  step={0.25}
+                  value={[view.strokeWidth]}
+                />
+                <span className="w-8 shrink-0 text-right tabular-nums">
+                  {view.strokeWidth.toFixed(2)}
+                </span>
+              </div>
             </div>
 
             <Separator />

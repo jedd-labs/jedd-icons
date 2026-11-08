@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createSearchAPI } from "fumadocs-core/search/server";
-import { VARIANT_ICONS, VISIBLE_VARIANTS } from "@/lib/icons";
+import { VARIANT_ICONS, VARIANTS } from "@/lib/icons";
 import { source } from "@/lib/source";
 
 const docsIndexes = source.getPages().map((page) => ({
@@ -12,7 +12,7 @@ const docsIndexes = source.getPages().map((page) => ({
   tag: "docs",
 }));
 
-const iconIndexes = VISIBLE_VARIANTS.flatMap((variant) =>
+const iconIndexes = VARIANTS.flatMap((variant) =>
   VARIANT_ICONS[variant].map(({ name }) => ({
     title: name,
     description: `Jedd ${variant} icon: ${name}`,

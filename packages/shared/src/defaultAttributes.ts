@@ -1,4 +1,6 @@
-export type Variant = "stroke" | "fill";
+// One entry per icon set under `icons/<variant>/`. Only the default stroke set
+// exists today; a rounded set would be added here with its own defaults.
+export type Variant = "stroke";
 
 const kebabToCamel = (s: string) =>
   s.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
@@ -35,26 +37,6 @@ export const strokeDefaultsCamel = toCamel(strokeDefaults) as {
   strokeLinejoin: string;
 };
 
-// ── Fill defaults ────────────────────────────────────────────────────
-
-export const fillDefaults = {
-  xmlns: "http://www.w3.org/2000/svg",
-  width: 24,
-  height: 24,
-  viewBox: "0 0 24 24",
-  fill: "currentColor",
-  stroke: "none",
-} as const;
-
-export const fillDefaultsCamel = toCamel(fillDefaults) as {
-  xmlns: string;
-  width: number;
-  height: number;
-  viewBox: string;
-  fill: string;
-  stroke: string;
-};
-
 // ── Variant lookup ───────────────────────────────────────────────────
 
 export const variantDefaults: Record<
@@ -62,7 +44,6 @@ export const variantDefaults: Record<
   Record<string, string | number>
 > = {
   stroke: strokeDefaults,
-  fill: fillDefaults,
 };
 
 export const variantDefaultsCamel: Record<
@@ -70,7 +51,6 @@ export const variantDefaultsCamel: Record<
   Record<string, string | number>
 > = {
   stroke: strokeDefaultsCamel,
-  fill: fillDefaultsCamel,
 };
 
 // Backward compat

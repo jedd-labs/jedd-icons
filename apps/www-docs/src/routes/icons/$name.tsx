@@ -23,8 +23,8 @@ import {
   getIconTags,
   humanizeCategory,
   humanizeIconName,
-  SHOW_FILL,
   VARIANT_MAPS,
+  VARIANTS,
   type Variant,
 } from "@/lib/icons";
 import { baseOptions } from "@/lib/layout.shared";
@@ -39,9 +39,7 @@ const COPY_RESET_DELAY_MS = 1200;
 export const Route = createFileRoute("/icons/$name")({
   component: IconPage,
   validateSearch: (search: Record<string, unknown>) => ({
-    variant: (SHOW_FILL && search.variant === "fill"
-      ? "fill"
-      : "stroke") as Variant,
+    variant: VARIANTS.find((v) => v === search.variant) ?? "stroke",
   }),
   loader: ({ params }) => {
     if (getAvailableVariants(params.name).length === 0) {
@@ -59,7 +57,7 @@ export const Route = createFileRoute("/icons/$name")({
         { name: "description", content: description },
         ...socialMeta({ title, description, url }),
       ],
-      // Canonical without the ?variant search param so stroke/fill variants
+      // Canonical without the ?variant search param so an icon's variants
       // collapse to a single indexable URL.
       links: [{ rel: "canonical", href: url }],
     };
@@ -68,7 +66,7 @@ export const Route = createFileRoute("/icons/$name")({
 
 function IconPage() {
   const { name } = Route.useParams();
-  // validateSearch pins this to stroke while fill is hidden, which also
+  // validateSearch falls back to stroke for an unknown variant, which also
   // neutralizes any stale `?variant=fill` link.
   const { variant } = Route.useSearch();
   const navigate = Route.useNavigate();
@@ -176,7 +174,6 @@ function IconPage() {
                       component={Component}
                       size={size}
                       strokeWidth={strokeWidth}
-                      variant={variant}
                     />
                   </div>
 
@@ -190,7 +187,6 @@ function IconPage() {
                             component={Component}
                             size={s}
                             strokeWidth={strokeWidth}
-                            variant={variant}
                           />
                         </div>
                         <span className="font-mono text-[10px] text-muted-foreground">
@@ -222,47 +218,41 @@ function IconPage() {
                         />
                       </div>
 
-                      {variant === "stroke" && (
-                        <div className="flex flex-col gap-1.5">
-                          <div className="flex items-center justify-between text-xs">
-                            <span className="text-foreground">
-                              Stroke width
-                            </span>
-                            <span className="font-mono text-muted-foreground">
-                              {strokeWidth.toFixed(1)}px
-                            </span>
-                          </div>
-                          <Slider
-                            max={3}
-                            min={0.5}
-                            onValueChange={(v) =>
-                              setStrokeWidth(Array.isArray(v) ? v[0] : v)
-                            }
-                            step={0.25}
-                            value={[strokeWidth]}
-                          />
+                      <div className="flex flex-col gap-1.5">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-foreground">Stroke width</span>
+                          <span className="font-mono text-muted-foreground">
+                            {strokeWidth.toFixed(1)}px
+                          </span>
                         </div>
-                      )}
+                        <Slider
+                          max={3}
+                          min={0.5}
+                          onValueChange={(v) =>
+                            setStrokeWidth(Array.isArray(v) ? v[0] : v)
+                          }
+                          step={0.25}
+                          value={[strokeWidth]}
+                        />
+                      </div>
                     </div>
 
                     <div className="flex flex-col gap-4">
-                      {variant === "stroke" && (
-                        <Label
-                          className="flex items-center justify-between text-xs"
-                          htmlFor={absoluteId}
-                        >
-                          <span className="text-foreground">
-                            Absolute stroke width
-                          </span>
-                          <Checkbox
-                            checked={absolute}
-                            id={absoluteId}
-                            onCheckedChange={(checked) =>
-                              setAbsolute(checked === true)
-                            }
-                          />
-                        </Label>
-                      )}
+                      <Label
+                        className="flex items-center justify-between text-xs"
+                        htmlFor={absoluteId}
+                      >
+                        <span className="text-foreground">
+                          Absolute stroke width
+                        </span>
+                        <Checkbox
+                          checked={absolute}
+                          id={absoluteId}
+                          onCheckedChange={(checked) =>
+                            setAbsolute(checked === true)
+                          }
+                        />
+                      </Label>
 
                       <div className="flex items-center gap-2 text-xs">
                         <span className="text-foreground">Color</span>

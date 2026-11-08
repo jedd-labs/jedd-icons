@@ -65,14 +65,6 @@ describe("checkIcon", () => {
     expect(out).toHaveLength(1);
     expect(out[0]).toContain("error: dot at (12, 16) is only 0.0001 long");
   });
-
-  it("checks merging and dots only for the stroke variant", () => {
-    const fill = cleanSvg(
-      `<svg><path d="M12 16V16.0001" stroke-linecap="square"/></svg>`,
-      VARIANT_ROOT_ATTRS.fill
-    );
-    expect(checkIcon(fill, "fill")).toEqual([]);
-  });
 });
 
 describe("margin", () => {
@@ -87,11 +79,7 @@ describe("margin", () => {
   });
 
   it("says when geometry leaves the viewBox", () => {
-    const fill = cleanSvg(
-      `<svg><circle cx="12" cy="12" r="12.5"/></svg>`,
-      VARIANT_ROOT_ATTRS.fill
-    );
-    const out = messages(fill, "fill");
+    const out = messages(stroke(`<circle cx="12" cy="12" r="12.5"/>`));
     expect(out).toHaveLength(1);
     expect(out[0]).toContain("and leaves the 24×24 viewBox");
   });

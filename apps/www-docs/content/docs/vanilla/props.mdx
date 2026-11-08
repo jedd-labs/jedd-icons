@@ -28,7 +28,7 @@ helper.
     icons: { type: "Record<string, IconNode>", default: "{}", description: "Map of icon names to icon data. The name must match the data-jedd value." },
     attrs: { type: "CreateElementOptions", default: "{}", description: "Default options applied to every replaced icon." },
     nameAttr: { type: "string", default: '"data-jedd"', description: "The attribute used to find placeholders." },
-    watch: { type: "boolean", default: "false", description: "Keep replacing icons as new placeholders are added to the DOM." },
+    watch: { type: "boolean", default: "false", description: "Keep replacing icons as new placeholders are added to the DOM. Call the function createIcons returns to stop." },
   }}
 />
 
@@ -58,10 +58,10 @@ import type {
 - **`createElement(iconNode, options?)`** — builds an `<svg>` element from an
   icon's data.
 - **`createIcons(options?)`** — replaces `data-jedd` placeholders in the page
-  with icons.
+  with icons. Returns a function that stops `watch` (a no-op without it).
 - **`variantDefaults`** — the attributes set on the root `<svg>` for each
-  variant (`stroke`, `fill`): `viewBox`, size, `fill` / `stroke` and, for
-  stroke icons, the width, line caps and joins. `createElement` starts from
+  variant (only `stroke` today): `viewBox`, size, `fill` / `stroke`, the
+  stroke width, line caps and joins. `createElement` starts from
   these before applying its options; use them to render icons yourself, for
   example as an SVG string.
 - **`defaultAttributes`** — the same as `variantDefaults.stroke`, kept for
@@ -71,5 +71,5 @@ import type {
   otherwise `strokeWidth` unchanged (see
   [How `absoluteStrokeWidth` works](#how-absolutestrokewidth-works)).
 - **`IconNode`** — the raw icon geometry tuple.
-- **`Variant`** — `"stroke" | "fill"`.
+- **`Variant`** — `"stroke"`.
 - **`CreateElementOptions`** / **`CreateIconsOptions`** — the options above.

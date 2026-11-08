@@ -34,7 +34,7 @@ export function SvgCodeView({
         <span className="font-medium text-muted-foreground text-xs">
           Shipped SVG
           <span className="ml-1.5 text-[10px] normal-case">
-            @jedd-icons/{variant === "fill" ? "react/fill" : "react"}
+            @jedd-icons/{variant === "stroke" ? "react" : `react/${variant}`}
           </span>
         </span>
         <button

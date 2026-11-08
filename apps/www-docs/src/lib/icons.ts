@@ -1,20 +1,14 @@
-import type { JeddIcon } from "@jedd-icons/react";
+import type { JeddIcon, Variant } from "@jedd-icons/react";
 import * as StrokeLib from "@jedd-icons/react";
-import * as FillLib from "@jedd-icons/react/fill";
 import iconCategories from "generated/icon-categories.json";
 import iconContributors from "generated/icon-contributors.json";
 import iconReleases from "generated/icon-releases.json";
 import iconTags from "generated/icon-tags.json";
 
-export type Variant = "stroke" | "fill";
-// Fill isn't being developed yet, so the site shows stroke only. The packages
-// still ship it (`@jedd-icons/react/fill`); flip this to bring it back here.
-export const SHOW_FILL = false;
+export type { Variant } from "@jedd-icons/react";
 
-/** Variants the site shows, in canonical order (stroke before fill). */
-export const VISIBLE_VARIANTS: Variant[] = SHOW_FILL
-  ? ["stroke", "fill"]
-  : ["stroke"];
+/** Every icon set, in canonical order (the default stroke set first). */
+export const VARIANTS: readonly Variant[] = ["stroke"];
 
 function extractIcons(lib: Record<string, unknown>) {
   // Icons are forwardRef objects; this drops the package's other runtime
@@ -31,7 +25,6 @@ export const VARIANT_ICONS: Record<
   { name: string; Component: JeddIcon }[]
 > = {
   stroke: extractIcons(StrokeLib as unknown as Record<string, unknown>),
-  fill: extractIcons(FillLib as unknown as Record<string, unknown>),
 };
 
 /** Name → component lookup per variant. */
@@ -39,19 +32,16 @@ export const VARIANT_MAPS: Record<Variant, Record<string, JeddIcon>> = {
   stroke: Object.fromEntries(
     VARIANT_ICONS.stroke.map(({ name, Component }) => [name, Component])
   ),
-  fill: Object.fromEntries(
-    VARIANT_ICONS.fill.map(({ name, Component }) => [name, Component])
-  ),
 };
 
-/** Every unique icon name across the visible variants — used to enumerate /icons/* routes. */
+/** Every unique icon name across the variants — used to enumerate /icons/* routes. */
 export const ALL_ICON_NAMES = Array.from(
-  new Set(VISIBLE_VARIANTS.flatMap((v) => VARIANT_ICONS[v].map((i) => i.name)))
+  new Set(VARIANTS.flatMap((v) => VARIANT_ICONS[v].map((i) => i.name)))
 ).sort((a, b) => a.localeCompare(b));
 
-/** Visible variants an icon exists in, in canonical order (stroke before fill). */
+/** Variants an icon exists in, in canonical order. */
 export function getAvailableVariants(name: string): Variant[] {
-  return VISIBLE_VARIANTS.filter((v) => name in VARIANT_MAPS[v]);
+  return VARIANTS.filter((v) => name in VARIANT_MAPS[v]);
 }
 
 /** PascalCase component name → spaced words: "ChevronRight" → "Chevron Right". */
@@ -158,13 +148,8 @@ export function buildReactSnippet({
     variant === "stroke" ? "@jedd-icons/react" : `@jedd-icons/react/${variant}`;
   const importLine = `import { ${name} } from "${importPath}"`;
   const colorProp = color ? ` color="${color}"` : "";
-
-  if (variant === "stroke") {
-    const absoluteProp = absolute ? " absoluteStrokeWidth" : "";
-    return `${importLine}\n\n<${name} size={${size}} strokeWidth={${strokeWidth}}${absoluteProp}${colorProp} />`;
-  }
-
-  return `${importLine}\n\n<${name} size={${size}}${colorProp} />`;
+  const absoluteProp = absolute ? " absoluteStrokeWidth" : "";
+  return `${importLine}\n\n<${name} size={${size}} strokeWidth={${strokeWidth}}${absoluteProp}${colorProp} />`;
 }
 
 /** Vanilla (`@jedd-icons/core`) usage snippet using the `createElement` helper. */
@@ -181,23 +166,16 @@ export function buildVanillaSnippet({
   }
 
   // The core (vanilla) package exposes each icon as plain data plus a
-  // `createElement(iconData, options)` helper. Fill icons live on `/core/fill`
-  // and need `variant: "fill"`; stroke is the default and omits the option.
-  const importPath =
-    variant === "stroke" ? "@jedd-icons/core" : "@jedd-icons/core/fill";
+  // `createElement(iconData, options)` helper. Other variants' icons live on
+  // `/core/<variant>`, but `createElement` always comes from the root.
   const importLine =
     variant === "stroke"
-      ? `import { ${name}, createElement } from "${importPath}"`
-      : `import { createElement } from "@jedd-icons/core"\nimport { ${name} } from "${importPath}"`;
+      ? `import { ${name}, createElement } from "@jedd-icons/core"`
+      : `import { createElement } from "@jedd-icons/core"\nimport { ${name} } from "@jedd-icons/core/${variant}"`;
 
-  const options: string[] = [`size: ${size}`];
-  if (variant === "stroke") {
-    options.push(`strokeWidth: ${strokeWidth}`);
-    if (absolute) {
-      options.push("absoluteStrokeWidth: true");
-    }
-  } else {
-    options.push(`variant: "fill"`);
+  const options: string[] = [`size: ${size}`, `strokeWidth: ${strokeWidth}`];
+  if (absolute) {
+    options.push("absoluteStrokeWidth: true");
   }
   if (color) {
     options.push(`color: "${color}"`);

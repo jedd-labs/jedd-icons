@@ -50,8 +50,15 @@ createIcons({
 });
 ```
 
-Per-element `data-jedd-size`, `data-jedd-color`, and `data-jedd-stroke-width`
-attributes override the shared `attrs` defaults.
+Per-element `data-jedd-size`, `data-jedd-color`, `data-jedd-stroke-width` and
+`data-jedd-absolute-stroke-width` attributes override the shared `attrs`
+defaults. `data-jedd-absolute-stroke-width` is on when present, so write
+`data-jedd-absolute-stroke-width="false"` to turn off a shared
+`absoluteStrokeWidth: true` for one icon:
+
+```html
+<i data-jedd="Check" data-jedd-size="48" data-jedd-absolute-stroke-width></i>
+```
 
 ### Watching for new icons
 
@@ -59,11 +66,18 @@ Set `watch: true` to install a `MutationObserver` that replaces placeholders
 added after the initial call — useful for dynamically rendered content:
 
 ```js
-createIcons({
+const stop = createIcons({
   icons: { ArrowDownLeft, Check },
   watch: true,
 });
+
+// Later, e.g. when the view that needed it unmounts:
+stop();
 ```
+
+`createIcons` returns that function whether or not you watch, so you can call it
+unconditionally. Each call with `watch: true` starts its own observer, so stop
+the previous one before calling it again.
 
 <Callout type="warn">
   Unknown icon names are skipped with a `console.warn` — make sure every name

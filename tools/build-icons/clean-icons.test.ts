@@ -31,18 +31,11 @@ describe("unwrapGroups", () => {
 
 describe("cleanSvg", () => {
   const stroke = VARIANT_ROOT_ATTRS.stroke;
-  const fill = VARIANT_ROOT_ATTRS.fill;
 
   it("strips inherited attrs from children and sets canonical stroke root", () => {
     const svg = `<svg foo="bar"><path d="M5 12h14" stroke="red" stroke-width="2"/></svg>`;
     const out = cleanSvg(svg, stroke);
     expect(out).toBe(`<svg ${stroke}>\n<path d="M5 12h14"/>\n</svg>\n`);
-  });
-
-  it("applies the fill variant root attrs", () => {
-    const svg = `<svg><path d="M1 1" fill="red"/></svg>`;
-    const out = cleanSvg(svg, fill);
-    expect(out).toBe(`<svg ${fill}>\n<path d="M1 1"/>\n</svg>\n`);
   });
 
   it("drops a redundant default (miter) stroke-linejoin from a child", () => {
