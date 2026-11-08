@@ -19,8 +19,8 @@ PR.
 
 Bump levels (we are pre-1.0, so breaking changes ride on `minor`):
 
-- **patch** — bug fixes, new icons, non-breaking additions
-- **minor** — new features, or a breaking change (while we are on `0.x`)
+- **patch** — bug fixes, including fixes to existing icon geometry
+- **minor** — new icons, new features, or a breaking change (while we are on `0.x`)
 - **major** — reserved for the eventual `1.0.0` stability commitment
 
 Docs-only / chore / CI PRs do not need a changeset.
