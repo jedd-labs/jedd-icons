@@ -1,5 +1,11 @@
 # @jedd-icons/react
 
+## 0.10.0
+
+### Minor Changes
+
+- [#207](https://github.com/jedd-labs/jedd-icons/pull/207) [`71e1fed`](https://github.com/jedd-labs/jedd-icons/commit/71e1fed437d9d52499441e7c82898987ec56e3f3) Thanks [@mnove](https://github.com/mnove)! - **Breaking:** the fill variant is removed. The `/fill` subpath export no longer exists in either package, and `createElement` in `@jedd-icons/core` no longer accepts a `variant` option. Only one icon ever had a fill version; import it from the package root instead.
+
 ## 0.9.0
 
 ### Minor Changes
