@@ -1,5 +1,11 @@
 # @jedd-icons/react
 
+## 0.9.0
+
+### Minor Changes
+
+- [#203](https://github.com/jedd-labs/jedd-icons/pull/203) [`631065e`](https://github.com/jedd-labs/jedd-icons/commit/631065e41bb2fb90b171a50e8a1c0e5af73e7940) Thanks [@mnove](https://github.com/mnove)! - **Breaking:** `createJeddIcon`, `Icon` and `defaultAttributes` are no longer exported from `@jedd-icons/react`. They were never documented and are now internal; import icon components and `JeddProvider` instead.
+
 ## 0.8.0
 
 ### Minor Changes
