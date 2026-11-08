@@ -61,8 +61,8 @@ You do **not** need a changeset for docs-only, chore, CI, or internal-package
 
 While we are on `0.x`, breaking changes ride on a **minor** bump:
 
-- **patch** — bug fixes, new icons, non-breaking additions
-- **minor** — new features, or a breaking change
+- **patch** — bug fixes, including fixes to existing icon geometry
+- **minor** — new icons, new features, or a breaking change
 - **major** — reserved for the eventual `1.0.0` stability commitment
 
 ## Releasing (maintainers)
