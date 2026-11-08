@@ -40,21 +40,6 @@
       },
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
-    },
-    "./fill": {
-      "types": {
-        "import": "./dist/fill.d.mts",
-        "require": "./dist/fill.d.cts"
-      },
-      "import": "./dist/fill.mjs",
-      "require": "./dist/fill.cjs"
-    }
-  },
-  "typesVersions": {
-    "*": {
-      "fill": [
-        "./dist/fill.d.mts"
-      ]
     }
   },
   "files": [

@@ -9,12 +9,16 @@ export interface CreateIconsOptions {
   watch?: boolean;
 }
 
+/**
+ * Replaces `[data-jedd]` placeholders with icons. Returns a function that
+ * stops watching for new placeholders (a no-op without `watch: true`).
+ */
 export function createIcons({
   icons = {},
   attrs = {},
   nameAttr = "data-jedd",
   watch = false,
-}: CreateIconsOptions = {}): void {
+}: CreateIconsOptions = {}): () => void {
   const replace = (root: ParentNode = document) => {
     const elements = root.querySelectorAll<HTMLElement>(`[${nameAttr}]`);
     for (const el of elements) {
@@ -39,6 +43,12 @@ export function createIcons({
       if (el.dataset.jeddStrokeWidth) {
         elAttrs.strokeWidth = el.dataset.jeddStrokeWidth;
       }
+      // Boolean attribute: present (or "true") turns it on, "false" turns off
+      // a shared `attrs.absoluteStrokeWidth: true` for this element.
+      const absolute = el.dataset.jeddAbsoluteStrokeWidth;
+      if (absolute !== undefined) {
+        elAttrs.absoluteStrokeWidth = absolute !== "false";
+      }
 
       const svg = createElement(iconNode, {
         ...elAttrs,
@@ -55,20 +65,29 @@ export function createIcons({
 
   replace();
 
-  if (watch && typeof MutationObserver !== "undefined") {
-    const observer = new MutationObserver((mutations) => {
-      for (const mutation of mutations) {
-        for (const node of mutation.addedNodes) {
-          if (node instanceof HTMLElement) {
-            if (node.hasAttribute(nameAttr)) {
-              replace(node.parentNode ?? document);
-            } else {
-              replace(node);
-            }
+  if (!watch || typeof MutationObserver === "undefined") {
+    return () => undefined;
+  }
+
+  const observer = new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      for (const node of mutation.addedNodes) {
+        if (node instanceof HTMLElement) {
+          if (node.hasAttribute(nameAttr)) {
+            replace(node.parentNode ?? document);
+          } else {
+            replace(node);
           }
         }
       }
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
-  }
+    }
+  });
+  // `document.body` is null when called from a script in <head>; watching the
+  // root element still catches the placeholders as the body is parsed.
+  observer.observe(document.body ?? document.documentElement, {
+    childList: true,
+    subtree: true,
+  });
+
+  return () => observer.disconnect();
 }

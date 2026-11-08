@@ -6,7 +6,7 @@ import { HeroSection } from "@/components/home/hero-section";
 import { IconPreviewGrid } from "@/components/home/icon-preview-grid";
 import { SiteFooter } from "@/components/site-footer";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
-import { VARIANT_ICONS, VISIBLE_VARIANTS } from "@/lib/icons";
+import { VARIANT_ICONS, VARIANTS } from "@/lib/icons";
 import { baseOptions } from "@/lib/layout.shared";
 import { appName, pageTitle, siteUrl, socialMeta } from "@/lib/shared";
 
@@ -31,7 +31,7 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
   const navigate = useNavigate();
-  const totalIcons = VISIBLE_VARIANTS.reduce(
+  const totalIcons = VARIANTS.reduce(
     (total, v) => total + VARIANT_ICONS[v].length,
     0
   );

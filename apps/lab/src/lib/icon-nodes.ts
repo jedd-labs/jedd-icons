@@ -1,5 +1,5 @@
 import rawIconNodes from "generated/icon-nodes.json";
-import type { Variant } from "@/lib/icons";
+import { VARIANTS, type Variant } from "@/lib/icons";
 import type { IconNodeChild } from "@/lib/svg-path";
 import type {
   Issue,
@@ -42,7 +42,7 @@ export function getVariantsWithGeometry(name: string): Variant[] {
   if (!entry) {
     return [];
   }
-  return (["stroke", "fill"] as const).filter((v) => v in entry);
+  return VARIANTS.filter((v) => v in entry);
 }
 
 /** Raw parsed geometry for an icon+variant, or null when absent. */
@@ -85,6 +85,6 @@ export function getPascalName(name: string, variant?: Variant): string | null {
   if (!entry) {
     return null;
   }
-  const chosen = variant ? entry[variant] : (entry.stroke ?? entry.fill);
+  const chosen = entry[variant ?? "stroke"];
   return chosen?.pascalName ?? null;
 }

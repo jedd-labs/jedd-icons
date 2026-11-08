@@ -1,7 +1,7 @@
 import { defineConfig } from "tsdown";
 
 export default defineConfig({
-  // index + auto-discovered variant entries (e.g. src/fill.ts), excluding the
+  // index + auto-discovered variant entries (e.g. src/rounded.ts), excluding the
   // internal top-level modules. unbundle preserves everything else (icons/*,
   // Icon.tsx, createJeddIcon.tsx) as their own modules regardless.
   // "use client" directives are preserved by default (oxc keeps top-level

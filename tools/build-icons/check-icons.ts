@@ -5,7 +5,7 @@
  * the packages ship, and have a sidecar `.json` matching `icon.schema.json`.
  * Exits 1 on any error; warnings flag what may be intended.
  *
- * Auto-discovers variant subdirectories under icons/ (e.g. stroke/, fill/).
+ * Auto-discovers variant subdirectories under icons/ (e.g. stroke/).
  * On GitHub Actions, issues are printed as annotations so they show on the
  * PR's changed files.
  *

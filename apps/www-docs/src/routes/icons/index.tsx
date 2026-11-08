@@ -28,8 +28,8 @@ import {
   humanizeIconName,
   VARIANT_ICONS,
   VARIANT_MAPS,
+  VARIANTS,
   type Variant,
-  VISIBLE_VARIANTS,
 } from "@/lib/icons";
 import { baseOptions } from "@/lib/layout.shared";
 import { appName, pageTitle, siteUrl, socialMeta } from "@/lib/shared";
@@ -102,9 +102,9 @@ function IconsPage() {
   }, []);
 
   // Only shown when there's more than one variant to pick from.
-  const variantToggle = VISIBLE_VARIANTS.length > 1 && (
+  const variantToggle = VARIANTS.length > 1 && (
     <div className="flex shrink-0 overflow-hidden rounded-none border border-border">
-      {VISIBLE_VARIANTS.map((v) => (
+      {VARIANTS.map((v) => (
         <button
           className={`px-2.5 py-1 text-xs capitalize transition-colors ${
             variant === v
@@ -330,7 +330,6 @@ function IconsPage() {
                             component={Component}
                             size={size}
                             strokeWidth={strokeWidth}
-                            variant={variant}
                           />
                         </span>
                         {showLabels && (
@@ -493,7 +492,6 @@ function IconsPage() {
                   component={SelectedComponent}
                   size={48}
                   strokeWidth={strokeWidth}
-                  variant={variant}
                 />
               </div>
 

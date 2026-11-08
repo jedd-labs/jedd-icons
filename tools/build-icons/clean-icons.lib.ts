@@ -13,14 +13,6 @@ export const VARIANT_ROOT_ATTRS: Record<string, string> = {
     'stroke-linecap="butt"',
     'stroke-linejoin="miter"',
   ].join(" "),
-  fill: [
-    'xmlns="http://www.w3.org/2000/svg"',
-    'width="24"',
-    'height="24"',
-    'viewBox="0 0 24 24"',
-    'fill="currentColor"',
-    'stroke="none"',
-  ].join(" "),
 };
 
 // Presentation attributes stripped from child elements (they're set on the root

@@ -38,25 +38,18 @@ const Icon = forwardRef<SVGSVGElement, InternalProps>(
     const hasA11y =
       "aria-label" in rest || "aria-labelledby" in rest || "role" in rest;
 
+    // Every variant is a stroked set, so color and stroke width always apply
+    // to the stroke; a variant's defaults only differ in caps/joins.
     const svgProps: Record<string, unknown> = {
       ref,
       ...defaults,
       width: size,
       height: size,
       className,
+      stroke: color,
+      strokeWidth: resolveStrokeWidth(strokeWidth, size, absoluteStrokeWidth),
       ...(children || hasA11y ? {} : { "aria-hidden": true }),
     };
-
-    if (variant === "stroke") {
-      svgProps.stroke = color;
-      svgProps.strokeWidth = resolveStrokeWidth(
-        strokeWidth,
-        size,
-        absoluteStrokeWidth
-      );
-    } else {
-      svgProps.fill = color;
-    }
 
     return createElement("svg", { ...svgProps, ...rest }, [
       ...iconNode.map(function renderNode(

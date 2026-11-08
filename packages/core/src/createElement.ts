@@ -1,5 +1,5 @@
-import type { IconNode, IconNodeChild, Variant } from "@jedd-icons/shared";
-import { resolveStrokeWidth, variantDefaults } from "@jedd-icons/shared";
+import type { IconNode, IconNodeChild } from "@jedd-icons/shared";
+import { resolveStrokeWidth, strokeDefaults } from "@jedd-icons/shared";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -10,13 +10,11 @@ export interface CreateElementOptions {
   color?: string;
   size?: number | string;
   strokeWidth?: number | string;
-  variant?: Variant;
 }
 
 export function createElement(
   iconNode: IconNode,
   {
-    variant = "stroke",
     size = 24,
     color = "currentColor",
     strokeWidth = 2,
@@ -26,22 +24,17 @@ export function createElement(
   }: CreateElementOptions = {}
 ): SVGSVGElement {
   const svg = document.createElementNS(SVG_NS, "svg");
-  const defaults = variantDefaults[variant];
 
-  for (const [key, value] of Object.entries(defaults)) {
+  for (const [key, value] of Object.entries(strokeDefaults)) {
     svg.setAttribute(key, String(value));
   }
 
   svg.setAttribute("width", String(size));
   svg.setAttribute("height", String(size));
 
-  if (variant === "stroke") {
-    const resolved = resolveStrokeWidth(strokeWidth, size, absoluteStrokeWidth);
-    svg.setAttribute("stroke", color);
-    svg.setAttribute("stroke-width", String(resolved));
-  } else {
-    svg.setAttribute("fill", color);
-  }
+  const resolved = resolveStrokeWidth(strokeWidth, size, absoluteStrokeWidth);
+  svg.setAttribute("stroke", color);
+  svg.setAttribute("stroke-width", String(resolved));
 
   if (className) {
     svg.setAttribute("class", className);
