@@ -6,12 +6,7 @@ export default defineConfig({
   // Icon.tsx, createJeddIcon.tsx) as their own modules regardless.
   // "use client" directives are preserved by default (oxc keeps top-level
   // directives), so rollup-preserve-directives is no longer needed.
-  entry: [
-    "src/*.ts",
-    "!src/defaultAttributes.ts",
-    "!src/types.ts",
-    "!src/_*.ts",
-  ],
+  entry: ["src/*.ts", "!src/types.ts", "!src/_*.ts"],
   format: ["esm", "cjs"],
   dts: true,
   unbundle: true,
