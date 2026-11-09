@@ -2,6 +2,40 @@
 
 Thanks for contributing to jedd-icons!
 
+## Adding or updating icons
+
+The step-by-step guide (SVG rules, metadata, build) is on the site:
+[Adding icons](https://jeddicons.com/docs/react/adding-icons). In short, after
+adding or changing an icon run:
+
+```bash
+pnpm icons   # clean + check the source SVGs, then build every package
+```
+
+When you re-export icons that are already in the repo, run
+`pnpm icons:compare` to check the shipped geometry didn't change by accident
+(it compares every icon SVG changed since `HEAD`; pass `--ref <git-ref>` or
+`--from <export-dir>` to compare against something else).
+
+## Commands
+
+Run from the repository root:
+
+| Command | What it does |
+| --- | --- |
+| `pnpm icons` | Full pipeline: clean + check SVGs, then build all packages |
+| `pnpm icons:clean` | Normalize source SVGs in place |
+| `pnpm icons:check` | Check source SVGs and metadata without changing them |
+| `pnpm icons:compare` | Compare re-exported SVGs with the committed icons |
+| `pnpm build` | Build all packages via Turbo |
+| `pnpm dev` | Run every package and app in dev mode |
+| `pnpm --filter www-docs dev` | Run just the gallery / docs site |
+| `pnpm lint` | Lint and format-check with Ultracite (Biome) |
+| `pnpm format` | Apply Ultracite lint and format fixes |
+| `pnpm test` | Run the Vitest suites |
+| `pnpm typecheck` | Type-check every package |
+| `pnpm knip` | Find unused files, exports, and dependencies (run after a build) |
+
 ## Git hooks
 
 We use [Lefthook](https://lefthook.dev) for git hooks. They install

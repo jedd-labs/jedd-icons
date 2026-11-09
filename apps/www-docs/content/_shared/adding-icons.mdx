@@ -114,6 +114,22 @@ pnpm --filter www-docs dev
 Open the gallery, search for your icon by name, and use the sliders to confirm
 the `size` / `strokeWidth` / `color` / `absoluteStrokeWidth` props behave.
 
+## Re-exporting existing icons
+
+When you re-export icons that are already in the repo, check that the shipped
+geometry didn't move by accident:
+
+```bash
+pnpm icons:compare                 # every icon SVG changed since HEAD
+pnpm icons:compare --ref main      # …or since another git ref
+pnpm icons:compare --from ~/export # every SVG in an export folder
+```
+
+Each icon gets a verdict: `identical` (same bytes shipped), `same geometry`
+(reordered, reversed, or a `<circle>` instead of a path), `restructured` (same
+segments, split into strokes differently), or `CHANGED`, which lists the
+segments that moved and by how much.
+
 ## Individual commands
 
 | Command | What it does |
@@ -121,11 +137,20 @@ the `size` / `strokeWidth` / `color` / `absoluteStrokeWidth` props behave.
 | `pnpm icons` | Full pipeline: clean + check SVGs, then build all packages |
 | `pnpm icons:clean` | Normalize source SVGs (strip inline attrs, set root defaults) |
 | `pnpm icons:check` | Check source SVGs without changing them; exits 1 on errors |
+| `pnpm icons:compare` | Compare re-exported SVGs with the committed icons |
 | `pnpm build` | Build all packages via Turbo |
 | `pnpm --filter @jedd-icons/react gen` | Regenerate icon TS files only |
 | `pnpm --filter @jedd-icons/react build` | Build the React package |
 | `pnpm --filter @jedd-icons/react dev` | Watch & rebuild on changes |
 | `pnpm --filter www-docs dev` | Run the gallery / docs site |
+| `pnpm lint` | Lint and format-check with Ultracite (Biome) |
+| `pnpm format` | Apply Ultracite lint and format fixes |
+| `pnpm test` | Run the Vitest suites |
+| `pnpm typecheck` | Type-check every package |
+| `pnpm knip` | Find unused files, exports, and dependencies (run after a build) |
+
+Before opening a PR, `pnpm icons:check`, `pnpm lint`, `pnpm test`,
+`pnpm typecheck`, and `pnpm knip` should all pass — CI runs the same checks.
 
 ## Changesets
 
