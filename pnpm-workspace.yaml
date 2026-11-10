@@ -42,8 +42,8 @@ catalog:
   # Vite / Cloudflare
   vite: ^8.3.4
   "@vitejs/plugin-react": ^6.1.2
-  "@cloudflare/vite-plugin": ^1.64.0
-  wrangler: ^4.151.2
+  "@cloudflare/vite-plugin": ^1.68.0
+  wrangler: ^4.159.0
 
   # Tailwind / styling
   tailwindcss: ^4.3.3
@@ -57,7 +57,7 @@ catalog:
   "@base-ui/react": ^1.9.0
   lucide-react: ^1.60.0
   motion: ^13.5.1
-  shadcn: ^4.22.1
+  shadcn: ^4.23.0
   sugar-high: ^2.6.1
   vaul: ^1.1.2
 
