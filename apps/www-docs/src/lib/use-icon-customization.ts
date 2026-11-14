@@ -7,7 +7,7 @@ import {
 } from "@/lib/icons";
 
 interface UseIconCustomizationOptions {
-  /** Initial (and reset) value for `size`. Gallery uses 32, the page uses 48. */
+  /** Initial (and reset) value for `size`. Gallery uses 32, the icon page 24. */
   defaultSize: number;
   /** Selected icon's PascalCase name; "" produces empty snippets. */
   name: string;
