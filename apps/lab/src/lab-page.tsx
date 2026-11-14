@@ -14,6 +14,7 @@ import { LabLegend } from "@/components/lab-legend";
 import { IconGlyph, PackageRender } from "@/components/package-render";
 import { SvgCodeView } from "@/components/svg-code-view";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { isAnimated } from "@/lib/animated";
 import {
   type Accent,
   CHECKS,
@@ -29,7 +30,7 @@ import {
   ICON_NODE_NAMES,
 } from "@/lib/icon-nodes";
 import { humanizeIconName, type Variant } from "@/lib/icons";
-import { readSelection, writeSelection } from "@/lib/selection-url";
+import { type Mode, readSelection, writeSelection } from "@/lib/selection-url";
 import { flattenPieces } from "@/lib/svg-path";
 import { useAnimationPrefs } from "@/lib/use-animation-prefs";
 import { useShortcuts } from "@/lib/use-shortcuts";
@@ -59,6 +60,12 @@ const OVERLAYS: { key: Overlay; label: string; shortcut: string }[] = [
   { key: "controls", label: "Control handles", shortcut: "C" },
   { key: "bounds", label: "Bounding box", shortcut: "B" },
   { key: "perPiece", label: "Color per piece", shortcut: "P" },
+];
+
+// The centre's two modes, each with the sidebar controls that go with it.
+const MODE_TABS: { key: Mode; label: string }[] = [
+  { key: "geometry", label: "Geometry" },
+  { key: "motion", label: "Motion" },
 ];
 
 // Accent styling per check color. Full class strings so Tailwind keeps them.
@@ -102,6 +109,14 @@ const FILTER_ACCENTS: Record<Accent, { active: string; dot: string }> = {
   },
 };
 
+// The "Animated" filter: a ring rather than a dot, so on a list row it doesn't
+// read as a failing check.
+const ANIMATED_FILTER = {
+  active:
+    "border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+  dot: "border border-emerald-500",
+};
+
 /** The variant to show for an icon: the preferred one if it has it. */
 function resolveVariant(name: string, preferred: Variant): Variant {
   const available = getVariantsWithGeometry(name);
@@ -117,23 +132,59 @@ function scrollIntoView(el: HTMLElement | null) {
   el?.scrollIntoView({ block: "nearest" });
 }
 
+/** A labelled slider with its value, for the sidebar's View controls. */
+function SliderRow({
+  format,
+  label,
+  max,
+  min,
+  onChange,
+  step,
+  value,
+}: {
+  format: (value: number) => string;
+  label: string;
+  max: number;
+  min: number;
+  onChange: (value: number) => void;
+  step: number;
+  value: number;
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="w-14 shrink-0 text-muted-foreground">{label}</span>
+      <Slider
+        className="flex-1"
+        max={max}
+        min={min}
+        onValueChange={(v) => onChange(Array.isArray(v) ? v[0] : v)}
+        step={step}
+        value={[value]}
+      />
+      <span className="w-8 shrink-0 text-right tabular-nums">
+        {format(value)}
+      </span>
+    </div>
+  );
+}
+
 /** A chip that filters the icon list to a flagged subset. */
 function FilterToggle({
   label,
   count,
   active,
-  accent,
+  styles: a,
   hint,
   onToggle,
 }: {
   label: string;
   count: number;
   active: boolean;
-  accent: Accent;
+  /** Classes for the active chip and its dot. */
+  styles: { active: string; dot: string };
   hint?: string;
   onToggle: () => void;
 }) {
-  const a = FILTER_ACCENTS[accent];
   return (
     <button
       aria-pressed={active}
@@ -197,6 +248,7 @@ export function LabPage() {
   const [initial] = useState(() => readSelection(DEFAULT_ICON));
   const [iconName, setIconName] = useState(initial.icon);
   const [variantState, setVariantState] = useState<Variant>(initial.variant);
+  const [mode, setMode] = useState<Mode>(initial.mode);
 
   const availableVariants = getVariantsWithGeometry(iconName);
   const variant = resolveVariant(iconName, variantState);
@@ -216,6 +268,7 @@ export function LabPage() {
   const [activeChecks, setActiveChecks] = useState<Set<CheckId>>(
     initial.checks
   );
+  const [animatedOnly, setAnimatedOnly] = useState(initial.animated);
 
   const searchRef = useRef<HTMLInputElement>(null);
   const inspectorRef = useRef<HTMLDivElement>(null);
@@ -224,10 +277,20 @@ export function LabPage() {
   const checkCounts = useMemo(() => getCheckCounts(), []);
   // Checks no icon fails have nothing to filter to, so they get no chip.
   const failingChecks = CHECKS.filter((c) => checkCounts[c.id] > 0);
+  const animatedCount = useMemo(
+    () => ICON_NODE_NAMES.filter(isAnimated).length,
+    []
+  );
 
   useEffect(() => {
-    writeSelection({ icon: iconName, variant, checks: activeChecks });
-  }, [iconName, variant, activeChecks]);
+    writeSelection({
+      icon: iconName,
+      variant,
+      checks: activeChecks,
+      animated: animatedOnly,
+      mode,
+    });
+  }, [iconName, variant, activeChecks, animatedOnly, mode]);
 
   const toggleCheck = (id: CheckId) => {
     setActiveChecks((prev) => {
@@ -243,7 +306,9 @@ export function LabPage() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    let names = ICON_NODE_NAMES;
+    let names = animatedOnly
+      ? ICON_NODE_NAMES.filter(isAnimated)
+      : ICON_NODE_NAMES;
     if (activeChecks.size > 0) {
       // An icon passes the filter if it fails EVERY active check (intersection),
       // so stacking filters narrows to icons with all selected problems.
@@ -263,12 +328,14 @@ export function LabPage() {
     return names.filter(
       (n) => n.includes(q) || humanizeIconName(n).toLowerCase().includes(q)
     );
-  }, [query, activeChecks]);
+  }, [query, activeChecks, animatedOnly]);
 
-  const isFiltering = query.trim() !== "" || activeChecks.size > 0;
+  const isFiltering =
+    query.trim() !== "" || activeChecks.size > 0 || animatedOnly;
   const clearFilters = () => {
     setQuery("");
     setActiveChecks(new Set());
+    setAnimatedOnly(false);
   };
 
   // Switching to an icon that breaks the margin turns on the bounds overlay,
@@ -309,10 +376,14 @@ export function LabPage() {
     arrowdown: () => step(1),
     arrowup: () => step(-1),
     "/": () => searchRef.current?.focus(),
-    escape: () => setIsolatedPiece(null),
-    ...Object.fromEntries(
-      OVERLAYS.map((o) => [o.shortcut.toLowerCase(), () => toggle(o.key)])
-    ),
+    m: () => setMode((m) => (m === "geometry" ? "motion" : "geometry")),
+    // The overlays only draw on the canvas, so their keys are Geometry's.
+    ...(mode === "geometry" && {
+      escape: () => setIsolatedPiece(null),
+      ...Object.fromEntries(
+        OVERLAYS.map((o) => [o.shortcut.toLowerCase(), () => toggle(o.key)])
+      ),
+    }),
   });
 
   const onSearchKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -385,19 +456,29 @@ export function LabPage() {
               </Kbd>
             </div>
 
-            {/* Spec-check filters — each narrows the list to a flagged subset. */}
+            {/* Spec-check filters (and Animated) — each narrows the list to a subset. */}
             <div className="mb-2 flex flex-wrap gap-1">
               {failingChecks.map((check) => (
                 <FilterToggle
-                  accent={check.accent}
                   active={activeChecks.has(check.id)}
                   count={checkCounts[check.id]}
                   hint={check.hint}
                   key={check.id}
                   label={check.label}
                   onToggle={() => toggleCheck(check.id)}
+                  styles={FILTER_ACCENTS[check.accent]}
                 />
               ))}
+              {animatedCount > 0 && (
+                <FilterToggle
+                  active={animatedOnly}
+                  count={animatedCount}
+                  hint="Icons with an animation file"
+                  label="Animated"
+                  onToggle={() => setAnimatedOnly((on) => !on)}
+                  styles={ANIMATED_FILTER}
+                />
+              )}
             </div>
 
             <div className="mb-1 flex items-center justify-between px-2 text-[10px] text-muted-foreground tabular-nums">
@@ -452,6 +533,12 @@ export function LabPage() {
                             <IconGlyph name={name} size={16} />
                           </span>
                           <span className="flex-1 truncate">{name}</span>
+                          {isAnimated(name) && (
+                            <span
+                              className={`size-1.5 shrink-0 rounded-full ${ANIMATED_FILTER.dot}`}
+                              title="Animated"
+                            />
+                          )}
                           {CHECKS.filter((c) =>
                             getIconFlags(name).has(c.id)
                           ).map((c) => (
@@ -473,13 +560,15 @@ export function LabPage() {
               <Kbd>↑</Kbd>
               <Kbd>↓</Kbd>
               browse icons
+              <Kbd className="ml-2">M</Kbd>
+              switch mode
             </p>
           </div>
         </aside>
 
-        {/* ── Center: canvas ────────────────────────────────── */}
+        {/* ── Center: geometry canvas or animated stage ─────── */}
         <main className="flex min-w-0 flex-1 flex-col items-center gap-6 overflow-auto border-border border-b bg-muted p-6 lg:border-r lg:border-b-0">
-          <div className="flex w-full items-center justify-between gap-3">
+          <div className="flex w-full flex-wrap items-center justify-between gap-3">
             <div className="flex flex-col items-start gap-1">
               <div className="flex items-center gap-2">
                 <h2 className="font-medium text-sm">
@@ -500,29 +589,59 @@ export function LabPage() {
                 {iconName}.svg · 24×24
               </span>
             </div>
-            {availableVariants.length > 1 && (
-              <div className="flex overflow-hidden rounded-none border border-border">
-                {availableVariants.map((v) => (
+            <div className="flex items-center gap-2">
+              {availableVariants.length > 1 && (
+                <div className="flex overflow-hidden rounded-none border border-border">
+                  {availableVariants.map((v) => (
+                    <button
+                      className={`px-2.5 py-1 text-xs capitalize transition-colors ${
+                        variant === v
+                          ? "bg-foreground text-background"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                      key={v}
+                      onClick={() => setVariant(v)}
+                      type="button"
+                    >
+                      {v}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <div
+                aria-label="Mode"
+                className="flex items-center overflow-hidden rounded-none border border-border"
+                role="tablist"
+              >
+                {MODE_TABS.map(({ key, label }) => (
                   <button
-                    className={`px-2.5 py-1 text-xs capitalize transition-colors ${
-                      variant === v
+                    aria-selected={mode === key}
+                    className={`px-2.5 py-1 text-xs transition-colors ${
+                      mode === key
                         ? "bg-foreground text-background"
                         : "text-muted-foreground hover:text-foreground"
                     }`}
-                    key={v}
-                    onClick={() => setVariant(v)}
+                    key={key}
+                    onClick={() => setMode(key)}
+                    role="tab"
+                    title="Switch mode (M)"
                     type="button"
                   >
-                    {v}
+                    {label}
                   </button>
                 ))}
               </div>
-            )}
+            </div>
           </div>
 
-          {/* Canvas + animated render, side by side; they wrap when narrow. */}
-          <div className="flex w-full flex-wrap items-stretch justify-center gap-6">
-            {node ? (
+          {!node && (
+            <p className="py-12 text-muted-foreground text-sm">
+              No geometry available for this icon.
+            </p>
+          )}
+
+          {node && mode === "geometry" && (
+            <>
               <div className="flex max-w-full shrink-0 items-center justify-center overflow-auto rounded-none border border-border bg-muted/10">
                 <LabCanvas
                   isolatedPiece={isolatedPiece}
@@ -538,234 +657,225 @@ export function LabPage() {
                   strokeWidth={view.strokeWidth}
                 />
               </div>
-            ) : (
-              <p className="py-12 text-muted-foreground text-sm">
-                No geometry available for this icon.
-              </p>
-            )}
 
-            {/* @jedd-icons/react-animated */}
-            {node && (
-              <div className="flex min-w-72 max-w-xl flex-1 basis-72 rounded-none border border-border bg-background p-4">
-                <AnimatedRender
-                  name={iconName}
-                  prefs={animationPrefs.prefs}
-                  strokeWidth={view.strokeWidth}
-                  variant={variant}
-                />
+              {/* Stats */}
+              <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-muted-foreground text-xs tabular-nums">
+                <span>{pieces.length} pieces</span>
+                <Separator className="h-3" orientation="vertical" />
+                <span>{totalCommands} commands</span>
+                <Separator className="h-3" orientation="vertical" />
+                <span className="text-red-500">{totalAnchors} anchors</span>
+                <Separator className="h-3" orientation="vertical" />
+                <span className="text-emerald-500">
+                  {totalControls} controls
+                </span>
               </div>
-            )}
-          </div>
 
-          {/* Stats */}
-          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-muted-foreground text-xs tabular-nums">
-            <span>{pieces.length} pieces</span>
-            <Separator className="h-3" orientation="vertical" />
-            <span>{totalCommands} commands</span>
-            <Separator className="h-3" orientation="vertical" />
-            <span className="text-red-500">{totalAnchors} anchors</span>
-            <Separator className="h-3" orientation="vertical" />
-            <span className="text-emerald-500">{totalControls} controls</span>
-          </div>
+              {/* Output split: shipped SVG code (left) + published renders (right). */}
+              <div className="grid w-full max-w-4xl gap-4 md:grid-cols-2">
+                <div className="rounded-none border border-border bg-background p-3">
+                  <SvgCodeView name={iconName} variant={variant} />
+                </div>
+                <div className="flex items-center justify-center rounded-none border border-border bg-muted/10 p-4">
+                  <PackageRender
+                    name={iconName}
+                    strokeWidth={view.strokeWidth}
+                    variant={variant}
+                  />
+                </div>
+              </div>
+            </>
+          )}
 
-          {/* Output split: shipped SVG code (left) + published renders (right). */}
-          {node && (
-            <div className="grid w-full max-w-4xl gap-4 md:grid-cols-2">
-              <div className="rounded-none border border-border bg-background p-3">
-                <SvgCodeView name={iconName} variant={variant} />
-              </div>
-              <div className="flex items-center justify-center rounded-none border border-border bg-muted/10 p-4">
-                <PackageRender
-                  name={iconName}
-                  strokeWidth={view.strokeWidth}
-                  variant={variant}
-                />
-              </div>
+          {/* @jedd-icons/react-animated */}
+          {node && mode === "motion" && (
+            <div className="flex w-full max-w-4xl rounded-none border border-border bg-background p-4">
+              <AnimatedRender
+                name={iconName}
+                prefs={animationPrefs.prefs}
+                strokeWidth={view.strokeWidth}
+                variant={variant}
+              />
             </div>
           )}
         </main>
 
-        {/* ── Right: controls + inspector ───────────────────── */}
+        {/* ── Right: the mode's controls + inspector ────────── */}
         <aside className="shrink-0 overflow-y-auto lg:w-80">
           <div className="flex flex-col gap-4 p-4 text-xs">
             {/* View controls */}
             <div className="flex flex-col gap-3">
               <span className="font-medium text-muted-foreground">View</span>
-
-              <div className="flex items-center gap-2">
-                <span className="w-14 shrink-0 text-muted-foreground">
-                  Zoom
-                </span>
-                <Slider
-                  className="flex-1"
+              {mode === "geometry" && (
+                <SliderRow
+                  format={(z) => `${Math.round((z / 24) * 10) / 10}×`}
+                  label="Zoom"
                   max={720}
                   min={192}
-                  onValueChange={(v) =>
-                    setPref("zoom", Array.isArray(v) ? v[0] : v)
-                  }
+                  onChange={(z) => setPref("zoom", z)}
                   step={24}
-                  value={[view.zoom]}
+                  value={view.zoom}
                 />
-                <span className="w-8 shrink-0 text-right tabular-nums">
-                  {Math.round((view.zoom / 24) * 10) / 10}×
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="w-14 shrink-0 text-muted-foreground">
-                  Stroke
-                </span>
-                <Slider
-                  className="flex-1"
-                  max={3}
-                  min={0.5}
-                  onValueChange={(v) =>
-                    setPref("strokeWidth", Array.isArray(v) ? v[0] : v)
-                  }
-                  step={0.25}
-                  value={[view.strokeWidth]}
-                />
-                <span className="w-8 shrink-0 text-right tabular-nums">
-                  {view.strokeWidth.toFixed(2)}
-                </span>
-              </div>
+              )}
+              <SliderRow
+                format={(w) => w.toFixed(2)}
+                label="Stroke"
+                max={3}
+                min={0.5}
+                onChange={(w) => setPref("strokeWidth", w)}
+                step={0.25}
+                value={view.strokeWidth}
+              />
             </div>
 
             <Separator />
 
-            {/* Overlay toggles */}
-            <div className="flex flex-col gap-2.5">
-              <span className="font-medium text-muted-foreground">
-                Overlays
-              </span>
-              {OVERLAYS.map(({ key, label, shortcut }) => (
-                <Label htmlFor={`${overlayId}-${key}`} key={key}>
-                  <Checkbox
-                    checked={view[key]}
-                    id={`${overlayId}-${key}`}
-                    onCheckedChange={(c) => setPref(key, c === true)}
-                  />
-                  <span className="text-muted-foreground">{label}</span>
-                  <Kbd className="ml-auto">{shortcut}</Kbd>
-                </Label>
-              ))}
-            </div>
-
-            <LabLegend
-              showAnchors={view.anchors}
-              showBounds={view.bounds}
-              showControls={view.controls}
-              showGrid={view.grid}
-              showKeylines={view.keylines}
-            />
-
-            {/* Animated render */}
-            {node && (
+            {mode === "geometry" && (
               <>
+                {/* Overlay toggles */}
+                <div className="flex flex-col gap-2.5">
+                  <span className="font-medium text-muted-foreground">
+                    Overlays
+                  </span>
+                  {OVERLAYS.map(({ key, label, shortcut }) => (
+                    <Label htmlFor={`${overlayId}-${key}`} key={key}>
+                      <Checkbox
+                        checked={view[key]}
+                        id={`${overlayId}-${key}`}
+                        onCheckedChange={(c) => setPref(key, c === true)}
+                      />
+                      <span className="text-muted-foreground">{label}</span>
+                      <Kbd className="ml-auto">{shortcut}</Kbd>
+                    </Label>
+                  ))}
+                </div>
+
+                <LabLegend
+                  showAnchors={view.anchors}
+                  showBounds={view.bounds}
+                  showControls={view.controls}
+                  showGrid={view.grid}
+                  showKeylines={view.keylines}
+                />
+
                 <Separator />
-                <AnimationSettings {...animationPrefs} />
               </>
             )}
 
-            <Separator />
+            {mode === "motion" && node && (
+              <>
+                <AnimationSettings {...animationPrefs} />
+                <Separator />
+              </>
+            )}
 
             {/* Checks + sidecar metadata for the current icon */}
             <div className="scroll-mt-4" ref={inspectorRef}>
               <IconInspector
                 name={iconName}
                 onShowBounds={
-                  view.bounds ? undefined : () => setPref("bounds", true)
+                  mode === "geometry" && !view.bounds
+                    ? () => setPref("bounds", true)
+                    : undefined
                 }
                 variant={variant}
               />
             </div>
 
-            <Separator />
+            {mode === "geometry" && (
+              <>
+                <Separator />
 
-            {/* Piece breakdown */}
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center justify-between">
-                <span className="font-medium text-muted-foreground">
-                  Pieces
-                </span>
-                {isolatedPiece !== null && (
-                  <Button
-                    className="h-auto gap-1.5 p-0 text-xs"
-                    onClick={() => setIsolatedPiece(null)}
-                    size="sm"
-                    variant="link"
-                  >
-                    Show all
-                    <Kbd>Esc</Kbd>
-                  </Button>
-                )}
-              </div>
-              <ul className="flex flex-col gap-1">
-                {pieces.map((piece) => {
-                  const active = isolatedPiece === piece.index;
-                  return (
-                    <li key={piece.index}>
-                      <button
-                        className={`flex w-full items-center gap-2 border px-2 py-1.5 text-left transition-colors ${
-                          active
-                            ? "border-foreground bg-muted/40"
-                            : "border-border hover:bg-muted/20"
-                        }`}
-                        onClick={() =>
-                          setIsolatedPiece(active ? null : piece.index)
-                        }
-                        type="button"
-                      >
-                        <span
-                          className="size-2.5 shrink-0 rounded-full"
-                          style={{
-                            backgroundColor:
-                              PIECE_COLORS[piece.index % PIECE_COLORS.length],
-                          }}
-                        />
-                        <span className="font-mono text-[11px]">
-                          {piece.tag}
-                        </span>
-                        <span className="ml-auto text-[10px] text-muted-foreground tabular-nums">
-                          {piece.parsed.commands.length || "—"} cmd
-                        </span>
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-
-            {/* Command inspector for the isolated piece */}
-            {isolatedPiece !== null &&
-              pieces[isolatedPiece]?.parsed.commands.length > 0 && (
-                <>
-                  <Separator />
-                  <div className="flex flex-col gap-2">
+                {/* Piece breakdown */}
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
                     <span className="font-medium text-muted-foreground">
-                      Path commands
+                      Pieces
                     </span>
-                    <ol className="max-h-64 overflow-y-auto font-mono text-[11px] leading-relaxed">
-                      {pieces[isolatedPiece].parsed.commands.map((cmd, i) => (
-                        <li
-                          className="flex gap-2 border-border/50 border-b py-0.5 last:border-0"
-                          // biome-ignore lint/suspicious/noArrayIndexKey: command order is stable and there is no better key.
-                          key={i}
-                        >
-                          <span className="w-4 shrink-0 font-semibold text-foreground">
-                            {cmd.command}
-                          </span>
-                          <span className="text-muted-foreground tabular-nums">
-                            {cmd.args
-                              .map((n) => Math.round(n * 100) / 100)
-                              .join(" ") || "close"}
-                          </span>
-                        </li>
-                      ))}
-                    </ol>
+                    {isolatedPiece !== null && (
+                      <Button
+                        className="h-auto gap-1.5 p-0 text-xs"
+                        onClick={() => setIsolatedPiece(null)}
+                        size="sm"
+                        variant="link"
+                      >
+                        Show all
+                        <Kbd>Esc</Kbd>
+                      </Button>
+                    )}
                   </div>
-                </>
-              )}
+                  <ul className="flex flex-col gap-1">
+                    {pieces.map((piece) => {
+                      const active = isolatedPiece === piece.index;
+                      return (
+                        <li key={piece.index}>
+                          <button
+                            className={`flex w-full items-center gap-2 border px-2 py-1.5 text-left transition-colors ${
+                              active
+                                ? "border-foreground bg-muted/40"
+                                : "border-border hover:bg-muted/20"
+                            }`}
+                            onClick={() =>
+                              setIsolatedPiece(active ? null : piece.index)
+                            }
+                            type="button"
+                          >
+                            <span
+                              className="size-2.5 shrink-0 rounded-full"
+                              style={{
+                                backgroundColor:
+                                  PIECE_COLORS[
+                                    piece.index % PIECE_COLORS.length
+                                  ],
+                              }}
+                            />
+                            <span className="font-mono text-[11px]">
+                              {piece.tag}
+                            </span>
+                            <span className="ml-auto text-[10px] text-muted-foreground tabular-nums">
+                              {piece.parsed.commands.length || "—"} cmd
+                            </span>
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+
+                {/* Command inspector for the isolated piece */}
+                {isolatedPiece !== null &&
+                  pieces[isolatedPiece]?.parsed.commands.length > 0 && (
+                    <>
+                      <Separator />
+                      <div className="flex flex-col gap-2">
+                        <span className="font-medium text-muted-foreground">
+                          Path commands
+                        </span>
+                        <ol className="max-h-64 overflow-y-auto font-mono text-[11px] leading-relaxed">
+                          {pieces[isolatedPiece].parsed.commands.map(
+                            (cmd, i) => (
+                              <li
+                                className="flex gap-2 border-border/50 border-b py-0.5 last:border-0"
+                                // biome-ignore lint/suspicious/noArrayIndexKey: command order is stable and there is no better key.
+                                key={i}
+                              >
+                                <span className="w-4 shrink-0 font-semibold text-foreground">
+                                  {cmd.command}
+                                </span>
+                                <span className="text-muted-foreground tabular-nums">
+                                  {cmd.args
+                                    .map((n) => Math.round(n * 100) / 100)
+                                    .join(" ") || "close"}
+                                </span>
+                              </li>
+                            )
+                          )}
+                        </ol>
+                      </div>
+                    </>
+                  )}
+              </>
+            )}
           </div>
         </aside>
       </div>

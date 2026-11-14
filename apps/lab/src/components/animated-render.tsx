@@ -1,10 +1,4 @@
-import * as StrokeLib from "@jedd-icons/react-animated";
-import {
-  type AnimatedJeddIcon,
-  AnimateIcon,
-  JeddProvider,
-  presets,
-} from "@jedd-icons/react-animated";
+import { JeddProvider, presets } from "@jedd-icons/react-animated";
 import { Button, buttonVariants } from "@workspace/ui/components/button";
 import {
   DropdownMenu,
@@ -16,9 +10,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
+import { Separator } from "@workspace/ui/components/separator";
 import { cn } from "@workspace/ui/lib/utils";
 import { useState } from "react";
 import { highlight } from "sugar-high";
+import { AnimationGrid } from "@/components/animation-grid";
+import { ContextExamples } from "@/components/context-examples";
+import { getAnimatedComponent } from "@/lib/animated";
 import { getPascalName } from "@/lib/icon-nodes";
 import type { Variant } from "@/lib/icons";
 import {
@@ -28,11 +26,6 @@ import {
   REPLAYABLE,
   toJsx,
 } from "@/lib/use-animation-prefs";
-
-// One entry point per variant, as in `PackageRender`.
-const LIBS: Record<Variant, Record<string, unknown>> = {
-  stroke: StrokeLib as unknown as Record<string, unknown>,
-};
 
 const SIZES = [24, 48, 96] as const;
 
@@ -88,9 +81,9 @@ function AnimationPicker({
 }
 
 /**
- * The stage for `@jedd-icons/react-animated`: the icon at common sizes and
- * inside a button, an animation picker, and the JSX for what's set. The
- * trigger and options live in the sidebar (`AnimationSettings`).
+ * The stage for `@jedd-icons/react-animated`: every animation looping in a grid,
+ * then the picked one at common sizes and in UI context, with the JSX for
+ * what's set. The trigger and options live in the sidebar (`AnimationSettings`).
  */
 export function AnimatedRender({
   name,
@@ -104,9 +97,7 @@ export function AnimatedRender({
   variant: Variant;
 }) {
   const pascal = getPascalName(name, variant);
-  const Component = (pascal ? LIBS[variant][pascal] : undefined) as
-    | AnimatedJeddIcon
-    | undefined;
+  const Component = getAnimatedComponent(name, variant);
   const [picked, setPicked] = useState("default");
   const [replays, setReplays] = useState(0);
   const [copied, setCopied] = useState(false);
@@ -135,6 +126,16 @@ export function AnimatedRender({
 
   return (
     <div className="flex w-full flex-col gap-4">
+      <AnimationGrid
+        component={Component}
+        onPick={setPicked}
+        picked={animation}
+        prefs={prefs}
+        strokeWidth={strokeWidth}
+      />
+
+      <Separator />
+
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="font-medium text-muted-foreground text-xs">
           Motion
@@ -183,32 +184,14 @@ export function AnimatedRender({
               </span>
             </div>
           ))}
-          {/* Driven from a larger element, with the same animation and options. */}
-          <div className="flex flex-col items-center gap-1.5">
-            <div className="flex h-24 items-center justify-center">
-              <AnimateIcon
-                animateOnHover
-                animation={animation}
-                asChild
-                completeOnStop={prefs.completeOnStop}
-                delay={prefs.delay}
-                initialOnAnimateEnd={prefs.initialOnAnimateEnd}
-                persistOnAnimateEnd={prefs.persistOnAnimateEnd}
-              >
-                <Button size="sm" variant="outline">
-                  Next
-                  <Component strokeWidth={strokeWidth} />
-                </Button>
-              </AnimateIcon>
-            </div>
-            <span
-              className="text-[10px] text-muted-foreground"
-              title="<AnimateIcon animateOnHover asChild> around a button"
-            >
-              in button
-            </span>
-          </div>
         </div>
+
+        <ContextExamples
+          animation={animation}
+          component={Component}
+          prefs={prefs}
+          strokeWidth={strokeWidth}
+        />
       </JeddProvider>
 
       <div className="flex min-h-0 flex-col">
