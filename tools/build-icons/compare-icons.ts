@@ -11,6 +11,10 @@
  *     Every SVG in <dir>, against the committed icon of the same name. Also
  *     lists committed icons missing from <dir>.
  *   Add --verbose to list the icons in every group, not just the changed ones.
+ *
+ * Animated icons (with an `animations/<variant>/<name>.ts`) are also listed
+ * when an element moved to another position, even if the shape is the same:
+ * their animations target elements by position.
  */
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
@@ -99,12 +103,20 @@ function describeSegment(key: string): string {
   return `${fmtPoint(pts[0])} → ${fmtPoint(pts.at(-1) ?? "")}${kind}${suffix}`;
 }
 
-type Group = Comparison["verdict"] | "new" | "deleted" | "missing" | "error";
+type Group =
+  | Comparison["verdict"]
+  | "animated"
+  | "new"
+  | "deleted"
+  | "missing"
+  | "error";
 const LABELS: Record<Group, string> = {
   identical: "identical (packages ship the same bytes)",
   "same-geometry": "same geometry (reordered, reversed, or other element type)",
   restructured: "restructured (same segments, split into strokes differently)",
   changed: "CHANGED",
+  animated:
+    "ANIMATED icons whose elements moved (animations target them by position)",
   new: "NEW (no committed icon with this name)",
   deleted: "DELETED",
   missing: "MISSING from the export folder",
@@ -129,6 +141,18 @@ function compare({ label, variant, before, after }: Pair): void {
   } catch (error) {
     add("error", `${label}: ${(error as Error).message}`);
     return;
+  }
+  const animations = join(
+    ROOT,
+    "animations",
+    variant,
+    `${basename(label, ".svg")}.ts`
+  );
+  if (result.moved.length > 0 && existsSync(animations)) {
+    add(
+      "animated",
+      `${label}: element${result.moved.length === 1 ? "" : "s"} ${result.moved.join(", ")} — keep the source order, or update ${animations.replace(`${ROOT}/`, "")}`
+    );
   }
   if (result.verdict !== "changed") {
     add(result.verdict, label);
@@ -164,7 +188,14 @@ for (const label of missing) {
   add("missing", label);
 }
 
-const DETAILED: Group[] = ["changed", "new", "deleted", "missing", "error"];
+const DETAILED: Group[] = [
+  "changed",
+  "animated",
+  "new",
+  "deleted",
+  "missing",
+  "error",
+];
 for (const group of Object.keys(LABELS) as Group[]) {
   const items = groups.get(group);
   if (!items) {

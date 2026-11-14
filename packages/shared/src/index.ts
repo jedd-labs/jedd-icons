@@ -1,3 +1,15 @@
+export type {
+  AnimatableValues,
+  Animation,
+  Animations,
+  Easing,
+  IconAnimations,
+  Keyframes,
+  PartAnimation,
+  PresetName,
+  Transition,
+} from "./animation";
+export { presets } from "./animation";
 export {
   default as defaultAttributes,
   strokeDefaults,

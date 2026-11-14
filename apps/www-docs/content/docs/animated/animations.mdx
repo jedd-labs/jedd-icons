@@ -1,0 +1,38 @@
+---
+title: Animations
+description: The presets every icon has, and each icon's own animations.
+icon: Film
+---
+
+import { getMDXComponents } from "@/components/mdx";
+import { OwnAnimationsTable, PresetDemo } from "@/components/animated-demos";
+import Status from "../../_shared/animated-status.mdx";
+
+<Status components={getMDXComponents()} />
+
+An icon plays its **default** unless you pick another with `animation` or a
+named trigger (`animateOnHover="pointing"`). Icons with their own animations
+choose one as their default (★ below); the rest play the fallback, `draw`,
+unless you set another with [`fallbackAnimation`](/docs/animated/global-styling#fallback-animation).
+
+## Presets
+
+Every icon can play these, whatever it depicts:
+
+<PresetDemo />
+
+| Name | What it does |
+| --- | --- |
+| `draw` | Draws each stroke in. The fallback default of icons without their own. |
+| `draw-loop` | Undraws each stroke and draws it back — made for `loop`. |
+| `pulse` | Shrinks and springs back. |
+| `wiggle` | Rocks side to side. |
+
+## Icons with their own animations
+
+These icons have animations designed for them. Hover a name to play it:
+
+<OwnAnimationsTable />
+
+More icons get their own animations over time; until then they play the
+fallback by default. Want to add one? See [Adding animations](/docs/animated/adding-animations).

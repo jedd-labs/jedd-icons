@@ -15,8 +15,10 @@
   },
   "dependencies": {
     "@jedd-icons/react": "workspace:*",
+    "@jedd-icons/react-animated": "workspace:*",
     "@jedd-icons/shared": "workspace:*",
     "@workspace/ui": "workspace:*",
+    "motion": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "sugar-high": "catalog:"

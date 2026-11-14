@@ -1,0 +1,116 @@
+---
+title: Props
+description: Every prop accepted by animated Jedd Icons and AnimateIcon.
+icon: SlidersHorizontal
+---
+
+import { getMDXComponents } from "@/components/mdx";
+import Status from "../../_shared/animated-status.mdx";
+
+<Status components={getMDXComponents()} />
+
+Every animated icon accepts the props below **plus all standard SVG
+attributes** (`className`, `onClick`, `style`, `aria-*`, `focusable`, …).
+
+## Styling
+
+The same styling props as `@jedd-icons/react`'s icons, with the same defaults:
+
+<TypeTable
+  type={{
+    size: { type: "number | string", default: "24", description: "Sets both width and height." },
+    color: { type: "string", default: '"currentColor"', description: "Sets the stroke color." },
+    strokeWidth: { type: "number | string", default: "2", description: "Stroke width." },
+    absoluteStrokeWidth: { type: "boolean", default: "false", description: "Keep a constant visual stroke width regardless of size." },
+  }}
+/>
+
+See the [React props](/docs/react/props) for how `color` and
+`absoluteStrokeWidth` work, and the CSS hooks (`jedd`, `jedd-<name>`) that
+animated icons carry too.
+
+## Triggers
+
+<TypeTable
+  type={{
+    animate: { type: "boolean | AnimationName", default: "false", description: "Plays while true. A name also picks the animation." },
+    animateOnHover: { type: "boolean | AnimationName", default: "false", description: "Plays while hovered." },
+    animateOnTap: { type: "boolean | AnimationName", default: "false", description: "Plays once per press, to the end." },
+    animateOnView: { type: "boolean | AnimationName", default: "false", description: "Plays while it's in the viewport." },
+    animateOnViewOnce: { type: "boolean", default: "true", description: "Only the first time it's in view." },
+    animateOnViewMargin: { type: "string", description: 'IntersectionObserver root margin, e.g. "0px 0px -20% 0px".' },
+    animation: { type: "AnimationName", default: '"default"', description: "Which animation plays. \"default\" is the icon's chosen one, or the fallback." },
+  }}
+/>
+
+`AnimationName` suggests the icon's own animations, `"default"` and the
+presets. Any other name plays the icon's default and logs a warning in
+development.
+
+## Options
+
+<TypeTable
+  type={{
+    delay: { type: "number", default: "0", description: "Milliseconds before it starts." },
+    loop: { type: "boolean", default: "false", description: "Repeat while the trigger is active." },
+    loopDelay: { type: "number", default: "0", description: "Milliseconds between loops." },
+    completeOnStop: { type: "boolean", default: "false", description: "Finish the current run before returning to rest when stopped." },
+    persistOnAnimateEnd: { type: "boolean", default: "false", description: "Stay where the animation ended instead of returning to rest." },
+    initialOnAnimateEnd: { type: "boolean", default: "false", description: "Snap back to rest, without a transition, when a run ends." },
+  }}
+/>
+
+## AnimateIcon
+
+`<AnimateIcon>` takes the same triggers and options, which apply to every icon
+inside it, plus:
+
+<TypeTable
+  type={{
+    asChild: { type: "boolean", default: "false", description: "Attach the triggers to its only child instead of wrapping it in a <span>." },
+    children: { type: "ReactNode", required: true, description: "The element (or icons) to animate." },
+  }}
+/>
+
+and any HTML attribute, passed to the `<span>` (or merged onto the child with
+`asChild`).
+
+An icon inside follows the wrapper's trigger. Its own `animation` and options
+win over the wrapper's; its own trigger, when active, takes over.
+
+To set any of these for every icon at once, wrap your app in `JeddProvider` —
+see [Global styling](/docs/animated/global-styling).
+
+## Exported types
+
+```ts
+import type {
+  AnimatedIconProps,
+  AnimatedJeddIcon,
+  AnimateIconProps,
+  AnimationName,
+  AnimationOptions,
+  AnimationTriggers,
+  JeddProviderProps,
+  ReducedMotion,
+} from "@jedd-icons/react-animated";
+```
+
+- **`AnimatedIconProps`** — the props every animated icon accepts.
+- **`AnimatedJeddIcon`** — the type of an animated icon component, with its
+  `animations` list and `defaultAnimation` (what its default plays, or
+  `undefined` when it plays the fallback).
+- **`AnimateIconProps`** — the props of `<AnimateIcon>`.
+- **`AnimationName`** — an icon's animation names, `"default"` and the
+  presets.
+- **`AnimationTriggers`** / **`AnimationOptions`** — the two groups of props
+  above.
+- **`JeddProviderProps`** — the props `JeddProvider` accepts.
+- **`ReducedMotion`** — `"user" | "always" | "never"`.
+
+The package also exports `IconProps` (the styling props, as in
+`@jedd-icons/react`), `IconNode` and `Variant`, the types of the animation data
+(`Animations`, `Animation`, `PartAnimation`, `Keyframes`, `AnimatableValues`,
+`Transition`, `Easing`, `PresetName`) — the format described in
+[Adding animations](/docs/animated/adding-animations) — and `presets`, the
+presets' data.

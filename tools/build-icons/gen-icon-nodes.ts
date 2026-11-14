@@ -16,6 +16,7 @@ import {
 } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { animationIssues } from "./animation-files";
 import {
   DEFAULT_VARIANT,
   type IconNode,
@@ -50,7 +51,10 @@ const OUTPUT = join(OUTPUT_DIR, "icon-nodes.json");
 // ── Main ───────────────────────────────────────────────────────────────
 
 interface IconNodeEntry {
-  /** What `icons:check` reports for this icon, sidecar `.json` included. */
+  /**
+   * What `icons:check` reports for this icon, sidecar `.json` and animation
+   * file included.
+   */
   issues: Issue[];
   /** How far the geometry crosses the 1px margin; null if it can't be read. */
   margin: MarginReport | null;
@@ -85,10 +89,10 @@ function measureMargin(node: IconNode): MarginReport | null {
   }
 }
 
-function collectVariant(
+async function collectVariant(
   variant: string,
   byIcon: Record<string, Record<string, IconNodeEntry>>
-): number {
+): Promise<number> {
   const dir = join(ICONS_DIR, variant);
   const files = readdirSync(dir)
     .filter((f) => f.endsWith(".svg"))
@@ -114,6 +118,7 @@ function collectVariant(
       issues: [
         ...(VARIANT_ROOT_ATTRS[variant] ? checkIcon(svg, variant) : []),
         ...checkMetadata(json),
+        ...(await animationIssues(svg, variant, name)),
       ],
       margin: measureMargin(node),
     };
@@ -122,7 +127,7 @@ function collectVariant(
   return files.length;
 }
 
-function main() {
+async function main() {
   if (!existsSync(ICONS_DIR)) {
     throw new Error(`icons directory not found: ${ICONS_DIR}`);
   }
@@ -134,7 +139,7 @@ function main() {
 
   for (const variant of readdirSync(ICONS_DIR, { withFileTypes: true })) {
     if (variant.isDirectory()) {
-      total += collectVariant(variant.name, byIcon);
+      total += await collectVariant(variant.name, byIcon);
     }
   }
 
@@ -149,4 +154,4 @@ function main() {
   );
 }
 
-main();
+await main();

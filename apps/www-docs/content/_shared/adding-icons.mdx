@@ -96,10 +96,11 @@ This single command runs the full pipeline:
    fix in the design tool.
 2. **`icons:check`** — checks the normalized SVGs and their metadata without
    changing them, and stops on problems such as transforms, dots too short for
-   Safari, geometry outside the 1px margin, or metadata that doesn't match
-   `icon.schema.json`.
+   Safari, geometry outside the 1px margin, metadata that doesn't match
+   `icon.schema.json`, or an animation file that doesn't fit its icon.
 3. **`build`** — builds `@jedd-icons/shared`, generates the per-icon TS files,
-   then builds `@jedd-icons/core` and `@jedd-icons/react`.
+   then builds `@jedd-icons/core` and `@jedd-icons/react` (and the unpublished
+   `@jedd-icons/react-animated`).
 
 </Step>
 
@@ -129,6 +130,10 @@ Each icon gets a verdict: `identical` (same bytes shipped), `same geometry`
 (reordered, reversed, or a `<circle>` instead of a path), `restructured` (same
 segments, split into strokes differently), or `CHANGED`, which lists the
 segments that moved and by how much.
+
+Icons with an [animation file](/docs/animated/adding-animations) are also
+listed when their elements changed position, even with the same geometry:
+their animations target elements by position, so keep the source order.
 
 ## Individual commands
 

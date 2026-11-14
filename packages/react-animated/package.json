@@ -1,0 +1,67 @@
+{
+  "name": "@jedd-icons/react-animated",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Animated Jedd icons for React, powered by Motion.",
+  "license": "MIT",
+  "author": "Marcello Novelli",
+  "homepage": "https://jeddicons.com/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jedd-labs/jedd-icons.git",
+    "directory": "packages/react-animated"
+  },
+  "bugs": {
+    "url": "https://github.com/jedd-labs/jedd-icons/issues"
+  },
+  "keywords": [
+    "jedd",
+    "jedd-icons",
+    "icons",
+    "animated-icons",
+    "animation",
+    "motion",
+    "svg",
+    "react"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": {
+        "import": "./dist/index.d.mts",
+        "require": "./dist/index.d.cts"
+      },
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "gen": "tsx ../../tools/build-icons/build-animated.ts",
+    "build": "pnpm gen && tsdown --config-loader tsx",
+    "dev": "pnpm gen && tsdown --config-loader tsx --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "motion": "^13",
+    "react": "^17 || ^18 || ^19"
+  },
+  "devDependencies": {
+    "@jedd-icons/shared": "workspace:*",
+    "@types/react": "catalog:",
+    "motion": "catalog:",
+    "react": "catalog:",
+    "tsdown": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:"
+  }
+}
