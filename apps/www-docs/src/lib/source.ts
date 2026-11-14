@@ -6,8 +6,28 @@ import { docsRoute } from "./shared";
 
 const MD_EXTENSION = /\.md$/;
 
+// Docs for packages that aren't on npm yet (`@jedd-icons/react-animated`):
+// `pnpm dev` serves them, the deployed site doesn't, so it never offers an
+// install that fails. Every page, the sidebar tabs, search, llms.txt and the
+// sitemap read from `source`, so they all leave these out. Wrap links to them
+// from other pages in `<DevOnly>`.
+const DEV_ONLY_FOLDERS = new Set(["animated"]);
+
+function docsSource() {
+  const all = docs.toFumadocsSource();
+  if (import.meta.env.DEV) {
+    return all;
+  }
+  return {
+    ...all,
+    files: all.files.filter(
+      (file) => !DEV_ONLY_FOLDERS.has(file.path.split("/")[0])
+    ),
+  };
+}
+
 export const source = loader({
-  source: docs.toFumadocsSource(),
+  source: docsSource(),
   baseUrl: docsRoute,
   // frameworkIconsPlugin runs first and resolves our custom SVG names;
   // lucideIconsPlugin resolves every remaining name from Lucide.
