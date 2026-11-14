@@ -59,6 +59,20 @@ const PATH_LENGTH_ATTRS = [
 
 const PART_INDEX = /^\d+$/;
 
+// Values that transform their target, so it needs an origin.
+const TRANSFORMS = new Set(["x", "y", "rotate", "scale", "scaleX", "scaleY"]);
+
+// Motion leaves an SVG element's CSS `transform-origin` at its default, the
+// top-left corner of the user space, so rotations and scales would pivot
+// there. The origin is set here instead: the target's own box (`fill-box`),
+// at the animation's `origin`, by default its center.
+function setOrigin(el: SVGElement, part: Animation[string]) {
+  if (part.origin || Object.keys(part.animate).some((k) => TRANSFORMS.has(k))) {
+    el.style.transformBox = "fill-box";
+    el.style.transformOrigin = part.origin ?? "center";
+  }
+}
+
 const reduceMotion = (setting: ReducedMotion) =>
   setting === "always" ||
   (setting === "user" &&
@@ -133,6 +147,7 @@ export function createPlayer(svg: SVGSVGElement): Player {
     running = Object.entries(animation).flatMap(([key, part]) =>
       targets(key).map((el) => {
         const values = restOf(el, Object.keys(part.animate));
+        setOrigin(el, part);
         if ("pathLength" in part.animate || "pathOffset" in part.animate) {
           el.setAttribute("pathLength", "1");
         }
@@ -140,9 +155,6 @@ export function createPlayer(svg: SVGSVGElement): Player {
         for (const [name, value] of Object.entries(part.animate)) {
           keyframes[name] =
             fromRest && !Array.isArray(value) ? [values[name], value] : value;
-        }
-        if (part.origin) {
-          keyframes.transformOrigin = part.origin;
         }
         return animate(
           el,

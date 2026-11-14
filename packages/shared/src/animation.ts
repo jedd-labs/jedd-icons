@@ -118,15 +118,25 @@ export const presets = {
       transition: { duration: 1.6, ease: "easeInOut" },
     },
   },
+  // An icon's strokes reach the edge of its box, and an <svg> clips what's
+  // past it, so presets never move the whole icon further out than at rest:
+  // no growing past 1, and a rotation shrinks it as far as every icon needs,
+  // on every frame between keyframes too (measured on the geometry, miter
+  // corners included, at stroke widths 2–3).
+  /** Shrinks and springs back. */
   pulse: {
     icon: {
-      animate: { scale: [1, 0.85, 1.08, 1] },
+      animate: { scale: [1, 0.85, 1] },
       transition: { duration: 0.6, ease: "easeInOut" },
     },
   },
+  /** Rocks side to side, shrinking just enough to stay in its box. */
   wiggle: {
     icon: {
-      animate: { rotate: [0, -12, 10, -6, 4, 0] },
+      animate: {
+        rotate: [0, -12, 10, -6, 4, 0],
+        scale: [1, 0.8, 0.865, 0.865, 0.93, 1],
+      },
       transition: { duration: 0.7, ease: "easeInOut" },
     },
   },
