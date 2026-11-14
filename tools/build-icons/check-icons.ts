@@ -3,7 +3,9 @@
  * Checks the source SVGs without changing them: each must already be
  * normalized (`pnpm icons:clean`), free of export problems that change what
  * the packages ship, and have a sidecar `.json` matching `icon.schema.json`.
- * Exits 1 on any error; warnings flag what may be intended.
+ * An icon's animation file (`animations/<variant>/<name>.ts`), if it has one,
+ * must fit its geometry. Exits 1 on any error; warnings flag what may be
+ * intended.
  *
  * Auto-discovers variant subdirectories under icons/ (e.g. stroke/).
  * On GitHub Actions, issues are printed as annotations so they show on the
@@ -14,6 +16,11 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  animationFile,
+  animationIssues,
+  orphanAnimations,
+} from "./animation-files";
 import { checkIcon, checkMetadata } from "./check-icons.lib";
 import type { Issue } from "./check-rules";
 import { VARIANT_ROOT_ATTRS } from "./clean-icons.lib";
@@ -46,7 +53,7 @@ function escapeProperty(s: string) {
   return escapeData(s).replaceAll(":", "%3A").replaceAll(",", "%2C");
 }
 
-/** `file` is relative to icons/, e.g. `stroke/arrow-down.svg`. */
+/** `file` is relative to the repo root, e.g. `icons/stroke/arrow-down.svg`. */
 function report(file: string, { severity, message }: Issue) {
   if (severity === "error") {
     errors++;
@@ -54,7 +61,7 @@ function report(file: string, { severity, message }: Issue) {
     warnings++;
   }
   if (GITHUB_ACTIONS) {
-    const path = escapeProperty(`icons/${file}`);
+    const path = escapeProperty(file);
     console.log(
       `::${severity} file=${path},title=icons%3Acheck::${escapeData(`${file}: ${message}`)}`
     );
@@ -82,22 +89,34 @@ for (const variant of variants) {
       ? readFileSync(metaPath, "utf8")
       : undefined;
     for (const issue of checkIcon(svg, variant)) {
-      report(`${variant}/${file}`, issue);
+      report(`icons/${variant}/${file}`, issue);
     }
     // Point metadata issues at the .json, unless it's the one that's missing.
     const metaFile = meta === undefined ? file : basename(metaPath);
     for (const issue of checkMetadata(meta)) {
-      report(`${variant}/${metaFile}`, issue);
+      report(`icons/${variant}/${metaFile}`, issue);
+    }
+    const name = basename(file, ".svg");
+    for (const issue of await animationIssues(svg, variant, name)) {
+      report(animationFile(variant, name), issue);
     }
   }
   for (const file of entries.filter((f) => f.endsWith(".json")).sort()) {
     if (!entries.includes(file.replace(/\.json$/, ".svg"))) {
-      report(`${variant}/${file}`, {
+      report(`icons/${variant}/${file}`, {
         rule: "metadata",
         severity: "error",
         message: "sidecar .json has no matching .svg — rename or delete it",
       });
     }
+  }
+  const icons = files.map((f) => basename(f, ".svg"));
+  for (const name of orphanAnimations(variant, icons)) {
+    report(animationFile(variant, name), {
+      rule: "animation",
+      severity: "error",
+      message: `no icons/${variant}/${name}.svg to animate — rename or delete it`,
+    });
   }
   checked += files.length;
 }

@@ -23,7 +23,8 @@ export type Accent =
   | "rose"
   | "amber"
   | "teal"
-  | "orange";
+  | "orange"
+  | "fuchsia";
 
 export interface CheckDef {
   /** Tailwind accent used for the pill + badge dot. */
@@ -45,6 +46,7 @@ const ACCENTS: Record<Rule, Accent> = {
   "short-dot": "amber",
   unmergeable: "teal",
   metadata: "orange",
+  animation: "fuchsia",
 };
 
 export const CHECKS: CheckDef[] = (Object.keys(RULES) as Rule[]).map((id) => ({

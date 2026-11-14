@@ -7,6 +7,9 @@
     "resolveJsonModule": true
   },
   "include": [
+    "./animated.lib.ts",
+    "./animation-files.ts",
+    "./build-animated.ts",
     "./build.ts",
     "./build.lib.ts",
     "./check-icons.ts",
@@ -16,6 +19,7 @@
     "./clean-icons.lib.ts",
     "./gen-icon-nodes.ts",
     "./naming.ts",
-    "./*.test.ts"
+    "./*.test.ts",
+    "../../animations/**/*.ts"
   ]
 }

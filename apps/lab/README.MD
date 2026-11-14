@@ -2,7 +2,10 @@
 
 An internal playground for inspecting source and generated icon geometry. It
 visualizes grids, keylines, anchor points, control handles, bounds, and the
-issues reported by `pnpm icons:check`.
+issues reported by `pnpm icons:check`, including problems with an icon's
+animation file. Next to the canvas, each icon plays from
+`@jedd-icons/react-animated`, with its triggers and options set in the sidebar
+and the matching JSX to copy.
 
 ## Development
 

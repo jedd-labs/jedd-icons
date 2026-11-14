@@ -1,0 +1,134 @@
+---
+title: Adding animations
+description: Give an icon animations of its own with a small motion file.
+icon: Plus
+---
+
+import { getMDXComponents } from "@/components/mdx";
+import Status from "../../_shared/animated-status.mdx";
+
+<Status components={getMDXComponents()} />
+
+An icon's shape lives in its SVG; how it moves lives in a separate file,
+`animations/<variant>/<icon>.ts`. The build combines the two, so a redrawn icon
+keeps its animations without copying any geometry. The icon itself has to exist
+first — see [Adding icons](/docs/react/adding-icons).
+
+<Steps>
+
+<Step>
+
+### Find the parts
+
+Animations target the SVG's elements **by position**: `0` is the first
+element, `1` the next, and so on. Open the icon in the Lab
+(`pnpm --filter lab dev`) to see them listed in order under **Pieces**.
+
+```xml title="icons/stroke/arrow-right.svg"
+<path d="M5 12H19"/>                           <!-- 0: shaft -->
+<path d="M12 4.92893L19.0711 12L12 19.0711"/>  <!-- 1: head -->
+```
+
+</Step>
+
+<Step>
+
+### Write the motion
+
+Create the file next to the other animations, with the same name as the SVG:
+
+```ts title="animations/stroke/arrow-right.ts"
+import type { IconAnimations } from "../types";
+
+// 0: shaft, 1: head.
+export default {
+  default: "nudge",
+  animations: {
+    nudge: {
+      icon: { animate: { x: 3 }, transition: { duration: 0.3, ease: "easeInOut" } },
+    },
+    pointing: {
+      0: { animate: { d: "M5 12H15" } },
+      1: { animate: { d: "M8 4.92893L15.0711 12L8 19.0711" } },
+    },
+  },
+} satisfies IconAnimations;
+```
+
+Each animation maps **targets** to what they do:
+
+- an element by position (`0`, `1`, …);
+- a **group** you declare in `groups: { lid: [0, 2] }` — the elements move
+  together, as one `<g>`. An element belongs to one group at most;
+- `"icon"` — every element as one;
+- `"*"` — every element on its own.
+
+Values:
+
+- `x`, `y` — translation in viewBox units, or relative to the target's own box
+  (`"25%"`);
+- `rotate` (degrees), `scale`, `scaleX`, `scaleY`, `opacity` — on any target;
+- `pathLength`, `pathOffset` — stroke drawing, on a single element (not a
+  group);
+- the element's own geometry — `d` on a `<path>`, `r` / `cx` / `cy` on a
+  `<circle>`. A `d` keyframe must keep the source path's commands and number
+  of coordinates, so it can morph.
+
+Give one value to animate there and back, or an array of keyframes. `origin`
+sets the transform origin, relative to the target's box (`"0% 100%"` for a lid
+hinged at its corner), and `transition` takes `duration` and `delay` (seconds),
+`ease`, and `times` (0–1, one per keyframe).
+
+Keep it plain data — no functions, and no imports beside the type.
+
+**Name each animation for its motion** — `nudge`, `spin`, `lift`, `pointing`
+— and reuse a name another icon already has when the motion is the same (three
+icons `spin` already), so `<AnimateIcon animation="spin">` means the same
+everywhere. `"default"` and the [preset](/docs/animated/animations#presets)
+names are reserved.
+
+**Point `default` at the one that plays when none is picked** — one of the
+icon's animations, or a preset (`default: "pulse"`). Leave it out and the icon
+plays the fallback (`draw`, or the app's
+[`fallbackAnimation`](/docs/animated/global-styling#fallback-animation)).
+
+</Step>
+
+<Step>
+
+### Check and preview
+
+```bash
+pnpm icons:check
+```
+
+`icons:check` checks every animation file against its SVG and reports a
+target that doesn't exist, an invalid group, a value that doesn't fit its
+element, a `d` keyframe that can't morph from the source path, `times` that
+don't match the keyframes, a `default` that is neither one of the icon's
+animations nor a preset, or a reserved name. It also flags an animation file
+with no matching SVG. On a PR, CI shows these as annotations on the file.
+
+Then preview it in the Lab (`pnpm --filter lab dev`): the icon plays in the
+**Motion** panel next to the canvas, with every trigger and option in the
+sidebar, the JSX to copy, and the same issues listed for the icon.
+
+To use it in the package, regenerate it:
+
+```bash
+pnpm --filter @jedd-icons/react-animated gen
+```
+
+The codegen refuses to generate from an animation file `icons:check` rejects.
+`pnpm icons` and `pnpm build` run it too.
+
+</Step>
+
+</Steps>
+
+<Callout type="warn">
+  Because targets are positions, **re-exporting an animated icon with its
+  elements in a different order breaks its animations.** Keep the element
+  order when you redraw it: [`pnpm icons:compare`](/docs/react/adding-icons#re-exporting-existing-icons)
+  lists animated icons whose elements moved, and exits with an error.
+</Callout>

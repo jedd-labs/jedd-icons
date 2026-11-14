@@ -25,7 +25,26 @@ describe("compareIcon", () => {
       removed: [],
       maxShift: null,
       elements: [1, 2],
+      moved: [0, 1],
     });
+  });
+
+  it("lists the source positions whose element moved, for animated icons", () => {
+    const lid = `<path d="M4 6H20"/>`;
+    const bin = `<path d="M6 6V20H18V6"/>`;
+    const handle = `<path d="M10 3H14"/>`;
+    const moved = (inner: string) =>
+      compareIcon(
+        committed(`${lid}\n${bin}\n${handle}`),
+        exported(inner),
+        "stroke"
+      ).moved;
+    // Same elements in the same order, one drawn in the other direction.
+    expect(moved(`${lid}\n<path d="M18 6V20H6V6"/>\n${handle}`)).toEqual([]);
+    // Same geometry, but the lid and the bin swapped places.
+    expect(moved(`${bin}\n${lid}\n${handle}`)).toEqual([0, 1]);
+    // The handle dropped.
+    expect(moved(`${lid}\n${bin}`)).toEqual([2]);
   });
 
   it("treats reordered, reversed and reformatted strokes as the same geometry", () => {

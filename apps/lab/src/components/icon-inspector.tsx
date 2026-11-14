@@ -10,6 +10,7 @@ const ACCENT_TEXT: Record<Accent, string> = {
   amber: "text-amber-600 dark:text-amber-400",
   teal: "text-teal-600 dark:text-teal-400",
   orange: "text-orange-600 dark:text-orange-400",
+  fuchsia: "text-fuchsia-600 dark:text-fuchsia-400",
 };
 
 /**

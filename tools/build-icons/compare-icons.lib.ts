@@ -46,6 +46,12 @@ export interface Comparison {
    * segments were added, removed, or changed between line and curve.
    */
   maxShift: number | null;
+  /**
+   * Source positions whose element doesn't draw the same strokes as before:
+   * reordered, changed, added or removed. Animation files target elements by
+   * position, so for an animated icon these break its animations.
+   */
+  moved: number[];
   /** Segments only present in the old version. */
   removed: string[];
   verdict: Verdict;
@@ -99,6 +105,16 @@ function geometryKeys(node: IconNode): Keys {
     strokes: [...strokes, ...unreadable],
     segments: [...segmentKeys(items), ...unreadable],
   };
+}
+
+/** Positions where the two sources' elements don't draw the same strokes. */
+function movedParts(before: IconNode, after: IconNode): number[] {
+  const key = (el: IconNode[number] | undefined) =>
+    el ? geometryKeys([el]).strokes.sort().join("|") : null;
+  return Array.from(
+    { length: Math.max(before.length, after.length) },
+    (_, i) => i
+  ).filter((i) => key(before[i]) !== key(after[i]));
 }
 
 const SHIFT_TOLERANCE = 0.02;
@@ -157,7 +173,8 @@ export function compareIcon(
     before.source.length,
     after.source.length,
   ];
-  const none = { added: [], removed: [], maxShift: null, elements };
+  const moved = movedParts(before.source, after.source);
+  const none = { added: [], removed: [], maxShift: null, elements, moved };
 
   if (JSON.stringify(before.node) === JSON.stringify(after.node)) {
     return { verdict: "identical", ...none };
@@ -178,5 +195,12 @@ export function compareIcon(
   if (shift !== null && shift < SHIFT_TOLERANCE) {
     return { verdict: "same-geometry", ...none };
   }
-  return { verdict: "changed", added, removed, maxShift: shift, elements };
+  return {
+    verdict: "changed",
+    added,
+    removed,
+    maxShift: shift,
+    elements,
+    moved,
+  };
 }

@@ -1,0 +1,16 @@
+{
+  "title": "Animated",
+  "description": "@jedd-icons/react-animated · preview",
+  "icon": "Sparkles",
+  "root": true,
+  "pages": [
+    "index",
+    "installation",
+    "usage",
+    "animations",
+    "props",
+    "global-styling",
+    "---Contributing---",
+    "adding-animations"
+  ]
+}

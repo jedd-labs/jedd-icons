@@ -31,6 +31,10 @@ export const RULES = {
     label: "Metadata",
     hint: "The sidecar .json is missing or doesn't match icon.schema.json",
   },
+  animation: {
+    label: "Animations",
+    hint: "The icon's animation file (animations/<variant>/<icon>.ts) doesn't fit its geometry",
+  },
 } as const;
 
 export type Rule = keyof typeof RULES;

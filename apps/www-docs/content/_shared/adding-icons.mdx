@@ -130,6 +130,14 @@ Each icon gets a verdict: `identical` (same bytes shipped), `same geometry`
 segments, split into strokes differently), or `CHANGED`, which lists the
 segments that moved and by how much.
 
+<DevOnly>
+
+Icons with an [animation file](/docs/animated/adding-animations) are also
+listed when their elements changed position, even with the same geometry:
+their animations target elements by position, so keep the source order.
+
+</DevOnly>
+
 ## Individual commands
 
 | Command | What it does |

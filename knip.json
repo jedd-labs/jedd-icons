@@ -4,6 +4,7 @@
   "ignore": ["apps/www-docs/src/components/hero-blueprint.tsx"],
   "workspaces": {
     ".": {
+      "entry": ["animations/*/*.ts"],
       "ignoreDependencies": ["@biomejs/biome"]
     },
     "packages/*": {},
