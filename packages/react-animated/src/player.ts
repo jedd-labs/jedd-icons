@@ -48,6 +48,9 @@ const RETURN_TRANSITION: AnimationOptions = { duration: 0.25, ease: "easeOut" };
 // What Motion writes to draw a partial stroke. Removed once a stroke is back at
 // rest, so a resting animated icon renders exactly like the static one (a
 // leftover `stroke-dasharray: 1px 1px` can leave a hairline gap in Safari).
+// Motion sets `pathLength="1"` only the first time it draws an element, so
+// `run` puts it back: without it the dash lengths read as user units, and the
+// stroke draws as tiny dashes.
 const PATH_LENGTH_ATTRS = [
   "pathLength",
   "stroke-dasharray",
@@ -130,6 +133,9 @@ export function createPlayer(svg: SVGSVGElement): Player {
     running = Object.entries(animation).flatMap(([key, part]) =>
       targets(key).map((el) => {
         const values = restOf(el, Object.keys(part.animate));
+        if ("pathLength" in part.animate || "pathOffset" in part.animate) {
+          el.setAttribute("pathLength", "1");
+        }
         const keyframes: Record<string, unknown> = {};
         for (const [name, value] of Object.entries(part.animate)) {
           keyframes[name] =
@@ -181,7 +187,8 @@ export function createPlayer(svg: SVGSVGElement): Player {
       )
     );
     Promise.all(running.map((controls) => controls.finished)).then(() => {
-      if (gen !== generation) {
+      // A loop's next run may already be drawing (`initialOnAnimateEnd`).
+      if (gen !== generation || runInProgress) {
         return;
       }
       running = [];
