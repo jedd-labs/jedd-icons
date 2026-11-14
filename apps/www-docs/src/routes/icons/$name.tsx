@@ -85,7 +85,6 @@ function IconPage() {
 
   const {
     size,
-    setSize,
     strokeWidth,
     setStrokeWidth,
     color,
@@ -95,7 +94,7 @@ function IconPage() {
     reset,
     reactSnippet,
     vanillaSnippet,
-  } = useIconCustomization({ name, variant, defaultSize: 48 });
+  } = useIconCustomization({ name, variant, defaultSize: 24 });
 
   const absoluteId = useId();
   const availableVariants = getAvailableVariants(name);
@@ -147,7 +146,7 @@ function IconPage() {
           {/* Preview + controls + metadata */}
           <section className="relative border-border border-b px-6 py-10">
             <GridDots columns={frameColumns} row="100%" y="outer-bottom" />
-            <div className="mx-auto grid max-w-5xl gap-y-6 lg:grid-cols-[380px_1fr] lg:gap-x-10 lg:gap-y-0">
+            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-y-6 lg:grid-cols-[380px_1fr] lg:gap-x-10 lg:gap-y-0">
               {/*
                 Each column below is `contents` on mobile (its box disappears, so
                 its children flatten into the outer grid and follow the `order-*`
@@ -160,7 +159,7 @@ function IconPage() {
               <div className="contents lg:col-start-1 lg:flex lg:flex-col lg:gap-4">
                 <div className="order-3 flex gap-3 lg:order-none">
                   <div
-                    className="relative flex aspect-square flex-1 items-center justify-center border border-border bg-muted/20 [&>svg]:h-full [&>svg]:w-full"
+                    className="relative flex aspect-square min-w-0 flex-1 items-center justify-center border border-border bg-muted/20 [&>svg]:h-full [&>svg]:w-full"
                     ref={previewRef}
                     style={{
                       backgroundImage:
@@ -177,7 +176,7 @@ function IconPage() {
                     />
                   </div>
 
-                  <div className="flex flex-col gap-2">
+                  <div className="hidden flex-col gap-2 sm:flex">
                     {SIZE_LADDER.map((s) => (
                       <div className="flex flex-col items-center gap-1" key={s}>
                         <div className="flex size-[72px] items-center justify-center border border-border bg-muted/20">
@@ -200,24 +199,6 @@ function IconPage() {
                 <div className="order-4 border border-border p-5 lg:order-none">
                   <div className="grid gap-5 sm:grid-cols-2">
                     <div className="flex flex-col gap-4">
-                      <div className="flex flex-col gap-1.5">
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="text-foreground">Size</span>
-                          <span className="font-mono text-muted-foreground">
-                            {size}px
-                          </span>
-                        </div>
-                        <Slider
-                          max={96}
-                          min={16}
-                          onValueChange={(v) =>
-                            setSize(Array.isArray(v) ? v[0] : v)
-                          }
-                          step={1}
-                          value={[size]}
-                        />
-                      </div>
-
                       <div className="flex flex-col gap-1.5">
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-foreground">Stroke width</span>
@@ -342,7 +323,7 @@ function IconPage() {
                   </Button>
                 </div>
 
-                <div className="order-6 flex min-h-0 flex-col lg:order-none lg:flex-1">
+                <div className="order-6 flex min-h-0 min-w-0 flex-col lg:order-none lg:flex-1">
                   <h2 className="font-heading text-lg">Usage</h2>
                   <UsageTabs
                     className="mt-3 lg:min-h-0 lg:flex-1"

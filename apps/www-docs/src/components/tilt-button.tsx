@@ -119,7 +119,7 @@ export function TiltButton({
       {/* Button surface */}
       <div
         className={cn(
-          "relative flex h-10 cursor-pointer items-center gap-2 px-3 font-medium text-sm",
+          "relative flex h-10 cursor-pointer items-center gap-2 whitespace-nowrap px-3 font-medium text-sm",
           radius,
           surfaceBg
         )}

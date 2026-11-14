@@ -31,7 +31,7 @@ export function HeroSection({ totalIcons }: { totalIcons: number }) {
           vanilla JS modules. Customize size, stroke, and color, then copy the
           code.
         </p>
-        <div className="relative flex justify-center gap-3">
+        <div className="relative flex flex-wrap justify-center gap-3">
           <Link to="/icons">
             <TiltButton rounded={false} shortcut="E">
               <BoxIcon />
