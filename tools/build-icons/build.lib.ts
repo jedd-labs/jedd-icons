@@ -224,23 +224,18 @@ const isMergeablePath = ([tag, attrs, children]: IconNodeChild) =>
   attrs.d.trimStart().startsWith("M");
 
 /**
- * Merges top-level elements into as few compound paths as possible, each
- * placed where its first element sat. Circles, rects and other basic shapes
- * are converted to path data first. Sources keep separate elements for their
- * part structure; the static packages ship the compact merged form, which also
- * paints overlapping strokes once (no darker joints with semi-transparent
- * colors). Stroke-only: for filled shapes, merging can turn overlaps into holes.
+ * Merges top-level elements (basic shapes converted to paths first) into as few
+ * compound paths as possible, each placed where its first element sat. Merged
+ * strokes paint overlaps once, so semi-transparent colors get no darker joints.
+ * Stroke-only: for filled shapes, merging can turn overlaps into holes.
  *
- * Elements with different line caps/joins still merge when the difference
- * can't show: a join only matters at corners and a cap only on open ends, so a
- * circle without `stroke-linejoin="bevel"` merges with bevelled clock hands and
- * the merged path is bevelled. Where a value would show on both sides (two
- * cornered strokes, one bevel and one miter), they stay separate paths.
+ * Different caps/joins still merge where the difference can't show (a join
+ * only matters at corners, a cap only on open ends), e.g. a circle with
+ * bevelled clock hands; two cornered strokes, one bevel and one miter, don't.
  *
- * `d`s are joined without a separator, so an icon re-exported unmerged from
- * the same geometry reproduces the design tool's merged path exactly. Paths
- * whose `d` doesn't start with an absolute `M` are left alone, since a
- * relative `m` would be offset by the path it's appended to.
+ * `d`s are joined without a separator, to match the design tool's own merged
+ * path. A `d` not starting with an absolute `M` is left alone: a relative `m`
+ * would be offset by the path before it.
  */
 export function mergePathNodes(nodes: IconNode): IconNode {
   const merged: IconNode = [];

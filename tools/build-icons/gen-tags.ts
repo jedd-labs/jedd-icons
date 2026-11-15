@@ -65,8 +65,7 @@ function main() {
     }
   }
 
-  // Convert kebab → PascalCase only here, at the serialization boundary, so the
-  // kebab-keyed stroke/fill merge above stays intact.
+  // Keyed by component name, as the docs site looks icons up.
   const byIcon: ByIcon = Object.fromEntries(
     Object.entries(byIconKebab)
       .map(([name, tags]) => [kebabToPascal(name), [...tags].sort()] as const)

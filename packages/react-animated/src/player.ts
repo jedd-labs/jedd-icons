@@ -45,12 +45,10 @@ const REST: Record<string, Value> = {
 
 const RETURN_TRANSITION: AnimationOptions = { duration: 0.25, ease: "easeOut" };
 
-// What Motion writes to draw a partial stroke. Removed once a stroke is back at
-// rest, so a resting animated icon renders exactly like the static one (a
-// leftover `stroke-dasharray: 1px 1px` can leave a hairline gap in Safari).
-// Motion sets `pathLength="1"` only the first time it draws an element, so
-// `run` puts it back: without it the dash lengths read as user units, and the
-// stroke draws as tiny dashes.
+// What Motion writes to draw a partial stroke, removed at rest so the icon
+// renders like the static one (a leftover dasharray leaves a hairline gap in
+// Safari). Motion only sets `pathLength="1"` on its first draw, so `run` puts it
+// back; without it the stroke draws as tiny dashes.
 const PATH_LENGTH_ATTRS = [
   "pathLength",
   "stroke-dasharray",
@@ -62,10 +60,8 @@ const PART_INDEX = /^\d+$/;
 // Values that transform their target, so it needs an origin.
 const TRANSFORMS = new Set(["x", "y", "rotate", "scale", "scaleX", "scaleY"]);
 
-// Motion leaves an SVG element's CSS `transform-origin` at its default, the
-// top-left corner of the user space, so rotations and scales would pivot
-// there. The origin is set here instead: the target's own box (`fill-box`),
-// at the animation's `origin`, by default its center.
+// Motion leaves SVG transforms pivoting on the viewBox's top-left corner, so
+// the origin is set on the target's own box (`fill-box`), centered by default.
 function setOrigin(el: SVGElement, part: Animation[string]) {
   if (part.origin || Object.keys(part.animate).some((k) => TRANSFORMS.has(k))) {
     el.style.transformBox = "fill-box";

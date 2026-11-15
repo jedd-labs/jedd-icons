@@ -1,18 +1,16 @@
 import { defineConfig } from "tsdown";
 
 export default defineConfig({
-  // index + auto-discovered variant entries (e.g. src/rounded.ts), excluding the
-  // internal top-level modules. unbundle preserves everything else (icons/*,
-  // Icon.tsx, createAnimatedJeddIcon.tsx…) as their own modules regardless.
+  // index + variant entries (e.g. src/rounded.ts); unbundle keeps every other
+  // module (icons/*, Icon.tsx…) as its own file.
   entry: ["src/*.ts", "!src/types.ts", "!src/player.ts", "!src/useTrigger.ts"],
   format: ["esm", "cjs"],
   dts: true,
   unbundle: true,
   deps: {
-    // Peer dependencies — never bundle them.
+    // Peer dependencies.
     neverBundle: ["react", "react/jsx-runtime", "motion"],
-    // @jedd-icons/shared is an internal monorepo package — bundle it in so the
-    // published package depends on no other Jedd package.
+    // Internal package: bundled so this one depends on no other Jedd package.
     alwaysBundle: ["@jedd-icons/shared"],
   },
 });

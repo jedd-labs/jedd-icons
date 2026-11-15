@@ -1,11 +1,8 @@
 #!/usr/bin/env node
 
-// Emits the raw parsed geometry (IconNode tuples) of every source SVG so the
-// docs app's "Jedd Lab" x-ray route can inspect path data at runtime. This is
-// the same tuple shape the codegen bakes into each package file, but kept as an
-// app-local artifact (nothing new is added to the published package surface).
-// Each icon also carries the issues `icons:check` reports for it, so the Lab
-// shows the same checks rather than re-implementing them.
+// Emits every source SVG's parsed geometry (IconNode tuples) for the Lab
+// (`apps/lab`), unmerged as in the source and merged as shipped, with the
+// issues `icons:check` reports for it so the Lab doesn't re-implement them.
 
 import {
   existsSync,
@@ -33,20 +30,13 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..", "..");
 const ICONS_DIR = join(ROOT, "icons");
 
-// Output dir is overridable via `--out <path>` (relative to repo root) so the
-// same generator can feed any consuming app. Defaults to the Lab app.
+// `--out <path>` (relative to the repo root) overrides the output dir.
 const outArgIdx = process.argv.indexOf("--out");
 const OUTPUT_DIR =
   outArgIdx !== -1 && process.argv[outArgIdx + 1]
     ? resolve(ROOT, process.argv[outArgIdx + 1])
     : join(ROOT, "apps", "lab", ".generated");
 const OUTPUT = join(OUTPUT_DIR, "icon-nodes.json");
-
-// The SVG parser and attribute-stripping rules are imported from build.lib so
-// the Lab reflects exactly what the codegen parses. They were previously
-// duplicated here and silently drifted. `node` is deliberately NOT merged: the
-// Lab inspects the source's element structure. `shipped` is the merged form the
-// stroke packages ship, for the Lab's "shipped SVG" view.
 
 // ── Main ───────────────────────────────────────────────────────────────
 
@@ -70,8 +60,7 @@ interface IconNodeEntry {
   variant: string;
 }
 
-// A malformed sidecar shows as a metadata issue in the Lab rather than
-// crashing the whole generation.
+// A malformed sidecar shows as a metadata issue rather than crashing.
 function parseMeta(json: string | undefined): unknown {
   try {
     return json === undefined ? null : JSON.parse(json);

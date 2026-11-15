@@ -64,9 +64,8 @@ export interface AnimatedIconProps<N extends string = string>
 
 /**
  * An icon's animation names, suggested by the editor. Any other string is
- * accepted too (it plays the icon's default and warns in development), so
- * every icon fits `AnimatedJeddIcon` —
- * e.g. in an array of icons or an `icon` prop.
+ * accepted too (it plays the default and warns in development), so every icon
+ * fits `AnimatedJeddIcon`, e.g. in an array of icons.
  */
 export type AnimationName<N extends string> =
   | N

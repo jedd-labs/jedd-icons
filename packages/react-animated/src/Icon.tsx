@@ -11,11 +11,8 @@ interface InternalProps extends IconProps {
 }
 
 /**
- * Renders an icon's node tuples as an `<svg>`. Internal (not exported): a copy
- * of `@jedd-icons/react`'s `Icon.tsx`, so this package needs no other
- * published package. Only `useJeddContext` differs (this package's own
- * provider): keep the two files otherwise identical, so an icon at rest
- * renders the same from either package.
+ * Internal copy of `@jedd-icons/react`'s `Icon.tsx` that reads this package's
+ * provider. Keep the two otherwise identical, so icons at rest render the same.
  */
 const Icon = forwardRef<SVGSVGElement, InternalProps>(
   (

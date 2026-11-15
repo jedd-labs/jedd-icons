@@ -1,10 +1,6 @@
 #!/usr/bin/env node
-// Collects each icon's contributors (GitHub usernames) from its `.json` sidecar
-// and writes them to apps/www-docs/.generated/icon-contributors.json for the
-// docs site. The sidecars are build-time only
-//
-// Contributors are kept PER VARIANT (stroke vs fill can differ), keyed
-// name → variant → [usernames]
+// Collects each icon's contributors (GitHub usernames) from its `.json`
+// sidecars, per variant, into apps/www-docs/.generated/icon-contributors.json.
 
 import {
   existsSync,
@@ -21,8 +17,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..", "..");
 const ICONS_DIR = join(ROOT, "icons");
 
-// Generated artifact — lives in the app's `.generated/` dir (gitignored),
-// mirroring the `.source` convention, not in hand-written `src/`.
 const OUTPUT_DIR = join(ROOT, "apps", "www-docs", ".generated");
 const OUTPUT = join(OUTPUT_DIR, "icon-contributors.json");
 
@@ -78,13 +72,8 @@ function main() {
     }
   }
 
-  // Key by PascalCase component name (matching the codegen's exports) so the
-  // docs site can look contributors up directly by component name — no lossy
-  // Pascal→kebab reverse transform. Convert only here, at the serialization
-  // boundary, so the kebab-keyed stroke/fill merge above stays intact.
-  // NOTE: alias components (build.ts `aliasExportLines`) are not keyed here;
-  // safe today because no sidecar defines aliases.
-  // (Icons with no contributors at all are absent.)
+  // Keyed by component name, as the docs site looks icons up. Aliases aren't
+  // keyed (no sidecar defines any yet).
   const sorted = Object.fromEntries(
     Object.entries(byIcon)
       .map(([name, variants]) => [kebabToPascal(name), variants] as const)

@@ -37,11 +37,9 @@ export interface JeddProviderProps extends JeddDefaults {
 const JeddContext = createContext<JeddDefaults>({});
 
 /**
- * Sets defaults for every animated icon below it: the styling props of
- * `@jedd-icons/react`'s `JeddProvider` (`size`, `color`, `strokeWidth`,
- * `absoluteStrokeWidth`), the animation options, `fallbackAnimation` and
- * `reducedMotion`. Props on an icon (or an `<AnimateIcon>` around it) still
- * win; a nested provider only overrides the values it sets.
+ * Sets defaults (styling props, animation options, `fallbackAnimation`,
+ * `reducedMotion`) for every animated icon below it. Props on an icon or its
+ * `<AnimateIcon>` still win; a nested provider only overrides what it sets.
  */
 export function JeddProvider({
   children,
