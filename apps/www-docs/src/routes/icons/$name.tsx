@@ -1,4 +1,9 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  notFound,
+  stripSearchParams,
+} from "@tanstack/react-router";
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { Checkbox } from "@workspace/ui/components/checkbox";
@@ -21,6 +26,7 @@ import {
   getIconContributors,
   getIconRelease,
   getIconTags,
+  getRelatedIcons,
   humanizeCategory,
   humanizeIconName,
   VARIANT_MAPS,
@@ -41,6 +47,8 @@ export const Route = createFileRoute("/icons/$name")({
   validateSearch: (search: Record<string, unknown>) => ({
     variant: VARIANTS.find((v) => v === search.variant) ?? "stroke",
   }),
+  // Keeps the default variant out of the canonical URL.
+  search: { middlewares: [stripSearchParams({ variant: "stroke" })] },
   loader: ({ params }) => {
     if (getAvailableVariants(params.name).length === 0) {
       throw notFound();
@@ -82,6 +90,7 @@ function IconPage() {
   const contributors = getIconContributors(name, variant);
   const categories = getIconCategories(name);
   const tags = getIconTags(name);
+  const related = getRelatedIcons(name, variant);
 
   const {
     size,
@@ -349,6 +358,35 @@ function IconPage() {
               <IconInContext className="mt-6" component={Component} />
             </div>
           </section>
+
+          {related.length > 0 && (
+            <section className="relative border-border border-b px-6 py-12">
+              <GridDots columns={frameColumns} row="100%" y="outer-bottom" />
+              <div className="mx-auto max-w-5xl">
+                <h2 className="font-heading text-lg">Related icons</h2>
+                <ul className="mt-6 grid grid-cols-[repeat(auto-fill,minmax(96px,1fr))] gap-px border border-border/40 bg-border/40">
+                  {related.map((other) => {
+                    const Related = VARIANT_MAPS[variant][other];
+                    return (
+                      <li key={other}>
+                        <Link
+                          className="flex aspect-square flex-col items-center justify-center gap-2 bg-background p-3 text-muted-foreground transition-colors hover:bg-muted/10 hover:text-foreground"
+                          params={{ name: other }}
+                          search={{ variant }}
+                          to="/icons/$name"
+                        >
+                          <Related aria-hidden className="text-foreground" />
+                          <span className="w-full truncate text-center text-[10px] leading-none">
+                            {humanizeIconName(other)}
+                          </span>
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            </section>
+          )}
 
           <SiteFooter />
         </div>

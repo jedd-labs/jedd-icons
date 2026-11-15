@@ -306,19 +306,32 @@ function IconsPage() {
                     <Tooltip>
                       <TooltipTrigger
                         render={
-                          <button
-                            aria-label={`Select ${name}`}
+                          // Crawlable link; a plain click selects instead.
+                          <Link
+                            aria-label={`${humanizeIconName(name)} icon`}
                             className={`group relative flex aspect-square w-full flex-col items-center justify-center gap-2 p-3 transition-colors focus-visible:z-10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/50 ${
                               selected === name
                                 ? "z-10 bg-muted/30"
                                 : "bg-background hover:bg-muted/10"
                             }`}
-                            onClick={() =>
+                            onClick={(e) => {
+                              if (
+                                e.metaKey ||
+                                e.ctrlKey ||
+                                e.shiftKey ||
+                                e.altKey
+                              ) {
+                                return;
+                              }
+                              e.preventDefault();
                               setSelected((prev) =>
                                 prev === name ? null : name
-                              )
-                            }
-                            type="button"
+                              );
+                            }}
+                            params={{ name }}
+                            preload={false}
+                            search={{ variant }}
+                            to="/icons/$name"
                           />
                         }
                       >
