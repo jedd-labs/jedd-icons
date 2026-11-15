@@ -2,15 +2,9 @@
 // biome-ignore-all lint/suspicious/noAssignInExpressions: `nums[i++]` cursor reads keep the command-arg consumption compact and are local to this parser.
 // biome-ignore-all lint/style/useConsistentTypeDefinitions: object-literal point/command types read better than interfaces for this geometry data.
 
-// A small SVG path-data parser tailored to the "Jedd Lab" x-ray. It turns a
-// `d` string into a flat list of absolute drawing commands plus the points that
-// matter for inspection: anchor points (on-curve vertices) and control points
-// (off-curve Bézier / arc-endpoint handles). Coordinates stay in the icon's
-// native 0–24 user space; the Lab component scales them for display.
-//
-// Jedd icons are flat, stroke-only geometry authored to a 24×24 grid, so we
-// only need the command set the source SVGs actually use: M/L/H/V/C/S/Q/T/A/Z
-// (absolute + relative). This is intentionally not a full SVG path engine.
+// A small path-data parser for the Lab: turns a `d` string into absolute
+// commands plus its anchor points (on-curve) and control points (off-curve), in
+// the icon's 0–24 space. Handles M/L/H/V/C/S/Q/T/A/Z, absolute and relative.
 
 type Point = { x: number; y: number };
 

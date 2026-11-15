@@ -137,14 +137,9 @@ function playOptions(
 }
 
 /**
- * An animated icon component. `iconNode` is the icon's unmerged source
- * geometry with `data-part`/`data-group` markers; `animations` are the icon's
- * own, beside the presets, and `defaultAnimation` names the one (or the
- * preset) `default` plays. Takes the same props as the icons of
- * `@jedd-icons/react` and renders the same at rest (see `Icon.tsx`).
- *
- * Internal: only the generated (gitignored) icon modules import this, so knip
- * can't see its uses.
+ * An animated icon component, from its unmerged source geometry (with
+ * `data-part`/`data-group` markers), its own animations and what `default`
+ * plays. Internal: only the generated icon modules use it, which knip can't see.
  * @lintignore
  */
 export default function createAnimatedJeddIcon<N extends string = never>(

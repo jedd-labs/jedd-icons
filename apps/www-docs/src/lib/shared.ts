@@ -61,7 +61,6 @@ export function socialMeta({
 
 export const docsRoute = "/docs";
 
-// fill this with your actual GitHub info, for example:
 export const gitConfig = {
   user: "jedd-labs",
   repo: "jedd-icons",

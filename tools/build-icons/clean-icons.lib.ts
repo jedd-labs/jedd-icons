@@ -1,6 +1,5 @@
-// Pure, side-effect-free SVG normalization for the source-of-truth icons. Kept
-// separate from `clean-icons.ts` (the CLI entry) so these transforms can be
-// imported and unit-tested without walking the filesystem.
+// Pure SVG normalization for the source icons, separate from the
+// `clean-icons.ts` CLI so it can be unit-tested.
 export const VARIANT_ROOT_ATTRS: Record<string, string> = {
   stroke: [
     'xmlns="http://www.w3.org/2000/svg"',
@@ -15,23 +14,15 @@ export const VARIANT_ROOT_ATTRS: Record<string, string> = {
   ].join(" "),
 };
 
-// Presentation attributes stripped from child elements (they're set on the root
-// and inherited). `stroke-linejoin` and `stroke-linecap` are intentionally NOT
-// here — they're handled separately so a non-default join (e.g. bevel) or cap
-// (e.g. square, which is what makes zero-length "dot" segments visible) can be
-// kept per element.
+// Presentation attributes stripped from child elements (inherited from the
+// root). Line join/cap aren't here: a non-default one is kept per element.
 export const INHERITED_ATTRS =
   /\s+(?:stroke|fill|stroke-width|stroke-dasharray|stroke-dashoffset|stroke-miterlimit|stroke-opacity|fill-opacity|opacity|class)="[^"]*"/g;
 
-// The default stroke-linejoin every icon inherits from the root. A child join
-// equal to this is redundant and stripped; any other value is a deliberate
-// per-element override and preserved.
+// A child join/cap equal to the root's default is stripped; any other value is
+// a deliberate override (a square cap is what makes a zero-length dot visible).
 export const DEFAULT_LINEJOIN = "miter";
 export const CHILD_LINEJOIN = /\s+stroke-linejoin="([^"]*)"/g;
-
-// Same contract for stroke-linecap. `butt` is the inherited default; `square`
-// and `round` are deliberate overrides that must survive cleaning — dropping
-// them collapses zero-length segments (dots) to nothing at render time.
 export const DEFAULT_LINECAP = "butt";
 export const CHILD_LINECAP = /\s+stroke-linecap="([^"]*)"/g;
 
@@ -44,18 +35,13 @@ const LAYER_IDS = /\s+id="[^"]*"/g;
 const DATA_ATTRS = /\s+data-[\w-]+="[^"]*"/g;
 
 /**
- * Flattens design-tool export artifacts: removes `<defs>` blocks (which hold
- * clip/mask/gradient definitions the flat icons never use) and unwraps
- * `<g clip-path="…">…</g>` groups, hoisting their children to the root. These
- * wrappers are functionally inert for a 24×24 flat icon but violate the
- * "no groups/defs" rule and confuse simple parsers. Idempotent.
+ * Flattens design-tool export artifacts: drops `<defs>` blocks and unwraps
+ * `<g>` groups (e.g. `clip-path` wrappers), hoisting their children. Idempotent.
  */
 export function unwrapGroups(inner: string): string {
   let out = inner;
-  // Drop entire <defs>…</defs> blocks (clipPath/mask/gradient definitions).
   out = out.replace(/<defs\b[^>]*>[\s\S]*?<\/defs>/g, "");
-  // Unwrap <g …>…</g>, repeatedly to handle nesting. The regex matches an
-  // innermost group (no nested <g> inside) and replaces it with its children.
+  // Unwraps innermost groups, repeatedly to handle nesting.
   let prev: string;
   do {
     prev = out;
@@ -176,13 +162,10 @@ export function cleanSvg(svg: string, rootAttrs: string): string {
 
   let inner = svg.slice(openMatch[0].length, closeIdx);
 
-  // Flatten export artifacts (defs/clip-path groups).
   inner = unwrapGroups(inner);
 
-  // The root is about to be replaced by the canonical template (miter/butt). If
-  // the source declared a non-default join or cap on the root, hoist it onto
-  // child elements first so it survives as a per-element override rather than
-  // being lost.
+  // The root is replaced by the canonical one: keep a non-default join/cap
+  // declared on it by moving it onto the children.
   inner = hoistRootAttr(
     inner,
     openMatch[0],
@@ -191,8 +174,6 @@ export function cleanSvg(svg: string, rootAttrs: string): string {
   );
   inner = hoistRootAttr(inner, openMatch[0], "stroke-linecap", DEFAULT_LINECAP);
 
-  // Strip inherited presentation attributes, layer ids and design-tool data
-  // attributes from child elements
   inner = inner.replace(/<([a-zA-Z][\w-]*)\s+([^>]*?)\s*\/?>/g, (match) =>
     match
       .replace(INHERITED_ATTRS, "")
@@ -200,22 +181,17 @@ export function cleanSvg(svg: string, rootAttrs: string): string {
       .replace(DATA_ATTRS, "")
   );
 
-  // Handle stroke-linejoin/stroke-linecap on children: drop the redundant
-  // default and keep any deliberate override (bevel/round, square/round).
   inner = stripDefaultAttr(inner, CHILD_LINEJOIN, DEFAULT_LINEJOIN);
   inner = stripDefaultAttr(inner, CHILD_LINECAP, DEFAULT_LINECAP);
 
-  // Separate elements are kept as authored: they carry the designer's part
-  // structure. The static packages merge them at build time (`mergePathNodes`).
+  // Elements stay separate, as authored; the static build merges them.
 
-  // Clean up any double spaces left behind
   inner = inner
     .replace(/ {2,}/g, " ")
     .replace(/ >/g, ">")
     .replace(/ \/>/g, "/>");
 
-  // Collapse blank lines left by unwrapping so each element sits on its own
-  // line with a single leading/trailing newline.
+  // One element per line.
   inner = `\n${inner
     .replace(/>\s*</g, ">\n<")
     .replace(/[ \t]*\n\s*\n/g, "\n")

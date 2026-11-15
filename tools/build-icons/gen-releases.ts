@@ -29,8 +29,6 @@ const REMOTE_URL =
   process.env.JEDD_RELEASES_REMOTE ??
   "https://github.com/jedd-labs/jedd-icons.git";
 
-// Generated artifact — lives in the app's `.generated/` dir (gitignored),
-// mirroring the `.source` convention, not in hand-written `src/`.
 const OUTPUT_DIR = join(ROOT, "apps", "www-docs", ".generated");
 const OUTPUT = join(OUTPUT_DIR, "icon-releases.json");
 
@@ -72,24 +70,19 @@ function tagCount(): number {
 }
 
 /**
- * Make sure release tags AND their history are present. Shallow CI clones
- * (Cloudflare/Vercel) have neither, so we fetch tags from the public remote.
- * We unshallow when needed so the per-tag diffs can see full history — without
- * it, tag commits may be missing and an icon's "since" version gets misdated.
+ * Makes sure release tags and their history are present: shallow CI clones
+ * have neither, and without the history an icon's "since" version is misdated.
  */
 function ensureTags() {
-  // A full clone with tags already present needs nothing.
   if (!isShallowClone() && tagCount() > 0) {
     return;
   }
 
-  // Unshallow first so tag commits and the history between them are reachable.
   if (isShallowClone()) {
     tryGit(["fetch", "--unshallow", "--tags", REMOTE_URL]);
   }
 
-  // Then make sure every tag ref is present (covers the non-shallow-but-no-tags
-  // case, e.g. `clone --no-tags`).
+  // e.g. `clone --no-tags`.
   if (tagCount() === 0) {
     const fetched = tryGit([
       "fetch",
@@ -106,14 +99,12 @@ function ensureTags() {
   }
 }
 
-// Minimal x.y.z(-pre)? comparator — enough for our simple version scheme.
-// Pre-release suffixes are intentionally ignored (we never tag pre-releases).
+// Minimal x.y.z comparator; pre-release suffixes are ignored (never tagged).
 function compareSemver(a: string, b: string): number {
   const parse = (v: string): [number, number, number] => {
     const [core] = v.split("-", 1);
     const parts = core.split(".").map((n) => Number.parseInt(n, 10) || 0);
-    // Pad missing segments to 0 so a short version like "1" compares as
-    // "1.0.0" instead of yielding NaN (undefined - number) and corrupting sort.
+    // "1" compares as "1.0.0" rather than NaN.
     return [parts[0] ?? 0, parts[1] ?? 0, parts[2] ?? 0];
   };
   const [a1, a2, a3] = parse(a);
@@ -122,8 +113,6 @@ function compareSemver(a: string, b: string): number {
 }
 
 function isValidSemver(v: string): boolean {
-  // Anchored at both ends so trailing junk (e.g. "1.2.3foo", "1.2.3.4") is
-  // rejected rather than silently accepted.
   return /^\d+\.\d+\.\d+$/.test(v);
 }
 
@@ -138,9 +127,7 @@ function getReleaseTags(): { tag: string; version: string; date: string }[] {
     .sort((a, b) => compareSemver(a.version, b.version));
 
   return tags.map(({ tag, version }) => {
-    // `tag^{commit}` dereferences annotated tags to their commit, so the date
-    // is the commit's ISO date — not the tag-object header that a bare
-    // `git show <tag>` would print first.
+    // `^{commit}`: the commit's date, even for an annotated tag.
     const date = git(["show", "-s", "--format=%cI", `${tag}^{commit}`]);
     return { tag, version, date };
   });
@@ -284,12 +271,8 @@ function main() {
   const releases = collectReleases(tags);
   markUnreleased(releases);
 
-  // Key by PascalCase component name (matching the codegen's exports) so the
-  // docs site can look metadata up directly by component name — no lossy
-  // Pascal→kebab reverse transform. Convert only here, at the serialization
-  // boundary, so the kebab-keyed rename tracking above stays intact.
-  // NOTE: alias components (build.ts `aliasExportLines`) are not keyed here;
-  // safe today because no sidecar defines aliases.
+  // Keyed by component name, as the docs site looks icons up. Aliases aren't
+  // keyed (no sidecar defines any yet).
   const sorted = Object.fromEntries(
     Object.entries(releases)
       .map(([name, rel]) => [kebabToPascal(name), rel] as const)

@@ -15,7 +15,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..", "..");
 const ICONS_DIR = join(ROOT, "icons");
 
-// Generated artifact — lives in the app's `.generated/` dir (gitignored),
 const OUTPUT_DIR = join(ROOT, "apps", "www-docs", ".generated");
 const OUTPUT = join(OUTPUT_DIR, "icon-categories.json");
 
