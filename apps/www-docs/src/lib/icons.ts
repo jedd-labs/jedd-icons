@@ -116,6 +116,32 @@ export function getIconTags(name: string): string[] {
   return iconTagsData.byIcon[name] ?? [];
 }
 
+/** Icons sharing categories (weighted higher) or tags with `name`. */
+export function getRelatedIcons(
+  name: string,
+  variant: Variant,
+  limit = 12
+): string[] {
+  const scores = new Map<string, number>();
+  const add = (names: string[] | undefined, weight: number) => {
+    for (const other of names ?? []) {
+      if (other !== name && other in VARIANT_MAPS[variant]) {
+        scores.set(other, (scores.get(other) ?? 0) + weight);
+      }
+    }
+  };
+  for (const category of getIconCategories(name)) {
+    add(iconCategoriesData.byCategory[category], 2);
+  }
+  for (const tag of getIconTags(name)) {
+    add(iconTagsData.byTag[tag], 1);
+  }
+  return [...scores]
+    .sort(([a, sa], [b, sb]) => sb - sa || a.localeCompare(b))
+    .slice(0, limit)
+    .map(([other]) => other);
+}
+
 export function humanizeCategory(category: string): string {
   return category
     .split("-")
