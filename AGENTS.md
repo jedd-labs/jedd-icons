@@ -26,6 +26,10 @@ The quality gate is `icons:check` + lint + test + typecheck + knip. Locally it's
 
 Node >= 20, pnpm 11.5.1. Dependency versions are pinned centrally in `pnpm-workspace.yaml` under `catalog:` — packages reference `"catalog:"` instead of literal versions, so add/bump deps there.
 
+## Comments
+
+Comment only where the code can't say it (a non-obvious reason, a constraint, a gotcha), in one short line. Don't narrate what the code does, restate names or types, or refer to PRs, issues or the change that introduced it.
+
 ## Architecture: the icon build pipeline
 
 The whole system exists to turn `icons/**/*.svg` into typed, tree-shakeable component modules. The chain is worth understanding before touching anything under `packages/`, because most of `packages/{react,core,react-animated}/src` is **generated and gitignored/lint-ignored** (see `biome.jsonc` `files.includes` exclusions for `src/icons`, `src/icons-*`).
