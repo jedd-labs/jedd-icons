@@ -1,0 +1,6 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": ["book", "open book", "minus", "remove", "subtract", "reading"],
+  "categories": ["files", "actions"]
+}

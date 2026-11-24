@@ -1,0 +1,6 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": ["folder", "directory", "edit", "rename", "modify", "files"],
+  "categories": ["files", "actions"]
+}

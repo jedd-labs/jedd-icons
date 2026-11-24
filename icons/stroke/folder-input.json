@@ -1,0 +1,14 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "folder",
+    "directory",
+    "input",
+    "import",
+    "incoming",
+    "move",
+    "files"
+  ],
+  "categories": ["files", "actions"]
+}
