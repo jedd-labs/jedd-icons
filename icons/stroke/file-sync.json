@@ -1,0 +1,15 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "file",
+    "document",
+    "sync",
+    "synchronize",
+    "refresh",
+    "update",
+    "backup",
+    "transfer"
+  ],
+  "categories": ["files", "actions"]
+}
