@@ -1,0 +1,14 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "mail",
+    "email",
+    "envelope",
+    "minus",
+    "remove",
+    "delete",
+    "unsubscribe"
+  ],
+  "categories": ["communication", "actions"]
+}
