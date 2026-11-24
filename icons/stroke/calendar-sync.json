@@ -1,0 +1,19 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "calendar",
+    "sync",
+    "synchronize",
+    "refresh",
+    "update",
+    "schedule",
+    "date",
+    "transfer",
+    "backup",
+    "recurring",
+    "reminder",
+    "subscribe"
+  ],
+  "categories": ["time", "actions"]
+}
