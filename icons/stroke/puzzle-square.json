@@ -1,0 +1,17 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "puzzle",
+    "puzzle piece",
+    "jigsaw",
+    "square",
+    "game",
+    "fit",
+    "connect",
+    "component",
+    "module",
+    "piece"
+  ],
+  "categories": ["shapes", "social"]
+}

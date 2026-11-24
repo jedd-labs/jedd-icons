@@ -1,0 +1,19 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "unplug",
+    "disconnect",
+    "cable",
+    "connection",
+    "remove",
+    "power",
+    "device",
+    "electricity",
+    "energy",
+    "electronics",
+    "socket",
+    "outlet"
+  ],
+  "categories": ["devices", "actions"]
+}
