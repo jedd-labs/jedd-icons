@@ -1,0 +1,14 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "triangle",
+    "dashed",
+    "outline",
+    "border",
+    "three sides",
+    "polygon",
+    "shape"
+  ],
+  "categories": ["shapes"]
+}
