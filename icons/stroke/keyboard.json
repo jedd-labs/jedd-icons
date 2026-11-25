@@ -1,0 +1,15 @@
+{
+  "$schema": "../../icon.schema.json",
+  "contributors": ["agoscolantuoni"],
+  "tags": [
+    "keyboard",
+    "typing",
+    "keys",
+    "input",
+    "computer",
+    "device",
+    "layout",
+    "settings"
+  ],
+  "categories": ["devices", "development"]
+}
