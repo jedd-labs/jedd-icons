@@ -1,5 +1,25 @@
 # @jedd-icons/core
 
+## 0.11.0
+
+### Minor Changes
+
+- [#225](https://github.com/jedd-labs/jedd-icons/pull/225) [`beea753`](https://github.com/jedd-labs/jedd-icons/commit/beea753659bb978f91f306c68251580473cf8f3b) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add key, keyboard, puzzle-diagonal, puzzle-square, rocket-2, rocket, unplug
+
+- [#223](https://github.com/jedd-labs/jedd-icons/pull/223) [`91a6d72`](https://github.com/jedd-labs/jedd-icons/commit/91a6d726e5ec10d9b34f9bd2331bc859f4511c69) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add circle-power, power, square-power
+
+- [#222](https://github.com/jedd-labs/jedd-icons/pull/222) [`3eece45`](https://github.com/jedd-labs/jedd-icons/commit/3eece4541ab161b1846dd4566618a17a02aa5b4b) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add circle-dashed, octagon-dashed, pentagon-dashed, rectangle-horizontal-dashed, rectangle-vertical-dashed, square-dashed, triangle-dashed
+
+- [#221](https://github.com/jedd-labs/jedd-icons/pull/221) [`529cb05`](https://github.com/jedd-labs/jedd-icons/commit/529cb05d3af1392365c4628290a0d6e4daf34ba6) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add calendar-sync, database-sync, file-sync, package-2-sync
+
+- [#218](https://github.com/jedd-labs/jedd-icons/pull/218) [`538c3bb`](https://github.com/jedd-labs/jedd-icons/commit/538c3bba04bac50dd4f4979e4098369c0f5dcc4e) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add mail, mail-arrow-down-corner, mail-arrow-up-corner, mail-block, mail-check, mail-clock, mail-dot, mail-edit, mail-exclamation-point, mail-heart, mail-lock, mail-minus, mail-open, mail-plus, mail-question-mark, mail-search, mail-star, mail-x
+
+- [#220](https://github.com/jedd-labs/jedd-icons/pull/220) [`8151e52`](https://github.com/jedd-labs/jedd-icons/commit/8151e52429ab9f814396b7b51006f1cee6b701bb) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Add book-open-bible, book-open-minus, book-open-plus, book-open-sync, book-open-text, book-open, folder-down, folder-edit, folder-input, folder-lock, folder-open, folder-output, folder-sync, folder-up
+
+### Patch Changes
+
+- [#224](https://github.com/jedd-labs/jedd-icons/pull/224) [`232d3d8`](https://github.com/jedd-labs/jedd-icons/commit/232d3d81ff32e60f94032aab87e3bdcc40aa0fa0) Thanks [@agoscolantuoni](https://github.com/agoscolantuoni)! - Fix cable, file-lock, package-2-lock
+
 ## 0.10.0
 
 ### Minor Changes
